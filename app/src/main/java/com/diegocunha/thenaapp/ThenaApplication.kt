@@ -2,6 +2,7 @@ package com.diegocunha.thenaapp
 
 import android.app.Application
 import com.diegocunha.thenaapp.core.di.coreModule
+import com.diegocunha.thenaapp.datasource.di.datasourceModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.GlobalContext.startKoin
@@ -17,6 +18,7 @@ class ThenaApplication : Application() {
             androidContext(this@ThenaApplication)
             modules(
                 coreModule,
+                datasourceModule,
             )
         }
     }

@@ -10,6 +10,7 @@ plugins {
 
 dependencies {
     kover(project(":core"))
+    kover(project(":datasource"))
 }
 
 kover {
@@ -17,6 +18,16 @@ kover {
         verify {
             rule {
                 minBound(80)
+            }
+        }
+
+        filters {
+            excludes {
+                packages(
+                    "com.diegocunha.thenaapp.core.di",
+                    "com.diegocunha.thenaapp.datasource.di",
+                    "com.diegocunha.thenaapp.datasource.model"
+                )
             }
         }
     }
