@@ -112,7 +112,6 @@ private fun LoginScreenContent(
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
         ) {
-            // Hero
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -154,7 +153,6 @@ private fun LoginScreenContent(
                 }
             }
 
-            // Form
             Column(
                 modifier = Modifier.padding(horizontal = spacing.lg, vertical = spacing.xl),
                 verticalArrangement = Arrangement.spacedBy(spacing.md),

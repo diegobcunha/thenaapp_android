@@ -65,8 +65,6 @@ class LoginRepositoryImplTest {
         Dispatchers.resetMain()
     }
 
-    // region performLogin
-
     @Test
     fun `WHEN performLogin succeeds THEN Resource Success with user data is returned`() = runTest {
         val authResult = successfulAuthResult(mockFirebaseUser)
@@ -108,10 +106,6 @@ class LoginRepositoryImplTest {
 
         assertTrue(result is Resource.Error)
     }
-
-    // endregion
-
-    // region loginWithGoogle
 
     @Test
     fun `WHEN loginWithGoogle succeeds THEN Resource Success with user data is returned`() = runTest {
@@ -168,10 +162,6 @@ class LoginRepositoryImplTest {
         assertTrue(result is Resource.Error)
     }
 
-    // endregion
-
-    // region sendPasswordResetEmail
-
     @Test
     fun `WHEN sendPasswordResetEmail succeeds THEN Resource Success Unit is returned`() = runTest {
         every { firebaseAuth.sendPasswordResetEmail(any()) } returns voidSuccessTask()
@@ -190,10 +180,6 @@ class LoginRepositoryImplTest {
 
         assertTrue(result is Resource.Error)
     }
-
-    // endregion
-
-    // region helpers
 
     private fun successfulAuthResult(user: FirebaseUser?): Task<AuthResult> = mockk {
         every { isComplete } returns true
@@ -221,6 +207,4 @@ class LoginRepositoryImplTest {
         every { isCanceled } returns false
         every { this@mockk.exception } returns exception
     }
-
-    // endregion
 }

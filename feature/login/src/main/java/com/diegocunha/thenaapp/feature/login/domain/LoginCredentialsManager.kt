@@ -44,4 +44,4 @@ class LoginCredentialsManager(
     }
 }
 
-class GoogleSignInException(message: String, cause: Throwable? = null) : Exception(message, cause)
+

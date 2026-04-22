@@ -175,7 +175,7 @@ class LoginViewModelTest {
         coEvery { loginRepository.loginWithGoogle() } returns Resource.Success(mockUser)
 
         viewModel.state.test {
-            awaitItem() // initial state
+            awaitItem()
             viewModel.sendIntent(LoginIntent.TriggerGoogleSignIn)
 
             assertEquals(true, awaitItem().isLoading)

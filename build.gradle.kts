@@ -31,7 +31,8 @@ kover {
                     "com.diegocunha.thenaapp.coreui",
                 )
                 classes(
-                    "com.diegocunha.thenaapp.feature.login.domain.LoginCredentialsManager"
+                    "com.diegocunha.thenaapp.feature.login.domain.LoginCredentialsManager",
+                    "*Exception*",
                 )
             }
         }
