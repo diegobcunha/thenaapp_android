@@ -432,5 +432,6 @@ hs_err_pid*
 ### AndroidStudio Patch ###
 
 !/gradle/wrapper/gradle-wrapper.jar
+*.DS_Store
 
 # End of https://www.toptal.com/developers/gitignore/api/android,androidstudio,maven,gradle,intellij,intellij+all,intellij+iml,firebase,dotenv
