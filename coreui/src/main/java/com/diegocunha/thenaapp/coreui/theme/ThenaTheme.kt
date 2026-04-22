@@ -20,7 +20,10 @@ fun ThenaTheme(
     val colorScheme = if (darkTheme) thenaDarkColorScheme() else thenaLightColorScheme()
     val extendedColors = if (darkTheme) thenaDarkExtendedColors else thenaLightExtendedColors
 
-    CompositionLocalProvider(LocalThenaExtendedColors provides extendedColors) {
+    CompositionLocalProvider(
+        LocalThenaExtendedColors provides extendedColors,
+        LocalThenaSpacing provides ThenaSpacing(),
+    ) {
         MaterialTheme(
             colorScheme = colorScheme,
             typography = thenaTypography(),
@@ -42,6 +45,9 @@ object ThenaTheme {
 
     val extendedColors: ThenaExtendedColors
         @Composable get() = LocalThenaExtendedColors.current
+
+    val spacing: ThenaSpacing
+        @Composable get() = LocalThenaSpacing.current
 }
 
 @Preview(name = "ThenaTheme — Light", showBackground = true)

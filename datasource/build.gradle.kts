@@ -33,6 +33,16 @@ android {
         buildConfig = true
     }
 
+    buildTypes {
+        debug {
+            buildConfigField("String", "BASE_URL", "\"http://10.0.0.2.2:8080\"")
+        }
+
+        release {
+            buildConfigField("String", "BASE_URL", "")
+        }
+    }
+
 }
 
 dependencies {
@@ -49,6 +59,8 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.room.paging)
     ksp(libs.androidx.room.compiler)
+    api(platform(libs.firebase.bom))
+    api(libs.firebase.auth)
 
     testImplementation(libs.junit)
     testImplementation(libs.androidx.room.testing)

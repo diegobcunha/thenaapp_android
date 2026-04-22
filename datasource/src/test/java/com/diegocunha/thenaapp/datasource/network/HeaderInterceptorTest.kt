@@ -1,5 +1,6 @@
 package com.diegocunha.thenaapp.datasource.network
 
+import com.diegocunha.thenaapp.datasource.network.interceptor.HeaderInterceptor
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
