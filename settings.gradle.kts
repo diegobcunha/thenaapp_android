@@ -26,3 +26,4 @@ rootProject.name = "ThenaApp"
 include(":app")
 include(":core")
 include(":datasource")
+include(":coreui")
