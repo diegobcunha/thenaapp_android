@@ -5,6 +5,7 @@ import com.diegocunha.thenaapp.core.resource.Resource
 import com.diegocunha.thenaapp.datasource.network.model.UserResponse
 import com.diegocunha.thenaapp.datasource.network.safeApiCall
 import com.diegocunha.thenaapp.datasource.network.service.UserService
+import com.diegocunha.thenaapp.feature.login.domain.LoginCredentialsManager
 import com.diegocunha.thenaapp.feature.login.domain.LoginRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
@@ -15,31 +16,26 @@ internal class LoginRepositoryImpl(
     private val userService: UserService,
     private val dispatchersProvider: DispatchersProvider,
     private val firebaseAuth: FirebaseAuth,
+    private val loginCredentialsManager: LoginCredentialsManager,
 ) : LoginRepository {
 
     override suspend fun performLogin(
         email: String,
         password: String,
-    ): Resource<UserResponse> = withContext(dispatchersProvider.io()) {
-        try {
-            val result = firebaseAuth.signInWithEmailAndPassword(email, password).await()
-            if (result.user == null) throw Exception("User not logged in")
-            safeApiCall(dispatchersProvider) { userService.getUsersInformation() }
-        } catch (e: Exception) {
-            Resource.Error(e)
-        }
+    ): Resource<UserResponse> = safeApiCall(dispatchersProvider) {
+
+        val result = firebaseAuth.signInWithEmailAndPassword(email, password).await()
+        if (result.user == null) throw Exception("User not logged in")
+        userService.getUsersInformation()
     }
 
-    override suspend fun loginWithGoogle(idToken: String): Resource<UserResponse> =
-        withContext(dispatchersProvider.io()) {
-            try {
-                val credential = GoogleAuthProvider.getCredential(idToken, null)
-                val result = firebaseAuth.signInWithCredential(credential).await()
-                if (result.user == null) throw Exception("Google Sign-In failed")
-                safeApiCall(dispatchersProvider) { userService.getUsersInformation() }
-            } catch (e: Exception) {
-                Resource.Error(e)
-            }
+    override suspend fun loginWithGoogle(): Resource<UserResponse> =
+        safeApiCall(dispatchersProvider) {
+            val idToken = loginCredentialsManager.getGoogleIdToken()
+            val credential = GoogleAuthProvider.getCredential(idToken, null)
+            val result = firebaseAuth.signInWithCredential(credential).await()
+            if (result.user == null) throw Exception("Google Sign-In failed")
+            userService.getUsersInformation()
         }
 
     override suspend fun sendPasswordResetEmail(email: String): Resource<Unit> =

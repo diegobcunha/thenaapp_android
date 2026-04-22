@@ -97,7 +97,7 @@ class LoginViewModelTest {
             viewModel.sendIntent(LoginIntent.UpdateEmail("test@example.com"))
             viewModel.sendIntent(LoginIntent.UpdatePassword("Password@1"))
             viewModel.sendIntent(LoginIntent.SubmitLogin)
-    
+
             assertEquals(LoginEffect.NavigateToHome, awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
@@ -131,7 +131,7 @@ class LoginViewModelTest {
         viewModel.effects.test {
             viewModel.sendIntent(LoginIntent.UpdateEmail("test@example.com"))
             viewModel.sendIntent(LoginIntent.ForgotPassword)
-    
+
             assertEquals(LoginEffect.ShowSnackbar(R.string.login_password_reset_sent), awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
@@ -141,40 +141,45 @@ class LoginViewModelTest {
     fun `WHEN NavigateToSignUp intent THEN NavigateToSignUp effect emitted`() = runTest {
         viewModel.effects.test {
             viewModel.sendIntent(LoginIntent.NavigateToSignUp)
-    
+
             assertEquals(LoginEffect.NavigateToSignUp, awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `WHEN TriggerGoogleSignIn intent THEN LaunchGoogleSignIn effect emitted`() = runTest {
+    fun `WHEN TriggerGoogleSignIn and loginWithGoogle succeeds THEN NavigateToHome effect emitted`() = runTest {
+        coEvery { loginRepository.loginWithGoogle() } returns Resource.Success(mockUser)
+
         viewModel.effects.test {
             viewModel.sendIntent(LoginIntent.TriggerGoogleSignIn)
-    
-            assertEquals(LoginEffect.LaunchGoogleSignIn, awaitItem())
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
 
-    @Test
-    fun `WHEN LoginWithGoogle with valid token and success THEN NavigateToHome effect emitted`() = runTest {
-        coEvery { loginRepository.loginWithGoogle(any()) } returns Resource.Success(mockUser)
-
-        viewModel.effects.test {
-            viewModel.sendIntent(LoginIntent.LoginWithGoogle("valid-id-token"))
-    
             assertEquals(LoginEffect.NavigateToHome, awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `WHEN LoginWithGoogle fails THEN generalError is set`() = runTest {
-        coEvery { loginRepository.loginWithGoogle(any()) } returns Resource.Error(Exception("Google error"))
+    fun `WHEN TriggerGoogleSignIn and loginWithGoogle fails THEN generalError is set and isLoading is false`() = runTest {
+        coEvery { loginRepository.loginWithGoogle() } returns Resource.Error(Exception("Google error"))
 
-        viewModel.sendIntent(LoginIntent.LoginWithGoogle("invalid-token"))
+        viewModel.sendIntent(LoginIntent.TriggerGoogleSignIn)
 
-        assertNotNull(viewModel.state.value.generalError)
+        val state = viewModel.state.value
+        assertNotNull(state.generalError)
+        assertEquals(false, state.isLoading)
+    }
+
+    @Test
+    fun `WHEN TriggerGoogleSignIn starts THEN isLoading is set to true`() = runTest {
+        coEvery { loginRepository.loginWithGoogle() } returns Resource.Success(mockUser)
+
+        viewModel.state.test {
+            awaitItem() // initial state
+            viewModel.sendIntent(LoginIntent.TriggerGoogleSignIn)
+
+            assertEquals(true, awaitItem().isLoading)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 }

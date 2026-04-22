@@ -19,12 +19,13 @@ class LoginViewModel(
             is LoginIntent.UpdateEmail -> updateState {
                 copy(email = intent.email, emailError = null, generalError = null)
             }
+
             is LoginIntent.UpdatePassword -> updateState {
                 copy(password = intent.password, passwordError = null, generalError = null)
             }
+
             is LoginIntent.SubmitLogin -> submitLogin()
-            is LoginIntent.LoginWithGoogle -> loginWithGoogle(intent.idToken)
-            is LoginIntent.TriggerGoogleSignIn -> sendEffect(LoginEffect.LaunchGoogleSignIn)
+            is LoginIntent.TriggerGoogleSignIn -> loginWithGoogle()
             is LoginIntent.ForgotPassword -> forgotPassword()
             is LoginIntent.NavigateToSignUp -> sendEffect(LoginEffect.NavigateToSignUp)
         }
@@ -47,19 +48,21 @@ class LoginViewModel(
                 is Resource.Error -> updateState {
                     copy(isLoading = false, generalError = mapFirebaseError(result.exception))
                 }
+
                 is Resource.Loading -> Unit
             }
         }
     }
 
-    private fun loginWithGoogle(idToken: String) {
+    private fun loginWithGoogle() {
         viewModelScope.launch {
             updateState { copy(isLoading = true, generalError = null) }
-            when (val result = loginRepository.loginWithGoogle(idToken)) {
+            when (val result = loginRepository.loginWithGoogle()) {
                 is Resource.Success -> sendEffect(LoginEffect.NavigateToHome)
                 is Resource.Error -> updateState {
                     copy(isLoading = false, generalError = mapFirebaseError(result.exception))
                 }
+
                 is Resource.Loading -> Unit
             }
         }
@@ -81,9 +84,11 @@ class LoginViewModel(
                     updateState { copy(isLoading = false) }
                     sendEffect(LoginEffect.ShowSnackbar(R.string.login_password_reset_sent))
                 }
+
                 is Resource.Error -> updateState {
                     copy(isLoading = false, generalError = mapFirebaseError(result.exception))
                 }
+
                 is Resource.Loading -> Unit
             }
         }
@@ -111,6 +116,7 @@ class LoginViewModel(
     private fun mapFirebaseError(exception: Throwable): Int = when (exception) {
         is FirebaseAuthInvalidCredentialsException,
         is FirebaseAuthInvalidUserException -> R.string.login_error_invalid_credentials
+
         else -> R.string.login_error_generic
     }
 }
