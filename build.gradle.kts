@@ -30,6 +30,10 @@ kover {
                     "com.diegocunha.thenaapp.datasource.model",
                     "com.diegocunha.thenaapp.coreui",
                 )
+                classes(
+                    "com.diegocunha.thenaapp.feature.login.domain.LoginCredentialsManager",
+                    "*Exception*",
+                )
             }
         }
     }

@@ -54,7 +54,9 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     implementation(libs.coil.compose)
     implementation(libs.kotlinx.collections.immutable)
-    implementation(libs.play.services.auth)
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.googleid)
 
     debugImplementation(libs.androidx.compose.ui.tooling)
 

@@ -6,6 +6,5 @@ import com.diegocunha.thenaapp.core.mvi.MviEffect
 sealed interface LoginEffect : MviEffect {
     object NavigateToHome : LoginEffect
     object NavigateToSignUp : LoginEffect
-    object LaunchGoogleSignIn : LoginEffect
     data class ShowSnackbar(@StringRes val message: Int) : LoginEffect
 }

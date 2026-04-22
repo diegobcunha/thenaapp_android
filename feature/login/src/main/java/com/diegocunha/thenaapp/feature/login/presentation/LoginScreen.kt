@@ -1,8 +1,5 @@
 package com.diegocunha.thenaapp.feature.login.presentation
 
-import android.app.Activity
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -43,7 +40,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -58,12 +54,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.diegocunha.thenaapp.coreui.theme.ThenaTheme
 import com.diegocunha.thenaapp.feature.login.R
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.common.api.ApiException
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
-import org.koin.compose.koinInject
 
 @Composable
 fun LoginScreen(
@@ -73,40 +64,14 @@ fun LoginScreen(
 ) {
     val state by viewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
     val context = LocalContext.current
-    val googleSignInClient: GoogleSignInClient = koinInject()
-
-    val googleLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-            try {
-                val account = task.getResult(ApiException::class.java)
-                account.idToken?.let { token ->
-                    viewModel.sendIntent(LoginIntent.LoginWithGoogle(token))
-                }
-            } catch (_: ApiException) {
-                scope.launch {
-                    snackbarHostState.showSnackbar("Google Sign-In failed, please try again")
-                }
-            }
-        }
-    }
 
     LaunchedEffect(Unit) {
         viewModel.effects.collectLatest { effect ->
             when (effect) {
                 is LoginEffect.NavigateToHome -> onNavigateToHome()
                 is LoginEffect.NavigateToSignUp -> onNavigateToSignUp()
-                is LoginEffect.LaunchGoogleSignIn -> googleLauncher.launch(googleSignInClient.signInIntent)
-                // getString is correct here — stringResource() cannot be called in a coroutine
-                is LoginEffect.ShowSnackbar -> snackbarHostState.showSnackbar(
-                    context.getString(
-                        effect.message
-                    )
-                )
+                is LoginEffect.ShowSnackbar -> snackbarHostState.showSnackbar(context.getString(effect.message))
             }
         }
     }
@@ -147,7 +112,6 @@ private fun LoginScreenContent(
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
         ) {
-            // Hero
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -189,7 +153,6 @@ private fun LoginScreenContent(
                 }
             }
 
-            // Form
             Column(
                 modifier = Modifier.padding(horizontal = spacing.lg, vertical = spacing.xl),
                 verticalArrangement = Arrangement.spacedBy(spacing.md),
