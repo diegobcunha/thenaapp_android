@@ -43,5 +43,3 @@ class LoginCredentialsManager(
         throw GoogleSignInException("Unexpected credential type: ${credential.type}")
     }
 }
-
-
