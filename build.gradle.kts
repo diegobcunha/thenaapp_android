@@ -27,7 +27,8 @@ kover {
                 packages(
                     "com.diegocunha.thenaapp.core.di",
                     "com.diegocunha.thenaapp.datasource.di",
-                    "com.diegocunha.thenaapp.datasource.model"
+                    "com.diegocunha.thenaapp.datasource.model",
+                    "com.diegocunha.thenaapp.coreui",
                 )
             }
         }

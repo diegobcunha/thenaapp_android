@@ -45,6 +45,7 @@ android {
 dependencies {
     implementation(project(":core"))
     implementation(project(":datasource"))
+    implementation(project(":coreui"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
