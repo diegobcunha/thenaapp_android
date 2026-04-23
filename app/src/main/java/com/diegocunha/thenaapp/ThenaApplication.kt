@@ -3,7 +3,9 @@ package com.diegocunha.thenaapp
 import android.app.Application
 import com.diegocunha.thenaapp.core.di.coreModule
 import com.diegocunha.thenaapp.datasource.di.datasourceModule
+import com.diegocunha.thenaapp.di.appModule
 import com.diegocunha.thenaapp.feature.login.di.loginModule
+import com.diegocunha.thenaapp.feature.onboarding.di.onboardingModule
 import com.diegocunha.thenaapp.feature.signup.di.signupModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -19,10 +21,12 @@ class ThenaApplication : Application() {
             androidLogger(if (BuildConfig.DEBUG) Level.DEBUG else Level.ERROR)
             androidContext(this@ThenaApplication)
             modules(
+                appModule,
                 coreModule,
                 datasourceModule,
                 loginModule,
                 signupModule,
+                onboardingModule,
             )
         }
     }

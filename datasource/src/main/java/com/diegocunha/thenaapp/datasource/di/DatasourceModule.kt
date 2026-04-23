@@ -9,6 +9,8 @@ import com.diegocunha.thenaapp.datasource.network.interceptor.AccessTokenReposit
 import com.diegocunha.thenaapp.datasource.network.interceptor.HeaderInterceptor
 import com.diegocunha.thenaapp.datasource.network.service.UserService
 import com.diegocunha.thenaapp.datasource.repository.LoginCredentialsManager
+import com.diegocunha.thenaapp.datasource.storage.sharedpreferences.CustomSharedPreferences
+import com.diegocunha.thenaapp.datasource.storage.sharedpreferences.CustomSharedPreferencesImpl
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
@@ -58,6 +60,13 @@ val datasourceModule = module {
         LoginCredentialsManager(
             credentialManager = get(),
             context = androidApplication()
+        )
+    }
+
+    single<CustomSharedPreferences> {
+        CustomSharedPreferencesImpl(
+            context = androidApplication(),
+            dispatchersProvider = get()
         )
     }
 }
