@@ -55,6 +55,7 @@ import androidx.compose.ui.unit.sp
 import com.diegocunha.thenaapp.coreui.theme.ThenaTheme
 import com.diegocunha.thenaapp.feature.login.R
 import kotlinx.coroutines.flow.collectLatest
+import com.diegocunha.thenaapp.coreui.R as CoreUiR
 
 @Composable
 fun LoginScreen(
@@ -167,7 +168,7 @@ private fun LoginScreenContent(
                     value = state.email,
                     onValueChange = onEmailChange,
                     modifier = Modifier.fillMaxWidth(),
-                    label = { Text(stringResource(R.string.login_email_label)) },
+                    label = { Text(stringResource(CoreUiR.string.login_email_label)) },
                     leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                     isError = state.emailError != null,
@@ -179,14 +180,14 @@ private fun LoginScreenContent(
                     value = state.password,
                     onValueChange = onPasswordChange,
                     modifier = Modifier.fillMaxWidth(),
-                    label = { Text(stringResource(R.string.login_password_label)) },
+                    label = { Text(stringResource(CoreUiR.string.login_password_label)) },
                     leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
                     trailingIcon = {
                         IconButton(onClick = { passwordVisible = !passwordVisible }) {
                             Icon(
                                 imageVector = if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
                                 contentDescription = stringResource(
-                                    if (passwordVisible) R.string.login_hide_password else R.string.login_show_password
+                                    if (passwordVisible) CoreUiR.string.login_hide_password else CoreUiR.string.login_show_password
                                 ),
                             )
                         }
@@ -224,7 +225,7 @@ private fun LoginScreenContent(
                             color = colors.onPrimary,
                         )
                     } else {
-                        Text(stringResource(R.string.login_sign_in))
+                        Text(stringResource(CoreUiR.string.login_sign_in))
                     }
                 }
 
@@ -234,7 +235,7 @@ private fun LoginScreenContent(
                 ) {
                     HorizontalDivider(modifier = Modifier.weight(1f))
                     Text(
-                        text = "  ${stringResource(R.string.login_or_continue_with)}  ",
+                        text = "  ${stringResource(CoreUiR.string.login_or_continue_with)}  ",
                         style = MaterialTheme.typography.labelSmall,
                         color = colors.onSurfaceVariant,
                     )
@@ -252,7 +253,7 @@ private fun LoginScreenContent(
                         color = colors.primary,
                     )
                     Spacer(Modifier.width(spacing.md - spacing.xs))
-                    Text(stringResource(R.string.login_google_button))
+                    Text(stringResource(CoreUiR.string.login_google_button))
                 }
 
                 Row(

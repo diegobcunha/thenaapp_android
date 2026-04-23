@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_signup_header">Create your account</string>
+    <string name="feature_signup_subtitle">Start your jorney here</string>
+    <string name="feature_signup_confirm_password_match_error">Confirm password doesn\'t match.</string>
+    <string name="feature_signup_name_empty">Name should not be empty</string>
+</resources>

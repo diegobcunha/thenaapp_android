@@ -1,5 +1,6 @@
 package com.diegocunha.thenaapp.datasource.network
 
+import com.diegocunha.thenaapp.datasource.network.interceptor.AccessTokenRepository
 import com.diegocunha.thenaapp.datasource.network.interceptor.HeaderInterceptor
 import io.mockk.every
 import io.mockk.mockk
@@ -13,7 +14,10 @@ import org.junit.Test
 
 class HeaderInterceptorTest {
 
-    private val interceptor = HeaderInterceptor()
+    private val accessTokenRepository: AccessTokenRepository = mockk {
+        every { getAccessToken() } returns "test-token"
+    }
+    private val interceptor = HeaderInterceptor(accessTokenRepository)
 
     private val mockResponse = mockk<Response>()
     private val chain = mockk<Interceptor.Chain>()

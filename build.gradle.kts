@@ -12,6 +12,8 @@ plugins {
 dependencies {
     kover(project(":core"))
     kover(project(":datasource"))
+    kover(project(":feature:login"))
+    kover(project(":feature:signup"))
 }
 
 kover {
@@ -27,6 +29,8 @@ kover {
                 packages(
                     "com.diegocunha.thenaapp.core.di",
                     "com.diegocunha.thenaapp.datasource.di",
+                    "com.diegocunha.thenaapp.feature.login.di",
+                    "com.diegocunha.thenaapp.feature.signup.di",
                     "com.diegocunha.thenaapp.datasource.model",
                     "com.diegocunha.thenaapp.coreui",
                 )

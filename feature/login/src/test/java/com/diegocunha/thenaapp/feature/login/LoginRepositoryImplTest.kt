@@ -4,8 +4,8 @@ import com.diegocunha.thenaapp.core.coroutines.DispatchersProvider
 import com.diegocunha.thenaapp.core.resource.Resource
 import com.diegocunha.thenaapp.datasource.network.model.UserResponse
 import com.diegocunha.thenaapp.datasource.network.service.UserService
-import com.diegocunha.thenaapp.feature.login.domain.GoogleSignInException
-import com.diegocunha.thenaapp.feature.login.domain.LoginCredentialsManager
+import com.diegocunha.thenaapp.datasource.repository.GoogleSignInException
+import com.diegocunha.thenaapp.datasource.repository.LoginCredentialsManager
 import com.diegocunha.thenaapp.feature.login.repository.LoginRepositoryImpl
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthResult

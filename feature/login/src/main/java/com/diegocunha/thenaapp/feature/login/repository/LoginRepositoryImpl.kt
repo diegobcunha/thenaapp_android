@@ -5,7 +5,7 @@ import com.diegocunha.thenaapp.core.resource.Resource
 import com.diegocunha.thenaapp.datasource.network.model.UserResponse
 import com.diegocunha.thenaapp.datasource.network.safeApiCall
 import com.diegocunha.thenaapp.datasource.network.service.UserService
-import com.diegocunha.thenaapp.feature.login.domain.LoginCredentialsManager
+import com.diegocunha.thenaapp.datasource.repository.LoginCredentialsManager
 import com.diegocunha.thenaapp.feature.login.domain.LoginRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider

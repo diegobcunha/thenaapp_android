@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="login_email_label">Email address</string>
+    <string name="login_password_label">Password</string>
+    <string name="confirm_password_label">Confirm Password</string>
+    <string name="login_name_label">Name</string>
+    <string name="login_show_password">Show password</string>
+    <string name="login_hide_password">Hide password</string>
+    <string name="login_or_continue_with">or continue with</string>
+    <string name="login_google_button">Google</string>
+    <string name="login_sign_in">Sign in</string>
+    <string name="login_error_email_required">Email is required</string>
+    <string name="login_error_email_invalid">Enter a valid email address</string>
+    <string name="generic_error">Something when wrong, try again later.</string>
+
+    <!-- Password validation errors -->
+    <string name="login_error_password_required">Password is required</string>
+    <string name="login_error_password_too_short">Password must be at least 8 characters</string>
+    <string name="login_error_password_no_uppercase">Password must contain an uppercase letter</string>
+    <string name="login_error_password_no_digit">Password must contain a digit</string>
+    <string name="login_error_password_no_special">Password must contain a special character</string>
+</resources>
