@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="onboarding_welcome_title">Welcome to Thena</string>
+    <string name="onboarding_welcome_subtitle">Your all-in-one newborn care companion. We\'re here to support you every step of the way.</string>
+
+    <string name="onboarding_sleep_title">Track Sleep Patterns</string>
+    <string name="onboarding_sleep_subtitle">Log every nap and night sleep with a single tap. Understand your baby\'s rhythms and build healthy routines.</string>
+    <string name="onboarding_sleep_feature_1">Live sleep timer</string>
+    <string name="onboarding_sleep_feature_2">Daily &amp; weekly goals</string>
+    <string name="onboarding_sleep_feature_3">Sleep quality insights</string>
+
+    <string name="onboarding_feed_title">Never Miss a Feeding</string>
+    <string name="onboarding_feed_subtitle">Track breastfeeding, bottle and solids. Set reminders so you always know when it\'s time to feed.</string>
+    <string name="onboarding_feed_feature_1">Breast &amp; bottle logging</string>
+    <string name="onboarding_feed_feature_2">Feeding reminders</string>
+    <string name="onboarding_feed_feature_3">Volume &amp; duration tracking</string>
+
+    <string name="onboarding_vaccine_title">Vaccination Schedule</string>
+    <string name="onboarding_vaccine_subtitle">Stay on top of your baby\'s immunizations with a clear, personalized schedule and timely alerts.</string>
+    <string name="onboarding_vaccine_feature_1">Full vaccine calendar</string>
+    <string name="onboarding_vaccine_feature_2">Due date reminders</string>
+    <string name="onboarding_vaccine_feature_3">Progress tracking</string>
+
+    <string name="onboarding_insight_title">Smart Daily Insights</string>
+    <string name="onboarding_insight_subtitle">Get a full picture of your baby\'s day with charts, tips and personalized recommendations.</string>
+    <string name="onboarding_insight_feature_1">Daily &amp; weekly reports</string>
+    <string name="onboarding_insight_feature_2">Growth tracking</string>
+    <string name="onboarding_insight_feature_3">Personalized tips</string>
+</resources>
