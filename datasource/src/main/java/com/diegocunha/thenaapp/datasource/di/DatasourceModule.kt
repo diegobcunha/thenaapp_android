@@ -1,5 +1,6 @@
 package com.diegocunha.thenaapp.datasource.di
 
+import androidx.credentials.CredentialManager
 import com.diegocunha.thenaapp.datasource.BuildConfig
 import com.diegocunha.thenaapp.datasource.network.ThenaAppService
 import com.diegocunha.thenaapp.datasource.network.createRetrofit
@@ -7,10 +8,12 @@ import com.diegocunha.thenaapp.datasource.network.interceptor.AccessTokenReposit
 import com.diegocunha.thenaapp.datasource.network.interceptor.AccessTokenRepositoryImpl
 import com.diegocunha.thenaapp.datasource.network.interceptor.HeaderInterceptor
 import com.diegocunha.thenaapp.datasource.network.service.UserService
+import com.diegocunha.thenaapp.datasource.repository.LoginCredentialsManager
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import org.koin.android.ext.koin.androidApplication
 import org.koin.dsl.module
 import retrofit2.Retrofit
 
@@ -46,4 +49,15 @@ val datasourceModule = module {
     single { createRetrofit(okHttpClient = get(), json = get()) }
     single { get<Retrofit>().create(ThenaAppService::class.java) }
     single { get<Retrofit>().create(UserService::class.java) }
+
+    single<CredentialManager> {
+        CredentialManager.create(androidApplication())
+    }
+
+    single {
+        LoginCredentialsManager(
+            credentialManager = get(),
+            context = androidApplication()
+        )
+    }
 }

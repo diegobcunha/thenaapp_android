@@ -41,7 +41,6 @@ dependencies {
     implementation(project(":coreui"))
     implementation(project(":datasource"))
 
-    implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.material.icons.extended)
@@ -49,14 +48,8 @@ dependencies {
     implementation(libs.koin.androidx.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.kotlinx.serialization.json)
-    implementation(libs.androidx.paging.compose)
-    implementation(libs.androidx.paging.runtime)
-    implementation(libs.androidx.room.ktx)
     implementation(libs.coil.compose)
     implementation(libs.kotlinx.collections.immutable)
-    implementation(libs.androidx.credentials)
-    implementation(libs.androidx.credentials.play.services.auth)
-    implementation(libs.googleid)
 
     debugImplementation(libs.androidx.compose.ui.tooling)
 
@@ -66,5 +59,4 @@ dependencies {
     testImplementation(libs.turbine)
     testImplementation(libs.koin.test)
     testImplementation(libs.koin.test.junit4)
-    testImplementation(libs.androidx.paging.testing)
 }

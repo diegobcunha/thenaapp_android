@@ -6,27 +6,9 @@
 
     <!-- Form labels -->
     <string name="login_welcome_back">Welcome back 👋</string>
-    <string name="login_email_label">Email address</string>
-    <string name="login_password_label">Password</string>
-    <string name="login_show_password">Show password</string>
-    <string name="login_hide_password">Hide password</string>
     <string name="login_forgot_password">Forgot password?</string>
-    <string name="login_sign_in">Sign in</string>
-    <string name="login_or_continue_with">or continue with</string>
-    <string name="login_google_button">Google</string>
-    <string name="login_no_account">Don\'t have an account?</string>
     <string name="login_sign_up">Sign up</string>
-
-    <!-- Email validation errors -->
-    <string name="login_error_email_required">Email is required</string>
-    <string name="login_error_email_invalid">Enter a valid email address</string>
-
-    <!-- Password validation errors -->
-    <string name="login_error_password_required">Password is required</string>
-    <string name="login_error_password_too_short">Password must be at least 8 characters</string>
-    <string name="login_error_password_no_uppercase">Password must contain an uppercase letter</string>
-    <string name="login_error_password_no_digit">Password must contain a digit</string>
-    <string name="login_error_password_no_special">Password must contain a special character</string>
+    <string name="login_no_account">Don\'t have an account?</string>
 
     <!-- Auth errors -->
     <string name="login_error_invalid_credentials">Email or password is incorrect</string>

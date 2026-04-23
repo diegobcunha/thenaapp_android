@@ -1,4 +1,4 @@
-package com.diegocunha.thenaapp.feature.login.domain
+package com.diegocunha.thenaapp.datasource.repository
 
 import android.content.Context
 import androidx.credentials.CredentialManager

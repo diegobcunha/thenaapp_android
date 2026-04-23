@@ -9,6 +9,7 @@ import com.diegocunha.thenaapp.feature.login.domain.LoginRepository
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import kotlinx.coroutines.launch
+import com.diegocunha.thenaapp.coreui.R as CoreUiR
 
 class LoginViewModel(
     private val loginRepository: LoginRepository,
@@ -96,20 +97,22 @@ class LoginViewModel(
 
     @StringRes
     private fun validateEmail(email: String): Int? {
-        if (email.isBlank()) return R.string.login_error_email_required
         val emailRegex = Regex("^[A-Za-z0-9._%+\\-]+@[A-Za-z0-9.\\-]+\\.[A-Za-z]{2,}$")
-        if (!emailRegex.matches(email)) return R.string.login_error_email_invalid
-        return null
+        return when {
+            email.isBlank() -> CoreUiR.string.login_error_email_required
+            !emailRegex.matches(email) -> CoreUiR.string.login_error_email_invalid
+            else -> null
+        }
     }
 
     @StringRes
-    private fun validatePassword(password: String): Int? {
-        if (password.isBlank()) return R.string.login_error_password_required
-        if (password.length < 8) return R.string.login_error_password_too_short
-        if (!password.any { it.isUpperCase() }) return R.string.login_error_password_no_uppercase
-        if (!password.any { it.isDigit() }) return R.string.login_error_password_no_digit
-        if (!password.any { !it.isLetterOrDigit() }) return R.string.login_error_password_no_special
-        return null
+    private fun validatePassword(password: String): Int? = when {
+        password.isBlank() -> CoreUiR.string.login_error_password_required
+        password.length < 8 -> CoreUiR.string.login_error_password_too_short
+        !password.any { it.isUpperCase() } -> CoreUiR.string.login_error_password_no_uppercase
+        !password.any { it.isDigit() } -> CoreUiR.string.login_error_password_no_digit
+        !password.any { !it.isLetterOrDigit() } -> CoreUiR.string.login_error_password_no_special
+        else -> null
     }
 
     @StringRes

@@ -1,11 +1,12 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.kover)
 }
 
 android {
-    namespace = "com.diegocunha.thenaapp.coreui"
+    namespace = "com.diegocunha.thenaapp.feature.signup"
     compileSdk {
         version = release(36) {
             minorApiLevel = 1
@@ -36,20 +37,16 @@ android {
 }
 
 dependencies {
-    api(platform(libs.androidx.compose.bom))
-    api(libs.androidx.compose.ui)
-    api(libs.androidx.compose.ui.graphics)
-    api(libs.androidx.compose.ui.tooling.preview)
-    api(libs.androidx.compose.material3)
-    api(libs.koin.android)
-    api(libs.androidx.navigation3.ui)
-    api(libs.androidx.compose.material.icons.extended)
-    api(libs.koin.androidx.compose)
-    api(libs.androidx.lifecycle.viewmodel.compose)
-    api(libs.coil.compose)
-    api(libs.kotlinx.collections.immutable)
+    implementation(project(":core"))
+    implementation(project(":coreui"))
+    implementation(project(":datasource"))
 
-    debugImplementation(libs.androidx.compose.ui.tooling)
 
-    debugImplementation(libs.androidx.compose.ui.tooling)
+
+    testImplementation(libs.junit)
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.turbine)
+    testImplementation(libs.koin.test)
+    testImplementation(libs.koin.test.junit4)
 }

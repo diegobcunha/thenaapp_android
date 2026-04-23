@@ -1,4 +1,4 @@
-package com.diegocunha.thenaapp.feature.login
+package com.diegocunha.thenaapp.feature.signup
 
 import com.diegocunha.thenaapp.core.coroutines.DispatchersProvider
 import com.diegocunha.thenaapp.core.resource.Resource
@@ -6,7 +6,8 @@ import com.diegocunha.thenaapp.datasource.network.model.UserResponse
 import com.diegocunha.thenaapp.datasource.network.service.UserService
 import com.diegocunha.thenaapp.datasource.repository.GoogleSignInException
 import com.diegocunha.thenaapp.datasource.repository.LoginCredentialsManager
-import com.diegocunha.thenaapp.feature.login.repository.LoginRepositoryImpl
+import com.diegocunha.thenaapp.feature.signup.domain.GoogleSignUpResponse
+import com.diegocunha.thenaapp.feature.signup.repository.SignupRepositoryImpl
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
@@ -29,7 +30,7 @@ import org.junit.Test
 import java.util.UUID
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class LoginRepositoryImplTest {
+class SignupRepositoryImplTest {
 
     private val testDispatcher = UnconfinedTestDispatcher()
     private val userService: UserService = mockk()
@@ -39,7 +40,7 @@ class LoginRepositoryImplTest {
         every { io() } returns testDispatcher
     }
 
-    private lateinit var repository: LoginRepositoryImpl
+    private lateinit var repository: SignupRepositoryImpl
 
     private val mockUser = UserResponse(
         id = UUID.randomUUID(),
@@ -51,10 +52,10 @@ class LoginRepositoryImplTest {
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        repository = LoginRepositoryImpl(
+        repository = SignupRepositoryImpl(
             userService = userService,
-            dispatchersProvider = dispatchersProvider,
             firebaseAuth = firebaseAuth,
+            dispatchersProvider = dispatchersProvider,
             loginCredentialsManager = loginCredentialsManager,
         )
     }
@@ -65,121 +66,122 @@ class LoginRepositoryImplTest {
         Dispatchers.resetMain()
     }
 
-    @Test
-    fun `WHEN performLogin succeeds THEN Resource Success with user data is returned`() = runTest {
-        val authResult = successfulAuthResult(mockFirebaseUser)
-        every { firebaseAuth.signInWithEmailAndPassword(any(), any()) } returns authResult
-        coEvery { userService.getUsersInformation() } returns mockUser
+    // region createUser
 
-        val result = repository.performLogin("test@example.com", "Password@1")
+    @Test
+    fun `WHEN createUser succeeds THEN Resource Success with UserResponse is returned`() = runTest {
+        val authResult = successfulAuthResult(mockFirebaseUser)
+        every { firebaseAuth.createUserWithEmailAndPassword(any(), any()) } returns authResult
+        coEvery { userService.updateProfile(any()) } returns mockUser
+
+        val result = repository.createUser("test@example.com", "Password@1", "Test User")
 
         assertTrue(result is Resource.Success)
         assertEquals(mockUser, (result as Resource.Success).data)
     }
 
     @Test
-    fun `WHEN performLogin returns null user THEN Resource Error is returned`() = runTest {
+    fun `WHEN createUser Firebase returns null user THEN Resource Error is returned`() = runTest {
         val authResult = successfulAuthResult(user = null)
-        every { firebaseAuth.signInWithEmailAndPassword(any(), any()) } returns authResult
+        every { firebaseAuth.createUserWithEmailAndPassword(any(), any()) } returns authResult
 
-        val result = repository.performLogin("test@example.com", "Password@1")
-
-        assertTrue(result is Resource.Error)
-    }
-
-    @Test
-    fun `WHEN performLogin Firebase throws THEN Resource Error is returned`() = runTest {
-        every { firebaseAuth.signInWithEmailAndPassword(any(), any()) } returns failedAuthTask(Exception("Invalid credentials"))
-
-        val result = repository.performLogin("test@example.com", "wrong-password")
+        val result = repository.createUser("test@example.com", "Password@1", "Test User")
 
         assertTrue(result is Resource.Error)
     }
 
     @Test
-    fun `WHEN performLogin API call fails THEN Resource Error is returned`() = runTest {
+    fun `WHEN createUser Firebase throws THEN Resource Error is returned`() = runTest {
+        every { firebaseAuth.createUserWithEmailAndPassword(any(), any()) } returns failedAuthTask(Exception("Email already in use"))
+
+        val result = repository.createUser("test@example.com", "Password@1", "Test User")
+
+        assertTrue(result is Resource.Error)
+    }
+
+    @Test
+    fun `WHEN createUser updateProfile API call fails THEN Resource Error is returned`() = runTest {
         val authResult = successfulAuthResult(mockFirebaseUser)
-        every { firebaseAuth.signInWithEmailAndPassword(any(), any()) } returns authResult
-        coEvery { userService.getUsersInformation() } throws Exception("Network error")
+        every { firebaseAuth.createUserWithEmailAndPassword(any(), any()) } returns authResult
+        coEvery { userService.updateProfile(any()) } throws Exception("Network error")
 
-        val result = repository.performLogin("test@example.com", "Password@1")
+        val result = repository.createUser("test@example.com", "Password@1", "Test User")
 
         assertTrue(result is Resource.Error)
     }
 
+    // endregion
+
+    // region createUserWithGoogle
+
     @Test
-    fun `WHEN loginWithGoogle succeeds THEN Resource Success with user data is returned`() = runTest {
+    fun `WHEN createUserWithGoogle succeeds THEN Resource Success with email is returned`() = runTest {
         coEvery { loginCredentialsManager.getGoogleIdToken() } returns "valid-id-token"
         val authResult = successfulAuthResult(mockFirebaseUser)
         every { firebaseAuth.signInWithCredential(any()) } returns authResult
         coEvery { userService.getUsersInformation() } returns mockUser
 
-        val result = repository.loginWithGoogle()
+        val result = repository.createUserWithGoogle()
 
         assertTrue(result is Resource.Success)
-        assertEquals(mockUser, (result as Resource.Success).data)
+        assertEquals(GoogleSignUpResponse(email = mockUser.email), (result as Resource.Success).data)
     }
 
     @Test
-    fun `WHEN loginWithGoogle getGoogleIdToken throws THEN Resource Error is returned`() = runTest {
+    fun `WHEN createUserWithGoogle getGoogleIdToken throws THEN Resource Error is returned`() = runTest {
         coEvery { loginCredentialsManager.getGoogleIdToken() } throws GoogleSignInException("User cancelled")
 
-        val result = repository.loginWithGoogle()
+        val result = repository.createUserWithGoogle()
 
         assertTrue(result is Resource.Error)
     }
 
     @Test
-    fun `WHEN loginWithGoogle Firebase signIn fails THEN Resource Error is returned`() = runTest {
+    fun `WHEN createUserWithGoogle Firebase signIn fails THEN Resource Error is returned`() = runTest {
         coEvery { loginCredentialsManager.getGoogleIdToken() } returns "valid-id-token"
         every { firebaseAuth.signInWithCredential(any()) } returns failedAuthTask(Exception("Firebase error"))
 
-        val result = repository.loginWithGoogle()
+        val result = repository.createUserWithGoogle()
 
         assertTrue(result is Resource.Error)
     }
 
     @Test
-    fun `WHEN loginWithGoogle returns null user THEN Resource Error is returned`() = runTest {
-        coEvery { loginCredentialsManager.getGoogleIdToken() } returns "valid-id-token"
-        val authResult = successfulAuthResult(user = null)
-        every { firebaseAuth.signInWithCredential(any()) } returns authResult
-
-        val result = repository.loginWithGoogle()
-
-        assertTrue(result is Resource.Error)
-    }
-
-    @Test
-    fun `WHEN loginWithGoogle API call fails THEN Resource Error is returned`() = runTest {
+    fun `WHEN createUserWithGoogle getUsersInformation fails THEN Resource Error is returned`() = runTest {
         coEvery { loginCredentialsManager.getGoogleIdToken() } returns "valid-id-token"
         val authResult = successfulAuthResult(mockFirebaseUser)
         every { firebaseAuth.signInWithCredential(any()) } returns authResult
         coEvery { userService.getUsersInformation() } throws Exception("Network error")
 
-        val result = repository.loginWithGoogle()
+        val result = repository.createUserWithGoogle()
 
         assertTrue(result is Resource.Error)
     }
 
-    @Test
-    fun `WHEN sendPasswordResetEmail succeeds THEN Resource Success Unit is returned`() = runTest {
-        every { firebaseAuth.sendPasswordResetEmail(any()) } returns voidSuccessTask()
+    // endregion
 
-        val result = repository.sendPasswordResetEmail("test@example.com")
+    // region updateUser
+
+    @Test
+    fun `WHEN updateUser succeeds THEN Resource Success with UserResponse is returned`() = runTest {
+        coEvery { userService.updateProfile(any()) } returns mockUser
+
+        val result = repository.updateUser("New Name")
 
         assertTrue(result is Resource.Success)
-        assertEquals(Unit, (result as Resource.Success).data)
+        assertEquals(mockUser, (result as Resource.Success).data)
     }
 
     @Test
-    fun `WHEN sendPasswordResetEmail Firebase throws THEN Resource Error is returned`() = runTest {
-        every { firebaseAuth.sendPasswordResetEmail(any()) } returns voidFailedTask(Exception("Email not found"))
+    fun `WHEN updateUser API call fails THEN Resource Error is returned`() = runTest {
+        coEvery { userService.updateProfile(any()) } throws Exception("Network error")
 
-        val result = repository.sendPasswordResetEmail("test@example.com")
+        val result = repository.updateUser("New Name")
 
         assertTrue(result is Resource.Error)
     }
+
+    // endregion
 
     private fun successfulAuthResult(user: FirebaseUser?): Task<AuthResult> = mockk {
         every { isComplete } returns true
@@ -189,20 +191,6 @@ class LoginRepositoryImplTest {
     }
 
     private fun failedAuthTask(exception: Exception): Task<AuthResult> = mockk {
-        every { isComplete } returns true
-        every { isCanceled } returns false
-        every { this@mockk.exception } returns exception
-    }
-
-    private fun voidSuccessTask(): Task<Void> = mockk {
-        every { isComplete } returns true
-        every { isCanceled } returns false
-        every { exception } returns null
-        @Suppress("UNCHECKED_CAST")
-        every { result } returns (null as Void?)
-    }
-
-    private fun voidFailedTask(exception: Exception): Task<Void> = mockk {
         every { isComplete } returns true
         every { isCanceled } returns false
         every { this@mockk.exception } returns exception
