@@ -1,5 +1,6 @@
-package com.diegocunha.thenaapp.datasource.network.model
+package com.diegocunha.thenaapp.datasource.network.model.user
 
+import com.diegocunha.thenaapp.datasource.network.model.baby.BabyResponse
 import com.diegocunha.thenaapp.datasource.serializer.UUIDSerializer
 import kotlinx.serialization.Serializable
 import java.util.UUID

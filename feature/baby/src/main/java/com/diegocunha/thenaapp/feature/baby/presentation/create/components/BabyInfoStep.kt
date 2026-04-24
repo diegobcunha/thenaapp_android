@@ -48,7 +48,6 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import coil.compose.AsyncImage
-import coil.compose.rememberAsyncImagePainter
 import com.diegocunha.thenaapp.coreui.theme.ThenaTheme
 import com.diegocunha.thenaapp.feature.baby.R
 import com.diegocunha.thenaapp.feature.baby.domain.model.BabyGender
@@ -184,7 +183,7 @@ fun BabyInfoStep(
             ) {
                 if (photo != null) {
                     AsyncImage(
-                        model = rememberAsyncImagePainter(photo),
+                        model = photo,
                         contentDescription = null,
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,

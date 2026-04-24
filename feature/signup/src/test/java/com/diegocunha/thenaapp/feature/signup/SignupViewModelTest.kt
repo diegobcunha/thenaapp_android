@@ -2,7 +2,7 @@ package com.diegocunha.thenaapp.feature.signup
 
 import app.cash.turbine.test
 import com.diegocunha.thenaapp.core.resource.Resource
-import com.diegocunha.thenaapp.datasource.network.model.UserResponse
+import com.diegocunha.thenaapp.datasource.network.model.user.UserResponse
 import com.diegocunha.thenaapp.feature.signup.domain.GoogleSignUpResponse
 import com.diegocunha.thenaapp.feature.signup.domain.SignupRepository
 import com.diegocunha.thenaapp.feature.signup.presentation.SignupEffect

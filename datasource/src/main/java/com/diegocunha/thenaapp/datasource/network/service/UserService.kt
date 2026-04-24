@@ -1,7 +1,7 @@
 package com.diegocunha.thenaapp.datasource.network.service
 
-import com.diegocunha.thenaapp.datasource.network.model.PutUserRequest
-import com.diegocunha.thenaapp.datasource.network.model.UserResponse
+import com.diegocunha.thenaapp.datasource.network.model.user.PutUserRequest
+import com.diegocunha.thenaapp.datasource.network.model.user.UserResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.PUT

@@ -2,7 +2,7 @@ package com.diegocunha.thenaapp.feature.login
 
 import com.diegocunha.thenaapp.core.coroutines.DispatchersProvider
 import com.diegocunha.thenaapp.core.resource.Resource
-import com.diegocunha.thenaapp.datasource.network.model.UserResponse
+import com.diegocunha.thenaapp.datasource.network.model.user.UserResponse
 import com.diegocunha.thenaapp.datasource.network.service.UserService
 import com.diegocunha.thenaapp.datasource.repository.GoogleSignInException
 import com.diegocunha.thenaapp.datasource.repository.LoginCredentialsManager

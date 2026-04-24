@@ -2,7 +2,7 @@ package com.diegocunha.thenaapp.feature.login
 
 import app.cash.turbine.test
 import com.diegocunha.thenaapp.core.resource.Resource
-import com.diegocunha.thenaapp.datasource.network.model.UserResponse
+import com.diegocunha.thenaapp.datasource.network.model.user.UserResponse
 import com.diegocunha.thenaapp.feature.login.domain.LoginRepository
 import com.diegocunha.thenaapp.feature.login.presentation.LoginEffect
 import com.diegocunha.thenaapp.feature.login.presentation.LoginIntent

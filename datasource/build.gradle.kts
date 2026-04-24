@@ -1,9 +1,22 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.kover)
     alias(libs.plugins.ksp)
 }
+
+fun getLocalProperties(): Properties {
+    val properties = Properties()
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists() && localPropertiesFile.isFile) {
+        localPropertiesFile.inputStream().use { properties.load(it) }
+    }
+    return properties // sempre retorna Properties, nunca null
+}
+
+val localProps = getLocalProperties()
 
 android {
     namespace = "com.diegocunha.thenaapp.datasource"
@@ -36,10 +49,30 @@ android {
     buildTypes {
         debug {
             buildConfigField("String", "BASE_URL", "\"http://localhost:8080\"")
+            buildConfigField(
+                "String",
+                "CLOUDINARY_CLOUD_NAME",
+                "\"${localProps.getProperty("CLOUDINARY_CLOUD_NAME") ?: ""}\""
+            )
+            buildConfigField(
+                "String",
+                "CLOUDINARY_UPLOAD_PRESET",
+                "\"${localProps.getProperty("CLOUDINARY_UPLOAD_PRESET") ?: ""}\""
+            )
         }
 
         release {
             buildConfigField("String", "BASE_URL", "")
+            buildConfigField(
+                "String",
+                "CLOUDINARY_CLOUD_NAME",
+                "\"${localProps.getProperty("CLOUDINARY_CLOUD_NAME") ?: ""}\""
+            )
+            buildConfigField(
+                "String",
+                "CLOUDINARY_UPLOAD_PRESET",
+                "\"${localProps.getProperty("CLOUDINARY_UPLOAD_PRESET") ?: ""}\""
+            )
         }
     }
 

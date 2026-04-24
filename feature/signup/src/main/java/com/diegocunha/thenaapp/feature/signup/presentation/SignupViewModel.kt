@@ -1,5 +1,6 @@
 package com.diegocunha.thenaapp.feature.signup.presentation
 
+import android.util.Log
 import androidx.annotation.StringRes
 import androidx.lifecycle.viewModelScope
 import com.diegocunha.thenaapp.core.mvi.BaseViewModel
@@ -186,6 +187,7 @@ class SignupViewModel(
 
                 is Resource.Error -> {
                     updateState {
+                        Log.e("Error", "Error", result.exception)
                         copy(
                             isLoading = false,
                             generalError = CoreUiR.string.generic_error

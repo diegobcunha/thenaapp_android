@@ -84,7 +84,12 @@ class MainActivity : ComponentActivity() {
                             entry<LoginNavigation> {
                                 LoginScreen(
                                     viewModel = koinViewModel<LoginViewModel>(),
-                                    onNavigateToHome = {},
+                                    onNavigateToHome = {
+                                        with(backStack) {
+                                            removeLastOrNull()
+                                            add(CreateBabyNavigation)
+                                        }
+                                    },
                                     onNavigateToSignUp = {
                                         backStack.add(SignupNavigation)
                                     },
