@@ -2,4 +2,8 @@
 <resources>
 
     <style name="Theme.ThenaApp" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="Theme.ThenaApp.Splash" parent="Theme.SplashScreen">
+        <item name="postSplashScreenTheme">@style/Theme.ThenaApp</item>
+    </style>
 </resources>

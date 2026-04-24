@@ -86,6 +86,7 @@ dependencies {
     implementation(libs.okhttp.logging.interceptor)
     api(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.coroutines.android)
+    api(libs.kotlinx.coroutines.play.services)
     implementation(libs.koin.android)
     api(platform(libs.firebase.bom))
     api(libs.firebase.auth)

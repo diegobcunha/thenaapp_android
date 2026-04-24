@@ -28,6 +28,7 @@ kover {
         filters {
             excludes {
                 packages(
+                    "com.diegocunha.thenaapp.di",
                     "com.diegocunha.thenaapp.core.di",
                     "com.diegocunha.thenaapp.datasource.di",
                     "com.diegocunha.thenaapp.feature.login.di",
