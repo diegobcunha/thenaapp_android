@@ -1,6 +1,7 @@
 package com.diegocunha.thenaapp
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -18,6 +19,9 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.diegocunha.thenaapp.coreui.theme.ThenaTheme
+import com.diegocunha.thenaapp.feature.baby.presentation.create.CreateBabyScreen
+import com.diegocunha.thenaapp.feature.baby.presentation.create.CreateBabyViewModel
+import com.diegocunha.thenaapp.feature.baby.presentation.create.navigation.CreateBabyNavigation
 import com.diegocunha.thenaapp.feature.login.presentation.LoginScreen
 import com.diegocunha.thenaapp.feature.login.presentation.LoginViewModel
 import com.diegocunha.thenaapp.feature.login.presentation.navigation.LoginNavigation
@@ -80,9 +84,18 @@ class MainActivity : ComponentActivity() {
                             entry<LoginNavigation> {
                                 LoginScreen(
                                     viewModel = koinViewModel<LoginViewModel>(),
-                                    onNavigateToHome = {},
+                                    onNavigateToHome = {
+                                        with(backStack) {
+                                            removeLastOrNull()
+                                            add(CreateBabyNavigation)
+                                        }
+                                    },
                                     onNavigateToSignUp = {
                                         backStack.add(SignupNavigation)
+                                    },
+                                    onNavigateToCreateBaby = {
+                                        backStack.removeLastOrNull()
+                                        backStack.add(CreateBabyNavigation)
                                     }
                                 )
                             }
@@ -93,7 +106,22 @@ class MainActivity : ComponentActivity() {
                                     onBackPressed = {
                                         backStack.removeLastOrNull()
                                     },
-                                    navigateToOnBoarding = {}
+                                    navigateToCreateBaby = {
+                                        with(backStack) {
+                                            clear()
+                                            add(CreateBabyNavigation)
+                                        }
+                                    }
+                                )
+                            }
+
+                            entry<CreateBabyNavigation> {
+                                CreateBabyScreen(
+                                    viewModel = koinViewModel<CreateBabyViewModel>(),
+                                    onNavigateToHome = {
+                                        Log.d("ThenaApp", "Baby created!")
+                                    },
+                                    onNavigateBack = { backStack.removeLastOrNull() },
                                 )
                             }
                         }

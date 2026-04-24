@@ -2,7 +2,7 @@ package com.diegocunha.thenaapp.feature.signup
 
 import app.cash.turbine.test
 import com.diegocunha.thenaapp.core.resource.Resource
-import com.diegocunha.thenaapp.datasource.network.model.UserResponse
+import com.diegocunha.thenaapp.datasource.network.model.user.UserResponse
 import com.diegocunha.thenaapp.feature.signup.domain.GoogleSignUpResponse
 import com.diegocunha.thenaapp.feature.signup.domain.SignupRepository
 import com.diegocunha.thenaapp.feature.signup.presentation.SignupEffect
@@ -38,6 +38,7 @@ class SignupViewModelTest {
         id = UUID.randomUUID(),
         name = "Test User",
         email = "test@example.com",
+        babies = emptyList(),
     )
 
     @Before
@@ -51,8 +52,6 @@ class SignupViewModelTest {
         unmockkAll()
         Dispatchers.resetMain()
     }
-
-    // region State update intents
 
     @Test
     fun `WHEN UpdateName is sent THEN name state is updated and errors cleared`() = runTest {
@@ -78,28 +77,26 @@ class SignupViewModelTest {
     }
 
     @Test
-    fun `WHEN UpdatePassword is sent THEN password state is updated and errors cleared`() = runTest {
-        viewModel.sendIntent(SignupIntent.UpdatePassword("Password@1"))
+    fun `WHEN UpdatePassword is sent THEN password state is updated and errors cleared`() =
+        runTest {
+            viewModel.sendIntent(SignupIntent.UpdatePassword("Password@1"))
 
-        val state = viewModel.state.value
-        assertEquals("Password@1", state.password)
-        assertNull(state.passwordError)
-        assertNull(state.generalError)
-    }
+            val state = viewModel.state.value
+            assertEquals("Password@1", state.password)
+            assertNull(state.passwordError)
+            assertNull(state.generalError)
+        }
 
     @Test
-    fun `WHEN UpdateConfirmPassword is sent THEN confirmPassword state is updated and errors cleared`() = runTest {
-        viewModel.sendIntent(SignupIntent.UpdateConfirmPassword("Password@1"))
+    fun `WHEN UpdateConfirmPassword is sent THEN confirmPassword state is updated and errors cleared`() =
+        runTest {
+            viewModel.sendIntent(SignupIntent.UpdateConfirmPassword("Password@1"))
 
-        val state = viewModel.state.value
-        assertEquals("Password@1", state.confirmPassword)
-        assertNull(state.confirmPasswordError)
-        assertNull(state.generalError)
-    }
-
-    // endregion
-
-    // region SubmitSignup validation
+            val state = viewModel.state.value
+            assertEquals("Password@1", state.confirmPassword)
+            assertNull(state.confirmPasswordError)
+            assertNull(state.generalError)
+        }
 
     @Test
     fun `WHEN SubmitSignup with empty name THEN nameError is set and no API call`() = runTest {
@@ -125,67 +122,67 @@ class SignupViewModelTest {
     }
 
     @Test
-    fun `WHEN SubmitSignup with weak password THEN passwordError is set and no API call`() = runTest {
-        viewModel.sendIntent(SignupIntent.UpdateName("Diego"))
-        viewModel.sendIntent(SignupIntent.UpdateEmail("test@example.com"))
-        viewModel.sendIntent(SignupIntent.UpdatePassword("weak"))
-        viewModel.sendIntent(SignupIntent.UpdateConfirmPassword("weak"))
-        viewModel.sendIntent(SignupIntent.SubmitSignup)
+    fun `WHEN SubmitSignup with weak password THEN passwordError is set and no API call`() =
+        runTest {
+            viewModel.sendIntent(SignupIntent.UpdateName("Diego"))
+            viewModel.sendIntent(SignupIntent.UpdateEmail("test@example.com"))
+            viewModel.sendIntent(SignupIntent.UpdatePassword("weak"))
+            viewModel.sendIntent(SignupIntent.UpdateConfirmPassword("weak"))
+            viewModel.sendIntent(SignupIntent.SubmitSignup)
 
-        assertNotNull(viewModel.state.value.passwordError)
-        coVerify(exactly = 0) { signupRepository.createUser(any(), any(), any()) }
-    }
-
-    @Test
-    fun `WHEN SubmitSignup with mismatched passwords THEN confirmPasswordError is set and no API call`() = runTest {
-        viewModel.sendIntent(SignupIntent.UpdateName("Diego"))
-        viewModel.sendIntent(SignupIntent.UpdateEmail("test@example.com"))
-        viewModel.sendIntent(SignupIntent.UpdatePassword("Password@1"))
-        viewModel.sendIntent(SignupIntent.UpdateConfirmPassword("Password@2"))
-        viewModel.sendIntent(SignupIntent.SubmitSignup)
-
-        assertNotNull(viewModel.state.value.confirmPasswordError)
-        coVerify(exactly = 0) { signupRepository.createUser(any(), any(), any()) }
-    }
-
-    // endregion
-
-    // region SubmitSignup standard flow
+            assertNotNull(viewModel.state.value.passwordError)
+            coVerify(exactly = 0) { signupRepository.createUser(any(), any(), any()) }
+        }
 
     @Test
-    fun `WHEN SubmitSignup with valid data and success THEN NavigateToOnboarding effect emitted`() = runTest {
-        coEvery { signupRepository.createUser(any(), any(), any()) } returns Resource.Success(mockUser)
+    fun `WHEN SubmitSignup with mismatched passwords THEN confirmPasswordError is set and no API call`() =
+        runTest {
+            viewModel.sendIntent(SignupIntent.UpdateName("Diego"))
+            viewModel.sendIntent(SignupIntent.UpdateEmail("test@example.com"))
+            viewModel.sendIntent(SignupIntent.UpdatePassword("Password@1"))
+            viewModel.sendIntent(SignupIntent.UpdateConfirmPassword("Password@2"))
+            viewModel.sendIntent(SignupIntent.SubmitSignup)
 
-        viewModel.effects.test {
+            assertNotNull(viewModel.state.value.confirmPasswordError)
+            coVerify(exactly = 0) { signupRepository.createUser(any(), any(), any()) }
+        }
+
+    @Test
+    fun `WHEN SubmitSignup with valid data and success THEN NavigateToOnboarding effect emitted`() =
+        runTest {
+            coEvery { signupRepository.createUser(any(), any(), any()) } returns Resource.Success(
+                mockUser
+            )
+
+            viewModel.effects.test {
+                viewModel.sendIntent(SignupIntent.UpdateName("Diego"))
+                viewModel.sendIntent(SignupIntent.UpdateEmail("test@example.com"))
+                viewModel.sendIntent(SignupIntent.UpdatePassword("Password@1"))
+                viewModel.sendIntent(SignupIntent.UpdateConfirmPassword("Password@1"))
+                viewModel.sendIntent(SignupIntent.SubmitSignup)
+
+                assertEquals(SignupEffect.NavigateToOnboarding, awaitItem())
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `WHEN SubmitSignup with valid data and error THEN generalError is set and isLoading is false`() =
+        runTest {
+            coEvery { signupRepository.createUser(any(), any(), any()) } returns Resource.Error(
+                Exception("Registration failed")
+            )
+
             viewModel.sendIntent(SignupIntent.UpdateName("Diego"))
             viewModel.sendIntent(SignupIntent.UpdateEmail("test@example.com"))
             viewModel.sendIntent(SignupIntent.UpdatePassword("Password@1"))
             viewModel.sendIntent(SignupIntent.UpdateConfirmPassword("Password@1"))
             viewModel.sendIntent(SignupIntent.SubmitSignup)
 
-            assertEquals(SignupEffect.NavigateToOnboarding, awaitItem())
-            cancelAndIgnoreRemainingEvents()
+            val state = viewModel.state.value
+            assertNotNull(state.generalError)
+            assertEquals(false, state.isLoading)
         }
-    }
-
-    @Test
-    fun `WHEN SubmitSignup with valid data and error THEN generalError is set and isLoading is false`() = runTest {
-        coEvery { signupRepository.createUser(any(), any(), any()) } returns Resource.Error(Exception("Registration failed"))
-
-        viewModel.sendIntent(SignupIntent.UpdateName("Diego"))
-        viewModel.sendIntent(SignupIntent.UpdateEmail("test@example.com"))
-        viewModel.sendIntent(SignupIntent.UpdatePassword("Password@1"))
-        viewModel.sendIntent(SignupIntent.UpdateConfirmPassword("Password@1"))
-        viewModel.sendIntent(SignupIntent.SubmitSignup)
-
-        val state = viewModel.state.value
-        assertNotNull(state.generalError)
-        assertEquals(false, state.isLoading)
-    }
-
-    // endregion
-
-    // region Google Sign-Up flow
 
     @Test
     fun `WHEN TriggerGoogleSignIn starts THEN isLoading is set to true`() = runTest {
@@ -198,67 +195,69 @@ class SignupViewModelTest {
 
             assertEquals(true, awaitItem().isLoading)
 
-            deferred.complete(Resource.Success(GoogleSignUpResponse("test@example.com")))
+            deferred.complete(Resource.Success(GoogleSignUpResponse(email = "test@example.com", isUserAlreadyCreated = false)))
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `WHEN TriggerGoogleSignIn succeeds THEN isSignupByGoogle is true and email is prefilled`() = runTest {
-        coEvery { signupRepository.createUserWithGoogle() } returns Resource.Success(GoogleSignUpResponse("test@example.com"))
+    fun `WHEN TriggerGoogleSignIn succeeds THEN isSignupByGoogle is true and email is prefilled`() =
+        runTest {
+            coEvery { signupRepository.createUserWithGoogle() } returns Resource.Success(
+                GoogleSignUpResponse(email = "test@example.com", isUserAlreadyCreated = false)
+            )
 
-        viewModel.sendIntent(SignupIntent.TriggerGoogleSignIn)
-
-        val state = viewModel.state.value
-        assertEquals(true, state.isSignupByGoogle)
-        assertEquals("test@example.com", state.email)
-        assertEquals(false, state.isLoading)
-    }
-
-    @Test
-    fun `WHEN TriggerGoogleSignIn fails THEN generalError is set and isLoading is false`() = runTest {
-        coEvery { signupRepository.createUserWithGoogle() } returns Resource.Error(Exception("Google error"))
-
-        viewModel.sendIntent(SignupIntent.TriggerGoogleSignIn)
-
-        val state = viewModel.state.value
-        assertNotNull(state.generalError)
-        assertEquals(false, state.isLoading)
-    }
-
-    // endregion
-
-    // region SubmitSignup in Google mode
-
-    @Test
-    fun `WHEN SubmitSignup with isSignupByGoogle true and valid name THEN NavigateToOnboarding effect emitted`() = runTest {
-        coEvery { signupRepository.createUserWithGoogle() } returns Resource.Success(GoogleSignUpResponse("test@example.com"))
-        coEvery { signupRepository.updateUser(any()) } returns Resource.Success(mockUser)
-
-        viewModel.effects.test {
             viewModel.sendIntent(SignupIntent.TriggerGoogleSignIn)
-            viewModel.sendIntent(SignupIntent.UpdateName("Diego"))
+
+            val state = viewModel.state.value
+            assertEquals(true, state.isSignupByGoogle)
+            assertEquals("test@example.com", state.email)
+            assertEquals(false, state.isLoading)
+        }
+
+    @Test
+    fun `WHEN TriggerGoogleSignIn fails THEN generalError is set and isLoading is false`() =
+        runTest {
+            coEvery { signupRepository.createUserWithGoogle() } returns Resource.Error(Exception("Google error"))
+
+            viewModel.sendIntent(SignupIntent.TriggerGoogleSignIn)
+
+            val state = viewModel.state.value
+            assertNotNull(state.generalError)
+            assertEquals(false, state.isLoading)
+        }
+
+    @Test
+    fun `WHEN SubmitSignup with isSignupByGoogle true and valid name THEN NavigateToOnboarding effect emitted`() =
+        runTest {
+            coEvery { signupRepository.createUserWithGoogle() } returns Resource.Success(
+                GoogleSignUpResponse(email = "test@example.com", isUserAlreadyCreated = false)
+            )
+            coEvery { signupRepository.updateUser(any()) } returns Resource.Success(mockUser)
+
+            viewModel.effects.test {
+                viewModel.sendIntent(SignupIntent.TriggerGoogleSignIn)
+                viewModel.sendIntent(SignupIntent.UpdateName("Diego"))
+                viewModel.sendIntent(SignupIntent.SubmitSignup)
+
+                assertEquals(SignupEffect.NavigateToOnboarding, awaitItem())
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `WHEN SubmitSignup with isSignupByGoogle true and empty name THEN nameError is set and updateUser not called`() =
+        runTest {
+            coEvery { signupRepository.createUserWithGoogle() } returns Resource.Success(
+                GoogleSignUpResponse(email = "test@example.com", isUserAlreadyCreated = false)
+            )
+
+            viewModel.sendIntent(SignupIntent.TriggerGoogleSignIn)
             viewModel.sendIntent(SignupIntent.SubmitSignup)
 
-            assertEquals(SignupEffect.NavigateToOnboarding, awaitItem())
-            cancelAndIgnoreRemainingEvents()
+            assertNotNull(viewModel.state.value.nameError)
+            coVerify(exactly = 0) { signupRepository.updateUser(any()) }
         }
-    }
-
-    @Test
-    fun `WHEN SubmitSignup with isSignupByGoogle true and empty name THEN nameError is set and updateUser not called`() = runTest {
-        coEvery { signupRepository.createUserWithGoogle() } returns Resource.Success(GoogleSignUpResponse("test@example.com"))
-
-        viewModel.sendIntent(SignupIntent.TriggerGoogleSignIn)
-        viewModel.sendIntent(SignupIntent.SubmitSignup)
-
-        assertNotNull(viewModel.state.value.nameError)
-        coVerify(exactly = 0) { signupRepository.updateUser(any()) }
-    }
-
-    // endregion
-
-    // region validateConfirmPassword
 
     @Test
     fun `WHEN validateConfirmPassword with matching valid passwords THEN returns null`() {
@@ -273,6 +272,4 @@ class SignupViewModelTest {
 
         assertNotNull(result)
     }
-
-    // endregion
 }

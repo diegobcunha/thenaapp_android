@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="create_baby_title">Add your baby</string>
+
+    <!-- Step labels -->
+    <string name="create_baby_step_info">Baby info</string>
+    <string name="create_baby_step_birth">Birth details</string>
+    <string name="create_baby_responsible_title">Responsible</string>
+    <string name="create_baby_step_ready">All set!</string>
+    <string name="create_baby_responsible_father">Father</string>
+    <string name="create_baby_responsible_mother">Father</string>
+    <string name="create_baby_responsible_other">Other</string>
+
+    <!-- Step 0 — Baby info -->
+    <string name="create_baby_add_photo">Add photo</string>
+    <string name="create_baby_name_label">Baby\'s name</string>
+    <string name="create_baby_gender_title">Gender</string>
+    <string name="create_baby_gender_girl">Girl</string>
+    <string name="create_baby_gender_boy">Boy</string>
+    <string name="create_baby_gender_other">Other</string>
+
+    <!-- Step 1 — Birth details -->
+    <string name="create_baby_dob_label">Date of birth</string>
+    <string name="create_baby_dob_hint_ymd">YYYY-MM-DD</string>
+    <string name="create_baby_dob_hint_dmy">DD/MM/YYYY</string>
+    <string name="create_baby_weight_label">Birth weight (kg)</string>
+    <string name="create_baby_height_label">Birth height (cm)</string>
+    <string name="create_baby_info_hint">This data helps us track your baby\'s growth and development milestones accurately.</string>
+
+    <!-- Step 2 — All set -->
+    <string name="create_baby_success_title">%s is all set!</string>
+    <string name="create_baby_success_subtitle">Let\'s start tracking their beautiful journey together.</string>
+    <string name="create_baby_feature_sleep">Sleep</string>
+    <string name="create_baby_feature_sleep_desc">Track naps &amp; night sleep</string>
+    <string name="create_baby_feature_feeding">Feeding</string>
+    <string name="create_baby_feature_feeding_desc">Breast, bottle &amp; solids</string>
+    <string name="create_baby_feature_vaccines">Vaccines</string>
+    <string name="create_baby_feature_vaccines_desc">Immunization schedule</string>
+
+    <!-- Buttons -->
+    <string name="create_baby_next">Next</string>
+    <string name="create_baby_back">Back</string>
+    <string name="create_baby_start_tracking">Start tracking 🌸</string>
+
+    <!-- Photo picker -->
+    <string name="create_baby_photo_dialog_title">Add photo</string>
+    <string name="create_baby_photo_take">Take photo</string>
+    <string name="create_baby_photo_gallery">Choose from gallery</string>
+    <string name="create_baby_photo_remove">Remove photo</string>
+    <string name="create_baby_photo_cancel">Cancel</string>
+
+    <!-- Validation errors -->
+    <string name="create_baby_error_name_required">Baby\'s name is required</string>
+    <string name="create_baby_error_gender_required">Please select a gender</string>
+    <string name="create_baby_error_date_required">Date of birth is required</string>
+    <string name="create_baby_error_date_invalid">Please enter a valid date</string>
+    <string name="create_baby_error_weight_required">Birth weight is required</string>
+    <string name="create_baby_error_height_required">Birth height is required</string>
+    <string name="create_baby_error_general">Something went wrong, please try again</string>
+    <string name="create_baby_responsible_error">A responsible it\'s required.</string>
+</resources>

@@ -1,7 +1,7 @@
 package com.diegocunha.thenaapp.feature.signup.domain
 
 import com.diegocunha.thenaapp.core.resource.Resource
-import com.diegocunha.thenaapp.datasource.network.model.UserResponse
+import com.diegocunha.thenaapp.datasource.network.model.user.UserResponse
 
 interface SignupRepository {
 

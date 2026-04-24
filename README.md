@@ -8,11 +8,12 @@
 
 ### Currently Implemented
 
-| Feature | Status | Description |
-|---|---|---|
-| Onboarding | ✅ Done | 5-slide carousel introducing app features |
-| Login | ✅ Done | Email/password + Google Sign-In with validation |
-| Signup | ✅ Done | Email/password + Google Sign-Up with profile completion |
+| Feature     | Status | Description                                             |
+|-------------|---|---------------------------------------------------------|
+| Onboarding  | ✅ Done | 5-slide carousel introducing app features               |
+| Login       | ✅ Done | Email/password + Google Sign-In with validation         |
+| Signup      | ✅ Done | Email/password + Google Sign-Up with profile completion |
+| Create_Baby | ✅ Done | Create a new baby and upload a photo                    |
 
 ### In Development
 
@@ -30,7 +31,7 @@
 ```
 First launch:  Onboarding → Login → Home
 Return launch: Login → Home
-Signup flow:   Login → Signup → Onboarding
+Signup flow:   Onboarding → Login → Signup → Create Baby
 ```
 
 ---
@@ -63,6 +64,7 @@ Signup flow:   Login → Signup → Onboarding
 :feature:onboarding   — 5-slide onboarding carousel
 :feature:login        — Login screen with email/password and Google Sign-In
 :feature:signup       — Signup screen with email/password and Google Sign-Up
+:feature:baby         — Responsible to handle the baby CRUD and informations
 ```
 
 Each feature module follows clean architecture with:
@@ -99,6 +101,7 @@ UI (Composable)
 - JDK 17+
 - Android SDK 36
 - Google Services JSON (`google-services.json`) placed in `app/`
+- Account created at Cloudinary to upload the images
 
 ### Build Commands
 

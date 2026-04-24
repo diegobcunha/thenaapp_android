@@ -2,12 +2,13 @@ package com.diegocunha.thenaapp.feature.signup.repository
 
 import com.diegocunha.thenaapp.core.coroutines.DispatchersProvider
 import com.diegocunha.thenaapp.core.resource.Resource
-import com.diegocunha.thenaapp.datasource.network.model.PutUserRequest
-import com.diegocunha.thenaapp.datasource.network.model.UserResponse
+import com.diegocunha.thenaapp.datasource.network.model.user.PutUserRequest
+import com.diegocunha.thenaapp.datasource.network.model.user.UserResponse
 import com.diegocunha.thenaapp.datasource.network.safeApiCall
 import com.diegocunha.thenaapp.datasource.network.service.UserService
 import com.diegocunha.thenaapp.datasource.repository.GoogleSignInException
 import com.diegocunha.thenaapp.datasource.repository.LoginCredentialsManager
+import com.diegocunha.thenaapp.datasource.repository.UserSessionRepository
 import com.diegocunha.thenaapp.feature.signup.domain.GoogleSignUpResponse
 import com.diegocunha.thenaapp.feature.signup.domain.SignupRepository
 import com.google.firebase.auth.FirebaseAuth
@@ -19,6 +20,7 @@ class SignupRepositoryImpl(
     private val firebaseAuth: FirebaseAuth,
     private val dispatchersProvider: DispatchersProvider,
     private val loginCredentialsManager: LoginCredentialsManager,
+    private val userSessionRepository: UserSessionRepository,
 ) : SignupRepository {
 
     override suspend fun createUser(
@@ -30,8 +32,9 @@ class SignupRepositoryImpl(
         if (firebaseToken.user == null) {
             throw Exception("User not created")
         }
-
-        userService.updateProfile(PutUserRequest(name))
+        val user = userService.updateProfile(PutUserRequest(name))
+        userSessionRepository.saveUserId(user.id.toString())
+        user
     }
 
     override suspend fun createUserWithGoogle(): Resource<GoogleSignUpResponse> =
@@ -41,7 +44,11 @@ class SignupRepositoryImpl(
             firebaseAuth.signInWithCredential(credential).await()
                 ?: throw GoogleSignInException("User is null")
             val user = userService.getUsersInformation()
-            GoogleSignUpResponse(email = user.email)
+            userSessionRepository.saveUserId(user.id.toString())
+            GoogleSignUpResponse(
+                email = user.email,
+                isUserAlreadyCreated = !user.name.isNullOrEmpty()
+            )
         }
 
     override suspend fun updateUser(name: String): Resource<UserResponse> =

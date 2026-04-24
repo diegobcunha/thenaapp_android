@@ -2,16 +2,19 @@ package com.diegocunha.thenaapp.feature.login
 
 import com.diegocunha.thenaapp.core.coroutines.DispatchersProvider
 import com.diegocunha.thenaapp.core.resource.Resource
-import com.diegocunha.thenaapp.datasource.network.model.UserResponse
+import com.diegocunha.thenaapp.datasource.network.model.user.UserResponse
 import com.diegocunha.thenaapp.datasource.network.service.UserService
 import com.diegocunha.thenaapp.datasource.repository.GoogleSignInException
 import com.diegocunha.thenaapp.datasource.repository.LoginCredentialsManager
+import com.diegocunha.thenaapp.datasource.repository.UserSessionRepository
+import com.diegocunha.thenaapp.feature.login.domain.UserInformation
 import com.diegocunha.thenaapp.feature.login.repository.LoginRepositoryImpl
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import io.mockk.coEvery
+import io.mockk.coJustRun
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.unmockkAll
@@ -35,6 +38,7 @@ class LoginRepositoryImplTest {
     private val userService: UserService = mockk()
     private val firebaseAuth: FirebaseAuth = mockk()
     private val loginCredentialsManager: LoginCredentialsManager = mockk()
+    private val userSessionRepository: UserSessionRepository = mockk()
     private val dispatchersProvider: DispatchersProvider = mockk {
         every { io() } returns testDispatcher
     }
@@ -45,17 +49,20 @@ class LoginRepositoryImplTest {
         id = UUID.randomUUID(),
         name = "Test User",
         email = "test@example.com",
+        babies = emptyList(),
     )
     private val mockFirebaseUser: FirebaseUser = mockk()
 
     @Before
     fun setUp() {
+        coJustRun { userSessionRepository.saveUserId(any()) }
         Dispatchers.setMain(testDispatcher)
         repository = LoginRepositoryImpl(
             userService = userService,
             dispatchersProvider = dispatchersProvider,
             firebaseAuth = firebaseAuth,
             loginCredentialsManager = loginCredentialsManager,
+            userSessionRepository = userSessionRepository,
         )
     }
 
@@ -89,7 +96,9 @@ class LoginRepositoryImplTest {
 
     @Test
     fun `WHEN performLogin Firebase throws THEN Resource Error is returned`() = runTest {
-        every { firebaseAuth.signInWithEmailAndPassword(any(), any()) } returns failedAuthTask(Exception("Invalid credentials"))
+        every { firebaseAuth.signInWithEmailAndPassword(any(), any()) } returns failedAuthTask(
+            Exception("Invalid credentials")
+        )
 
         val result = repository.performLogin("test@example.com", "wrong-password")
 
@@ -108,17 +117,18 @@ class LoginRepositoryImplTest {
     }
 
     @Test
-    fun `WHEN loginWithGoogle succeeds THEN Resource Success with user data is returned`() = runTest {
-        coEvery { loginCredentialsManager.getGoogleIdToken() } returns "valid-id-token"
-        val authResult = successfulAuthResult(mockFirebaseUser)
-        every { firebaseAuth.signInWithCredential(any()) } returns authResult
-        coEvery { userService.getUsersInformation() } returns mockUser
+    fun `WHEN loginWithGoogle succeeds THEN Resource Success with user data is returned`() =
+        runTest {
+            coEvery { loginCredentialsManager.getGoogleIdToken() } returns "valid-id-token"
+            val authResult = successfulAuthResult(mockFirebaseUser)
+            every { firebaseAuth.signInWithCredential(any()) } returns authResult
+            coEvery { userService.getUsersInformation() } returns mockUser
 
-        val result = repository.loginWithGoogle()
+            val result = repository.loginWithGoogle()
 
-        assertTrue(result is Resource.Success)
-        assertEquals(mockUser, (result as Resource.Success).data)
-    }
+            assertTrue(result is Resource.Success)
+            assertEquals(UserInformation(hasBaby = false), (result as Resource.Success).data)
+        }
 
     @Test
     fun `WHEN loginWithGoogle getGoogleIdToken throws THEN Resource Error is returned`() = runTest {

@@ -2,8 +2,8 @@ package com.diegocunha.thenaapp.feature.login
 
 import app.cash.turbine.test
 import com.diegocunha.thenaapp.core.resource.Resource
-import com.diegocunha.thenaapp.datasource.network.model.UserResponse
-import com.diegocunha.thenaapp.feature.login.domain.LoginRepository
+import com.diegocunha.thenaapp.datasource.network.model.user.UserResponse
+import com.diegocunha.thenaapp.feature.login.domain.LoginRepository import com.diegocunha.thenaapp.feature.login.domain.UserInformation
 import com.diegocunha.thenaapp.feature.login.presentation.LoginEffect
 import com.diegocunha.thenaapp.feature.login.presentation.LoginIntent
 import com.diegocunha.thenaapp.feature.login.presentation.LoginViewModel
@@ -36,6 +36,7 @@ class LoginViewModelTest {
         id = UUID.randomUUID(),
         name = "Test User",
         email = "test@example.com",
+        babies = emptyList(),
     )
 
     @Before
@@ -149,7 +150,7 @@ class LoginViewModelTest {
 
     @Test
     fun `WHEN TriggerGoogleSignIn and loginWithGoogle succeeds THEN NavigateToHome effect emitted`() = runTest {
-        coEvery { loginRepository.loginWithGoogle() } returns Resource.Success(mockUser)
+        coEvery { loginRepository.loginWithGoogle() } returns Resource.Success(UserInformation(hasBaby = true))
 
         viewModel.effects.test {
             viewModel.sendIntent(LoginIntent.TriggerGoogleSignIn)
@@ -172,7 +173,7 @@ class LoginViewModelTest {
 
     @Test
     fun `WHEN TriggerGoogleSignIn starts THEN isLoading is set to true`() = runTest {
-        coEvery { loginRepository.loginWithGoogle() } returns Resource.Success(mockUser)
+        coEvery { loginRepository.loginWithGoogle() } returns Resource.Success(UserInformation(hasBaby = false))
 
         viewModel.state.test {
             awaitItem()

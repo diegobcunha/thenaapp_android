@@ -14,6 +14,7 @@ val signupModule = module {
             firebaseAuth = get(),
             dispatchersProvider = get(),
             loginCredentialsManager = get(),
+            userSessionRepository = get(),
         )
     }
 

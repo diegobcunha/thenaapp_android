@@ -35,6 +35,23 @@ class CustomSharedPreferencesImpl(
         }
     }
 
+    override fun putString(key: String, value: String?) {
+        values[key] = value
+        job.launch {
+            sharedPreferences.edit { putString(key, value) }
+        }
+    }
+
+    override fun getString(key: String): String? {
+        return if (values.containsKey(key)) {
+            values[key] as? String
+        } else {
+            val result = sharedPreferences.getString(key, null)
+            values[key] = result
+            result
+        }
+    }
+
     companion object {
         private const val SHARED_PREFERENCES = "thena_sp"
     }

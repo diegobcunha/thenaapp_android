@@ -61,7 +61,8 @@ import com.diegocunha.thenaapp.coreui.R as CoreUiR
 fun LoginScreen(
     viewModel: LoginViewModel,
     onNavigateToHome: () -> Unit,
-    onNavigateToSignUp: () -> Unit = {},
+    onNavigateToSignUp: () -> Unit,
+    onNavigateToCreateBaby: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -72,6 +73,7 @@ fun LoginScreen(
             when (effect) {
                 is LoginEffect.NavigateToHome -> onNavigateToHome()
                 is LoginEffect.NavigateToSignUp -> onNavigateToSignUp()
+                is LoginEffect.NavigateToCreateBaby -> onNavigateToCreateBaby()
                 is LoginEffect.ShowSnackbar -> snackbarHostState.showSnackbar(context.getString(effect.message))
             }
         }

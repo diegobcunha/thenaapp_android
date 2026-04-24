@@ -4,4 +4,5 @@
     <string name="feature_signup_subtitle">Start your jorney here</string>
     <string name="feature_signup_confirm_password_match_error">Confirm password doesn\'t match.</string>
     <string name="feature_signup_name_empty">Name should not be empty</string>
+    <string name="feature_signup_already_created">User already created, try again with different e-mail.</string>
 </resources>
