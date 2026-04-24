@@ -166,12 +166,21 @@ class SignupViewModel(
 
             when (val result = signupRepository.createUserWithGoogle()) {
                 is Resource.Success -> {
+                    val content = result.data
                     updateState {
-                        copy(
-                            isLoading = false,
-                            email = result.data.email,
-                            isSignupByGoogle = true
-                        )
+
+                        if (content.isUserAlreadyCreated) {
+                            copy(
+                                isLoading = false,
+                                generalError = R.string.feature_signup_already_created
+                            )
+                        } else {
+                            copy(
+                                isLoading = false,
+                                email = result.data.email,
+                                isSignupByGoogle = true
+                            )
+                        }
                     }
                 }
 

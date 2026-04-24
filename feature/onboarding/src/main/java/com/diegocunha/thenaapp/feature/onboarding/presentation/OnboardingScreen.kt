@@ -25,6 +25,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -75,7 +78,9 @@ private fun OnboardingScreenContent(
     val pagerState = rememberPagerState(pageCount = { slides.size })
     val coroutineScope = rememberCoroutineScope()
     val currentPage = pagerState.currentPage
-    val isLast = currentPage == slides.size - 1
+    val isLast by remember {
+        derivedStateOf { currentPage == slides.size - 1 }
+    }
 
     LaunchedEffect(currentPage) {
         onPageChanged(currentPage)

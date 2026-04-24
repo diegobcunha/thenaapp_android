@@ -7,8 +7,11 @@ import com.diegocunha.thenaapp.datasource.network.createRetrofit
 import com.diegocunha.thenaapp.datasource.network.interceptor.AccessTokenRepository
 import com.diegocunha.thenaapp.datasource.network.interceptor.AccessTokenRepositoryImpl
 import com.diegocunha.thenaapp.datasource.network.interceptor.HeaderInterceptor
+import com.diegocunha.thenaapp.datasource.network.service.BabyService
 import com.diegocunha.thenaapp.datasource.network.service.UserService
 import com.diegocunha.thenaapp.datasource.repository.LoginCredentialsManager
+import com.diegocunha.thenaapp.datasource.repository.UserSessionRepository
+import com.diegocunha.thenaapp.datasource.repository.UserSessionRepositoryImpl
 import com.diegocunha.thenaapp.datasource.storage.sharedpreferences.CustomSharedPreferences
 import com.diegocunha.thenaapp.datasource.storage.sharedpreferences.CustomSharedPreferencesImpl
 import com.google.firebase.auth.FirebaseAuth
@@ -51,6 +54,7 @@ val datasourceModule = module {
     single { createRetrofit(okHttpClient = get(), json = get()) }
     single { get<Retrofit>().create(ThenaAppService::class.java) }
     single { get<Retrofit>().create(UserService::class.java) }
+    single { get<Retrofit>().create(BabyService::class.java) }
 
     single<CredentialManager> {
         CredentialManager.create(androidApplication())
@@ -68,5 +72,9 @@ val datasourceModule = module {
             context = androidApplication(),
             dispatchersProvider = get()
         )
+    }
+
+    single<UserSessionRepository> {
+        UserSessionRepositoryImpl(preferences = get())
     }
 }

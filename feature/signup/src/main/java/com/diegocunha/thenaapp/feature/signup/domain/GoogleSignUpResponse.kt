@@ -4,5 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class GoogleSignUpResponse(
-    val email: String
+    val email: String,
+    val isUserAlreadyCreated: Boolean,
 )

@@ -19,7 +19,8 @@ val loginModule = module {
             userService = get(),
             dispatchersProvider = get(),
             firebaseAuth = get(),
-            loginCredentialsManager = get()
+            loginCredentialsManager = get(),
+            userSessionRepository = get(),
         )
     }
 }

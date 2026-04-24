@@ -59,7 +59,7 @@ import com.diegocunha.thenaapp.coreui.R as CoreUiR
 fun SignupScreen(
     viewModel: SignupViewModel,
     onBackPressed: () -> Unit,
-    navigateToOnBoarding: () -> Unit,
+    navigateToCreateBaby: () -> Unit,
 ) {
     val state by viewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -67,7 +67,7 @@ fun SignupScreen(
     LaunchedEffect(Unit) {
         viewModel.effects.collectLatest { effect ->
             when (effect) {
-                is SignupEffect.NavigateToOnboarding -> navigateToOnBoarding.invoke()
+                is SignupEffect.NavigateToOnboarding -> navigateToCreateBaby.invoke()
             }
         }
     }

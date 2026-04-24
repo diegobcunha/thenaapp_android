@@ -59,7 +59,15 @@ class LoginViewModel(
         viewModelScope.launch {
             updateState { copy(isLoading = true, generalError = null) }
             when (val result = loginRepository.loginWithGoogle()) {
-                is Resource.Success -> sendEffect(LoginEffect.NavigateToHome)
+                is Resource.Success -> {
+                    val effect = if (!result.data.hasBaby) {
+                        LoginEffect.NavigateToCreateBaby
+                    } else {
+                        LoginEffect.NavigateToHome
+                    }
+                    sendEffect(effect)
+                }
+
                 is Resource.Error -> updateState {
                     copy(isLoading = false, generalError = mapFirebaseError(result.exception))
                 }

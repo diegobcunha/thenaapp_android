@@ -49,6 +49,7 @@ dependencies {
     implementation(project(":feature:login"))
     implementation(project(":feature:signup"))
     implementation(project(":feature:onboarding"))
+    implementation(project(":feature:baby"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
