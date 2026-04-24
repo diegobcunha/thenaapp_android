@@ -9,6 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -44,6 +45,6 @@ class SafeApiCallTest {
     fun `safeApiCall returns Success with null value`() = runTest {
         val result = safeApiCall(testDispatchers) { null }
         assertTrue(result is Resource.Success)
-        assertEquals(null, (result as Resource.Success).data)
+        assertNull((result as Resource.Success).data)
     }
 }
