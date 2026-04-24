@@ -43,8 +43,6 @@ class CreateBabyViewModelTest {
         Dispatchers.resetMain()
     }
 
-    // region State update intents
-
     @Test
     fun `WHEN OnNameChange is sent THEN name is updated and nameError is cleared`() = runTest {
         viewModel.sendIntent(CreateBabyIntent.OnNameChange("Luna"))
@@ -123,10 +121,6 @@ class CreateBabyViewModelTest {
         assertEquals(0, viewModel.state.value.currentPage)
     }
 
-    // endregion
-
-    // region PAGE_0 validation
-
     @Test
     fun `WHEN OnNextPage on page 0 with all valid fields THEN advances to page 1`() = runTest {
         fillPage0()
@@ -183,10 +177,6 @@ class CreateBabyViewModelTest {
         assertNotNull(state.responsibleTypeError)
         assertEquals(0, state.currentPage)
     }
-
-    // endregion
-
-    // region PAGE_1 validation
 
     @Test
     fun `WHEN OnNextPage on page 1 with valid birth details THEN advances to page 2`() = runTest {
@@ -257,10 +247,6 @@ class CreateBabyViewModelTest {
         assertEquals(1, state.currentPage)
     }
 
-    // endregion
-
-    // region CreateBaby intent
-
     @Test
     fun `WHEN CreateBaby succeeds THEN NavigateToHome effect is emitted`() = runTest {
         coEvery { createBabyRepository.createBaby(any()) } returns Resource.Success(Unit)
@@ -294,7 +280,7 @@ class CreateBabyViewModelTest {
         goToPage2()
 
         viewModel.state.test {
-            awaitItem() // page 2 state
+            awaitItem()
             viewModel.sendIntent(CreateBabyIntent.CreateBaby)
 
             assertEquals(true, awaitItem().isLoading)
@@ -303,10 +289,6 @@ class CreateBabyViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
-
-    // endregion
-
-    // region Helpers
 
     private fun fillPage0() {
         viewModel.sendIntent(CreateBabyIntent.OnNameChange("Luna"))
@@ -330,6 +312,4 @@ class CreateBabyViewModelTest {
         fillPage1()
         viewModel.sendIntent(CreateBabyIntent.OnNextPage)
     }
-
-    // endregion
 }

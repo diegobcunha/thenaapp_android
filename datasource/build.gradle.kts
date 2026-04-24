@@ -13,7 +13,7 @@ fun getLocalProperties(): Properties {
     if (localPropertiesFile.exists() && localPropertiesFile.isFile) {
         localPropertiesFile.inputStream().use { properties.load(it) }
     }
-    return properties // sempre retorna Properties, nunca null
+    return properties
 }
 
 val localProps = getLocalProperties()

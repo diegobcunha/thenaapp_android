@@ -72,7 +72,7 @@ class CreateBabyViewModel(
                         null
                     }
                 val responsibleTypeError = if (current.responsibleType == null) {
-                    -1
+                    R.string.create_baby_responsible_error
                 } else {
                     null
                 }

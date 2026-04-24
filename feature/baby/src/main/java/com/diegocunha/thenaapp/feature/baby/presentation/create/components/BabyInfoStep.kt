@@ -162,7 +162,7 @@ fun BabyInfoStep(
             .padding(horizontal = spacing.lg, vertical = spacing.lg),
         verticalArrangement = Arrangement.spacedBy(spacing.lg),
     ) {
-        // Avatar picker
+
         Column(
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,

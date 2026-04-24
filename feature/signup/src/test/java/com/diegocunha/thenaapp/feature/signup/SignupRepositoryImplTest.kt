@@ -6,6 +6,7 @@ import com.diegocunha.thenaapp.datasource.network.model.user.UserResponse
 import com.diegocunha.thenaapp.datasource.network.service.UserService
 import com.diegocunha.thenaapp.datasource.repository.GoogleSignInException
 import com.diegocunha.thenaapp.datasource.repository.LoginCredentialsManager
+import com.diegocunha.thenaapp.datasource.repository.UserSessionRepository
 import com.diegocunha.thenaapp.feature.signup.domain.GoogleSignUpResponse
 import com.diegocunha.thenaapp.feature.signup.repository.SignupRepositoryImpl
 import com.google.android.gms.tasks.Task
@@ -13,6 +14,7 @@ import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import io.mockk.coEvery
+import io.mockk.coJustRun
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.unmockkAll
@@ -36,6 +38,7 @@ class SignupRepositoryImplTest {
     private val userService: UserService = mockk()
     private val firebaseAuth: FirebaseAuth = mockk()
     private val loginCredentialsManager: LoginCredentialsManager = mockk()
+    private val userSessionRepository: UserSessionRepository = mockk()
     private val dispatchersProvider: DispatchersProvider = mockk {
         every { io() } returns testDispatcher
     }
@@ -46,17 +49,20 @@ class SignupRepositoryImplTest {
         id = UUID.randomUUID(),
         name = "Test User",
         email = "test@example.com",
+        babies = emptyList(),
     )
     private val mockFirebaseUser: FirebaseUser = mockk()
 
     @Before
     fun setUp() {
+        coJustRun { userSessionRepository.saveUserId(any()) }
         Dispatchers.setMain(testDispatcher)
         repository = SignupRepositoryImpl(
             userService = userService,
             firebaseAuth = firebaseAuth,
             dispatchersProvider = dispatchersProvider,
             loginCredentialsManager = loginCredentialsManager,
+            userSessionRepository = userSessionRepository,
         )
     }
 
@@ -65,8 +71,6 @@ class SignupRepositoryImplTest {
         unmockkAll()
         Dispatchers.resetMain()
     }
-
-    // region createUser
 
     @Test
     fun `WHEN createUser succeeds THEN Resource Success with UserResponse is returned`() = runTest {
@@ -110,10 +114,6 @@ class SignupRepositoryImplTest {
         assertTrue(result is Resource.Error)
     }
 
-    // endregion
-
-    // region createUserWithGoogle
-
     @Test
     fun `WHEN createUserWithGoogle succeeds THEN Resource Success with email is returned`() = runTest {
         coEvery { loginCredentialsManager.getGoogleIdToken() } returns "valid-id-token"
@@ -124,7 +124,7 @@ class SignupRepositoryImplTest {
         val result = repository.createUserWithGoogle()
 
         assertTrue(result is Resource.Success)
-        assertEquals(GoogleSignUpResponse(email = mockUser.email), (result as Resource.Success).data)
+        assertEquals(GoogleSignUpResponse(email = mockUser.email, isUserAlreadyCreated = true), (result as Resource.Success).data)
     }
 
     @Test
@@ -158,10 +158,6 @@ class SignupRepositoryImplTest {
         assertTrue(result is Resource.Error)
     }
 
-    // endregion
-
-    // region updateUser
-
     @Test
     fun `WHEN updateUser succeeds THEN Resource Success with UserResponse is returned`() = runTest {
         coEvery { userService.updateProfile(any()) } returns mockUser
@@ -180,8 +176,6 @@ class SignupRepositoryImplTest {
 
         assertTrue(result is Resource.Error)
     }
-
-    // endregion
 
     private fun successfulAuthResult(user: FirebaseUser?): Task<AuthResult> = mockk {
         every { isComplete } returns true

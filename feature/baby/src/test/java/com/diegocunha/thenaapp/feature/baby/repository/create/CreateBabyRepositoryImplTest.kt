@@ -72,8 +72,6 @@ class CreateBabyRepositoryImplTest {
         Dispatchers.resetMain()
     }
 
-    // region createBaby
-
     @Test
     fun `WHEN createBaby without photo THEN updateBaby called with null photoUrl and returns Success`() = runTest {
         coEvery { babyService.createBaby(any()) } returns mockBabyResponse
@@ -136,8 +134,6 @@ class CreateBabyRepositoryImplTest {
 
         assertTrue(result is Resource.Error)
     }
-
-    // endregion
 
     private fun buildRequest(photo: Uri? = null) = CreateBabyRequest(
         name = "Luna",

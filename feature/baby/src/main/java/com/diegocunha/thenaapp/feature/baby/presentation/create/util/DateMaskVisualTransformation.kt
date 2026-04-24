@@ -30,7 +30,6 @@ class DateMaskVisualTransformation : VisualTransformation {
     }
 
     private fun offsetMapping(rawLen: Int, formattedLen: Int) = if (isYMD) {
-        // YYYY-MM-DD: separators inserted after positions 3 and 5 in raw (at formatted 4 and 7)
         object : OffsetMapping {
             override fun originalToTransformed(offset: Int): Int {
                 var adj = offset
@@ -46,7 +45,6 @@ class DateMaskVisualTransformation : VisualTransformation {
             }
         }
     } else {
-        // DD/MM/YYYY: separators inserted after positions 1 and 3 in raw (at formatted 2 and 5)
         object : OffsetMapping {
             override fun originalToTransformed(offset: Int): Int {
                 var adj = offset
