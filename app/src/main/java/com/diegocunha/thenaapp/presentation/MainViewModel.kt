@@ -3,7 +3,7 @@ package com.diegocunha.thenaapp.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation3.runtime.NavKey
-import com.diegocunha.thenaapp.feature.baby.presentation.create.navigation.CreateBabyNavigation
+import com.diegocunha.thenaapp.feature.home.presentation.navigation.HomeNavigation
 import com.diegocunha.thenaapp.feature.login.presentation.navigation.LoginNavigation
 import com.diegocunha.thenaapp.feature.onboarding.domain.repository.OnboardingRepository
 import com.diegocunha.thenaapp.feature.onboarding.presentation.navigation.OnboardingNavigation
@@ -28,7 +28,7 @@ class MainViewModel(
             user == null -> LoginNavigation
             else -> try {
                 user.getIdToken(true).await()
-                CreateBabyNavigation
+                HomeNavigation
             } catch (ex: Exception) {
                 Timber.e(ex)
                 LoginNavigation

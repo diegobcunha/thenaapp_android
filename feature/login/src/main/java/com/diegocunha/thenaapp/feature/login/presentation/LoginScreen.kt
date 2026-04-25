@@ -36,7 +36,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -52,6 +51,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.diegocunha.thenaapp.coreui.theme.ThenaTheme
 import com.diegocunha.thenaapp.feature.login.R
 import kotlinx.coroutines.flow.collectLatest
@@ -64,7 +64,7 @@ fun LoginScreen(
     onNavigateToSignUp: () -> Unit,
     onNavigateToCreateBaby: () -> Unit
 ) {
-    val state by viewModel.state.collectAsState()
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
 
@@ -79,15 +79,22 @@ fun LoginScreen(
         }
     }
 
+    val onEmailChange = remember(viewModel) { { email: String -> viewModel.sendIntent(LoginIntent.UpdateEmail(email)) } }
+    val onPasswordChange = remember(viewModel) { { password: String -> viewModel.sendIntent(LoginIntent.UpdatePassword(password)) } }
+    val onSubmitLogin = remember(viewModel) { { viewModel.sendIntent(LoginIntent.SubmitLogin) } }
+    val onGoogleSignIn = remember(viewModel) { { viewModel.sendIntent(LoginIntent.TriggerGoogleSignIn) } }
+    val onForgotPassword = remember(viewModel) { { viewModel.sendIntent(LoginIntent.ForgotPassword) } }
+    val onSignUp = remember(viewModel) { { viewModel.sendIntent(LoginIntent.NavigateToSignUp) } }
+
     LoginScreenContent(
         state = state,
         snackbarHostState = snackbarHostState,
-        onEmailChange = { viewModel.sendIntent(LoginIntent.UpdateEmail(it)) },
-        onPasswordChange = { viewModel.sendIntent(LoginIntent.UpdatePassword(it)) },
-        onSubmitLogin = { viewModel.sendIntent(LoginIntent.SubmitLogin) },
-        onGoogleSignIn = { viewModel.sendIntent(LoginIntent.TriggerGoogleSignIn) },
-        onForgotPassword = { viewModel.sendIntent(LoginIntent.ForgotPassword) },
-        onSignUp = { viewModel.sendIntent(LoginIntent.NavigateToSignUp) },
+        onEmailChange = onEmailChange,
+        onPasswordChange = onPasswordChange,
+        onSubmitLogin = onSubmitLogin,
+        onGoogleSignIn = onGoogleSignIn,
+        onForgotPassword = onForgotPassword,
+        onSignUp = onSignUp,
     )
 }
 

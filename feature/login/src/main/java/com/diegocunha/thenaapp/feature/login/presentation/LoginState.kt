@@ -1,8 +1,10 @@
 package com.diegocunha.thenaapp.feature.login.presentation
 
 import androidx.annotation.StringRes
+import androidx.compose.runtime.Immutable
 import com.diegocunha.thenaapp.core.mvi.MviState
 
+@Immutable
 data class LoginState(
     val email: String = "",
     val password: String = "",

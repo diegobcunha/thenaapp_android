@@ -17,10 +17,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.diegocunha.thenaapp.coreui.component.StepIndicator
 import com.diegocunha.thenaapp.coreui.theme.ThenaTheme
 import com.diegocunha.thenaapp.feature.baby.R
@@ -38,7 +39,7 @@ fun CreateBabyScreen(
     onNavigateToHome: () -> Unit,
     onNavigateBack: () -> Unit,
 ) {
-    val state by viewModel.state.collectAsState()
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.effects.collectLatest { effect ->
@@ -48,6 +49,17 @@ fun CreateBabyScreen(
         }
     }
 
+    val onBabyNameChange = remember(viewModel) { { name: String -> viewModel.sendIntent(CreateBabyIntent.OnNameChange(name)) } }
+    val onPhotoBase64Change = remember(viewModel) { { uri: Uri? -> viewModel.sendIntent(CreateBabyIntent.OnPhotoChange(uri)) } }
+    val onGenderChange = remember(viewModel) { { gender: BabyGender -> viewModel.sendIntent(CreateBabyIntent.OnGenderChange(gender)) } }
+    val onResponsibleTypeChange = remember(viewModel) { { type: ResponsibleType -> viewModel.sendIntent(CreateBabyIntent.OnResponsibleTypeChange(type)) } }
+    val onBirthDateChange = remember(viewModel) { { date: String -> viewModel.sendIntent(CreateBabyIntent.OnBirthDateChange(date)) } }
+    val onBirthWeightChange = remember(viewModel) { { weight: String -> viewModel.sendIntent(CreateBabyIntent.OnWeightChange(weight)) } }
+    val onBirthHeightChange = remember(viewModel) { { height: String -> viewModel.sendIntent(CreateBabyIntent.OnHeightChange(height)) } }
+    val onNextPage = remember(viewModel) { { viewModel.sendIntent(CreateBabyIntent.OnNextPage) } }
+    val onPreviousPage = remember(viewModel) { { viewModel.sendIntent(CreateBabyIntent.OnPreviousPage) } }
+    val onCreateBaby = remember(viewModel) { { viewModel.sendIntent(CreateBabyIntent.CreateBaby) } }
+
     BackHandler(enabled = state.currentPage > 0) {
         viewModel.sendIntent(CreateBabyIntent.OnPreviousPage)
     }
@@ -55,16 +67,16 @@ fun CreateBabyScreen(
     CreateBabyScreenContent(
         state = state,
         onNavigateBack = onNavigateBack,
-        onBabyNameChange = { viewModel.sendIntent(CreateBabyIntent.OnNameChange(it)) },
-        onPhotoBase64Change = { viewModel.sendIntent(CreateBabyIntent.OnPhotoChange(it)) },
-        onGenderChange = { viewModel.sendIntent(CreateBabyIntent.OnGenderChange(it)) },
-        onResponsibleTypeChange = { viewModel.sendIntent(CreateBabyIntent.OnResponsibleTypeChange(it)) },
-        onBirthDateChange = { viewModel.sendIntent(CreateBabyIntent.OnBirthDateChange(it)) },
-        onBirthWeightChange = { viewModel.sendIntent(CreateBabyIntent.OnWeightChange(it)) },
-        onBirthHeightChange = { viewModel.sendIntent(CreateBabyIntent.OnHeightChange(it)) },
-        onNextPage = { viewModel.sendIntent(CreateBabyIntent.OnNextPage) },
-        onPreviousPage = { viewModel.sendIntent(CreateBabyIntent.OnPreviousPage) },
-        onCreateBaby = { viewModel.sendIntent(CreateBabyIntent.CreateBaby) },
+        onBabyNameChange = onBabyNameChange,
+        onPhotoBase64Change = onPhotoBase64Change,
+        onGenderChange = onGenderChange,
+        onResponsibleTypeChange = onResponsibleTypeChange,
+        onBirthDateChange = onBirthDateChange,
+        onBirthWeightChange = onBirthWeightChange,
+        onBirthHeightChange = onBirthHeightChange,
+        onNextPage = onNextPage,
+        onPreviousPage = onPreviousPage,
+        onCreateBaby = onCreateBaby,
     )
 }
 

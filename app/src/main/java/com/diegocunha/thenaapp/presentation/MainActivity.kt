@@ -1,7 +1,6 @@
 package com.diegocunha.thenaapp.presentation
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -12,10 +11,10 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
@@ -25,6 +24,9 @@ import com.diegocunha.thenaapp.coreui.theme.ThenaTheme
 import com.diegocunha.thenaapp.feature.baby.presentation.create.CreateBabyScreen
 import com.diegocunha.thenaapp.feature.baby.presentation.create.CreateBabyViewModel
 import com.diegocunha.thenaapp.feature.baby.presentation.create.navigation.CreateBabyNavigation
+import com.diegocunha.thenaapp.feature.home.presentation.HomeScreen
+import com.diegocunha.thenaapp.feature.home.presentation.HomeViewModel
+import com.diegocunha.thenaapp.feature.home.presentation.navigation.HomeNavigation
 import com.diegocunha.thenaapp.feature.login.presentation.LoginScreen
 import com.diegocunha.thenaapp.feature.login.presentation.LoginViewModel
 import com.diegocunha.thenaapp.feature.login.presentation.navigation.LoginNavigation
@@ -51,7 +53,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val startDestination by mainViewModel.startDestination.collectAsState()
+                    val startDestination by mainViewModel.startDestination.collectAsStateWithLifecycle()
                     val destination = startDestination
                     if (destination == null) {
                         SplashScreen()
@@ -87,7 +89,7 @@ class MainActivity : ComponentActivity() {
                                         onNavigateToHome = {
                                             with(backStack) {
                                                 removeLastOrNull()
-                                                add(CreateBabyNavigation)
+                                                add(HomeNavigation)
                                             }
                                         },
                                         onNavigateToSignUp = {
@@ -119,9 +121,18 @@ class MainActivity : ComponentActivity() {
                                     CreateBabyScreen(
                                         viewModel = koinViewModel<CreateBabyViewModel>(),
                                         onNavigateToHome = {
-                                            Log.d("ThenaApp", "Baby created!")
+                                            with(backStack) {
+                                                removeLastOrNull()
+                                                add(HomeNavigation)
+                                            }
                                         },
                                         onNavigateBack = { backStack.removeLastOrNull() },
+                                    )
+                                }
+
+                                entry<HomeNavigation> {
+                                    HomeScreen(
+                                        viewModel = koinViewModel<HomeViewModel>()
                                     )
                                 }
                             }

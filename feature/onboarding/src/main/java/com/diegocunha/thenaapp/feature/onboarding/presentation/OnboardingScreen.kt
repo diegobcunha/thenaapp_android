@@ -270,64 +270,82 @@ private fun OnboardingSlideContent(slide: OnboardingSlide) {
 }
 
 @Composable
-private fun slideContent(colors: ColorScheme, extendedColors: ThenaExtendedColors) = listOf(
-    OnboardingSlide(
-        emoji = "🌸",
-        color = colors.primaryContainer,
-        accent = colors.primary,
-        title = stringResource(R.string.onboarding_welcome_title),
-        subtitle = stringResource(R.string.onboarding_welcome_subtitle),
-        features = emptyList(),
-    ),
-    OnboardingSlide(
-        emoji = "🌙",
-        color = extendedColors.sleepFill,
-        accent = colors.primary,
-        title = stringResource(R.string.onboarding_sleep_title),
-        subtitle = stringResource(R.string.onboarding_sleep_subtitle),
-        features = listOf(
-            stringResource(R.string.onboarding_sleep_feature_1),
-            stringResource(R.string.onboarding_sleep_feature_2),
-            stringResource(R.string.onboarding_sleep_feature_3),
-        ),
-    ),
-    OnboardingSlide(
-        emoji = "🍼",
-        color = extendedColors.feedFill,
-        accent = colors.secondary,
-        title = stringResource(R.string.onboarding_feed_title),
-        subtitle = stringResource(R.string.onboarding_feed_subtitle),
-        features = listOf(
-            stringResource(R.string.onboarding_feed_feature_1),
-            stringResource(R.string.onboarding_feed_feature_2),
-            stringResource(R.string.onboarding_feed_feature_3),
-        ),
-    ),
-    OnboardingSlide(
-        emoji = "💉",
-        color = extendedColors.vaccineFill,
-        accent = Color(0xFF4CAF50),
-        title = stringResource(R.string.onboarding_vaccine_title),
-        subtitle = stringResource(R.string.onboarding_vaccine_subtitle),
-        features = listOf(
-            stringResource(R.string.onboarding_vaccine_feature_1),
-            stringResource(R.string.onboarding_vaccine_feature_2),
-            stringResource(R.string.onboarding_vaccine_feature_3),
-        ),
-    ),
-    OnboardingSlide(
-        emoji = "📊",
-        color = extendedColors.summaryFill,
-        accent = colors.tertiary,
-        title = stringResource(R.string.onboarding_insight_title),
-        subtitle = stringResource(R.string.onboarding_insight_subtitle),
-        features = listOf(
-            stringResource(R.string.onboarding_insight_feature_1),
-            stringResource(R.string.onboarding_insight_feature_2),
-            stringResource(R.string.onboarding_insight_feature_3),
-        ),
-    ),
-)
+private fun slideContent(
+    colors: ColorScheme,
+    extendedColors: ThenaExtendedColors
+): List<OnboardingSlide> {
+    val welcomeTitle = stringResource(R.string.onboarding_welcome_title)
+    val welcomeSubtitle = stringResource(R.string.onboarding_welcome_subtitle)
+
+    val sleepTitle = stringResource(R.string.onboarding_sleep_title)
+    val sleepSubtitle = stringResource(R.string.onboarding_sleep_subtitle)
+    val sleepF1 = stringResource(R.string.onboarding_sleep_feature_1)
+    val sleepF2 = stringResource(R.string.onboarding_sleep_feature_2)
+    val sleepF3 = stringResource(R.string.onboarding_sleep_feature_3)
+
+    val feedTitle = stringResource(R.string.onboarding_feed_title)
+    val feedSubtitle = stringResource(R.string.onboarding_feed_subtitle)
+    val feedF1 = stringResource(R.string.onboarding_feed_feature_1)
+    val feedF2 = stringResource(R.string.onboarding_feed_feature_2)
+    val feedF3 = stringResource(R.string.onboarding_feed_feature_3)
+
+    val vaccineTitle = stringResource(R.string.onboarding_vaccine_title)
+    val vaccineSubtitle = stringResource(R.string.onboarding_vaccine_subtitle)
+    val vaccineF1 = stringResource(R.string.onboarding_vaccine_feature_1)
+    val vaccineF2 = stringResource(R.string.onboarding_vaccine_feature_2)
+    val vaccineF3 = stringResource(R.string.onboarding_vaccine_feature_3)
+
+    val insightTitle = stringResource(R.string.onboarding_insight_title)
+    val insightSubtitle = stringResource(R.string.onboarding_insight_subtitle)
+    val insightF1 = stringResource(R.string.onboarding_insight_feature_1)
+    val insightF2 = stringResource(R.string.onboarding_insight_feature_2)
+    val insightF3 = stringResource(R.string.onboarding_insight_feature_3)
+
+    return remember(colors, extendedColors) {
+        listOf(
+            OnboardingSlide(
+                emoji = "🌸",
+                color = colors.primaryContainer,
+                accent = colors.primary,
+                title = welcomeTitle,
+                subtitle = welcomeSubtitle,
+                features = emptyList(),
+            ),
+            OnboardingSlide(
+                emoji = "🌙",
+                color = extendedColors.sleepFill,
+                accent = colors.primary,
+                title = sleepTitle,
+                subtitle = sleepSubtitle,
+                features = listOf(sleepF1, sleepF2, sleepF3),
+            ),
+            OnboardingSlide(
+                emoji = "🍼",
+                color = extendedColors.feedFill,
+                accent = colors.secondary,
+                title = feedTitle,
+                subtitle = feedSubtitle,
+                features = listOf(feedF1, feedF2, feedF3),
+            ),
+            OnboardingSlide(
+                emoji = "💉",
+                color = extendedColors.vaccineFill,
+                accent = Color(0xFF4CAF50),
+                title = vaccineTitle,
+                subtitle = vaccineSubtitle,
+                features = listOf(vaccineF1, vaccineF2, vaccineF3),
+            ),
+            OnboardingSlide(
+                emoji = "📊",
+                color = extendedColors.summaryFill,
+                accent = colors.tertiary,
+                title = insightTitle,
+                subtitle = insightSubtitle,
+                features = listOf(insightF1, insightF2, insightF3),
+            ),
+        )
+    }
+}
 
 @Preview
 @Composable

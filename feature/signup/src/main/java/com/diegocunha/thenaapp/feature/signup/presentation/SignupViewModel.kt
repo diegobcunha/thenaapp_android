@@ -1,6 +1,5 @@
 package com.diegocunha.thenaapp.feature.signup.presentation
 
-import android.util.Log
 import androidx.annotation.StringRes
 import androidx.lifecycle.viewModelScope
 import com.diegocunha.thenaapp.core.mvi.BaseViewModel
@@ -8,6 +7,7 @@ import com.diegocunha.thenaapp.core.resource.Resource
 import com.diegocunha.thenaapp.feature.signup.R
 import com.diegocunha.thenaapp.feature.signup.domain.SignupRepository
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import com.diegocunha.thenaapp.coreui.R as CoreUiR
 
 class SignupViewModel(
@@ -186,8 +186,8 @@ class SignupViewModel(
                 }
 
                 is Resource.Error -> {
+                    Timber.e(result.exception)
                     updateState {
-                        Log.e("Error", "Error", result.exception)
                         copy(
                             isLoading = false,
                             generalError = CoreUiR.string.generic_error

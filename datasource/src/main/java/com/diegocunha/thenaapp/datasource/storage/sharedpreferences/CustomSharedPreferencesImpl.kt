@@ -12,15 +12,19 @@ class CustomSharedPreferencesImpl(
     private val dispatchersProvider: DispatchersProvider,
 ) : CustomSharedPreferences {
 
-    private val job = CoroutineScope(SupervisorJob() + dispatchersProvider.io())
+    private val scope = CoroutineScope(SupervisorJob() + dispatchersProvider.io())
     private val values = HashMap<String, Any?>()
     private val sharedPreferences by lazy {
         context.getSharedPreferences(SHARED_PREFERENCES, Context.MODE_PRIVATE)
     }
 
+    init {
+        scope.launch { sharedPreferences }
+    }
+
     override fun putBoolean(key: String, value: Boolean) {
         values[key] = value
-        job.launch {
+        scope.launch {
             sharedPreferences.edit { putBoolean(key, value) }
         }
     }
@@ -37,7 +41,7 @@ class CustomSharedPreferencesImpl(
 
     override fun putString(key: String, value: String?) {
         values[key] = value
-        job.launch {
+        scope.launch {
             sharedPreferences.edit { putString(key, value) }
         }
     }

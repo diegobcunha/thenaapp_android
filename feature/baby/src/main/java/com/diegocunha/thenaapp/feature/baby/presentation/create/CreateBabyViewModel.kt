@@ -125,6 +125,8 @@ class CreateBabyViewModel(
                 gender = current.babyGender ?: BabyGender.OTHER,
                 photo = current.photo,
                 responsibleType = current.responsibleType ?: ResponsibleType.OTHER,
+                weight = current.birthWeight,
+                height = current.birthHeight
             )
             when (createBabyRepository.createBaby(request)) {
                 is Resource.Success -> sendEffect(CreateBabyEffect.NavigateToHome)

@@ -37,7 +37,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,6 +49,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.diegocunha.thenaapp.coreui.theme.ThenaTheme
 import com.diegocunha.thenaapp.feature.signup.R
 import kotlinx.coroutines.flow.collectLatest
@@ -61,7 +61,7 @@ fun SignupScreen(
     onBackPressed: () -> Unit,
     navigateToCreateBaby: () -> Unit,
 ) {
-    val state by viewModel.state.collectAsState()
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
@@ -72,16 +72,23 @@ fun SignupScreen(
         }
     }
 
+    val onNameChange = remember(viewModel) { { name: String -> viewModel.sendIntent(SignupIntent.UpdateName(name)) } }
+    val onEmailChange = remember(viewModel) { { email: String -> viewModel.sendIntent(SignupIntent.UpdateEmail(email)) } }
+    val onPasswordChange = remember(viewModel) { { password: String -> viewModel.sendIntent(SignupIntent.UpdatePassword(password)) } }
+    val onConfirmPasswordChange = remember(viewModel) { { confirm: String -> viewModel.sendIntent(SignupIntent.UpdateConfirmPassword(confirm)) } }
+    val onSubmitSignup = remember(viewModel) { { viewModel.sendIntent(SignupIntent.SubmitSignup) } }
+    val onGoogleSignIn = remember(viewModel) { { viewModel.sendIntent(SignupIntent.TriggerGoogleSignIn) } }
+
     SignupScreenContent(
         state = state,
         onBackPressed = onBackPressed,
         snackbarHostState = snackbarHostState,
-        onNameChange = { viewModel.sendIntent(SignupIntent.UpdateName(it)) },
-        onEmailChange = { viewModel.sendIntent(SignupIntent.UpdateEmail(it)) },
-        onPasswordChange = { viewModel.sendIntent(SignupIntent.UpdatePassword(it)) },
-        onConfirmPasswordChange = { viewModel.sendIntent(SignupIntent.UpdateConfirmPassword(it)) },
-        onSubmitSignup = { viewModel.sendIntent(SignupIntent.SubmitSignup) },
-        onGoogleSignIn = { viewModel.sendIntent(SignupIntent.TriggerGoogleSignIn) },
+        onNameChange = onNameChange,
+        onEmailChange = onEmailChange,
+        onPasswordChange = onPasswordChange,
+        onConfirmPasswordChange = onConfirmPasswordChange,
+        onSubmitSignup = onSubmitSignup,
+        onGoogleSignIn = onGoogleSignIn,
     )
 }
 
@@ -109,6 +116,10 @@ private fun SignupScreenContent(
         }
     }
 
+    val headerBrush = remember(colors.primaryContainer, colors.secondaryContainer) {
+        Brush.linearGradient(listOf(colors.primaryContainer, colors.secondaryContainer))
+    }
+
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
@@ -122,11 +133,7 @@ private fun SignupScreenContent(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(
-                        Brush.linearGradient(
-                            listOf(colors.primaryContainer, colors.secondaryContainer)
-                        )
-                    ),
+                    .background(headerBrush),
             ) {
                 Column(
                     modifier = Modifier

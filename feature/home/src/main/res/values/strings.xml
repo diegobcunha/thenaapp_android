@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_welcome">Hi, %1$s</string>
+    <string name="home_not_developed_yet">Not developed yet, try again later!</string>
+    <string name="home_edit_info">Edit</string>
+    <plurals name="home_baby_age_months">
+        <item quantity="one">%d month</item>
+        <item quantity="other">%d months</item>
+    </plurals>
+    <plurals name="home_baby_age_years">
+        <item quantity="one">%d year</item>
+        <item quantity="other">%d years</item>
+    </plurals>
+    <string name="home_baby_info">%1$skg, %2$scm</string>
+
+    <string name="home_quick_log_title">Quick log</string>
+    <string name="home_quick_log_sleep">Sleep</string>
+    <string name="home_quick_log_feed">Feeding</string>
+    <string name="home_quick_log_vaccine">Vaccines</string>
+    <string name="home_quick_log_summary">Summary</string>
+</resources>

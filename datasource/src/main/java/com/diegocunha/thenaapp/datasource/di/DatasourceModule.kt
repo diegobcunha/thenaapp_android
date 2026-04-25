@@ -34,7 +34,7 @@ val datasourceModule = module {
 
     factory<FirebaseAuth> { FirebaseAuth.getInstance() }
 
-    single<OkHttpClient.Builder> {
+    factory<OkHttpClient.Builder> {
         OkHttpClient.Builder()
             .addInterceptor(
                 HttpLoggingInterceptor().setLevel(
