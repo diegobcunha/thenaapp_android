@@ -1,8 +1,10 @@
 package com.diegocunha.thenaapp.feature.signup.presentation
 
 import androidx.annotation.StringRes
+import androidx.compose.runtime.Immutable
 import com.diegocunha.thenaapp.core.mvi.MviState
 
+@Immutable
 data class SignupState(
     val name: String = "",
     val email: String = "",

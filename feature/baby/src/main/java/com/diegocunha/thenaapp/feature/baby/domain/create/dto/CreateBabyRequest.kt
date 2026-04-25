@@ -10,4 +10,6 @@ data class CreateBabyRequest(
     val gender: BabyGender,
     val responsibleType: ResponsibleType,
     val photo: Uri?,
+    val weight: String,
+    val height: String,
 )

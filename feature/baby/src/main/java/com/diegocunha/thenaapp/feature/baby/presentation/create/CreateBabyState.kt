@@ -2,10 +2,12 @@ package com.diegocunha.thenaapp.feature.baby.presentation.create
 
 import android.net.Uri
 import androidx.annotation.StringRes
+import androidx.compose.runtime.Stable
 import com.diegocunha.thenaapp.core.mvi.MviState
 import com.diegocunha.thenaapp.feature.baby.domain.model.BabyGender
 import com.diegocunha.thenaapp.feature.baby.domain.model.ResponsibleType
 
+@Stable
 data class CreateBabyState(
     val babyName: String = "",
     val babyGender: BabyGender? = null,

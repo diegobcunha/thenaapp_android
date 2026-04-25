@@ -12,6 +12,7 @@
     <string name="login_error_email_required">Email is required</string>
     <string name="login_error_email_invalid">Enter a valid email address</string>
     <string name="generic_error">Something when wrong, try again later.</string>
+    <string name="loading">Loading...</string>
 
     <!-- Password validation errors -->
     <string name="login_error_password_required">Password is required</string>

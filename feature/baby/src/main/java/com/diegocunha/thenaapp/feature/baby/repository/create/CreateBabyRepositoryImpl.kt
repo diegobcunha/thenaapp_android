@@ -13,6 +13,7 @@ import com.diegocunha.thenaapp.feature.baby.domain.create.dto.CreateBabyRequest
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import java.math.BigDecimal
 import java.util.UUID
 import com.diegocunha.thenaapp.datasource.network.model.baby.CreateBabyRequest as DatasourceCreateBabyRequest
 
@@ -31,6 +32,8 @@ class CreateBabyRepositoryImpl(
                     birthDate = request.birthDate,
                     gender = request.gender.name,
                     responsible = request.responsibleType.name,
+                    birthWeight = BigDecimal(request.weight),
+                    birthHeight = BigDecimal(request.height)
                 )
             )
 

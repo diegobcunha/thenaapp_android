@@ -62,7 +62,7 @@ android {
         }
 
         release {
-            buildConfigField("String", "BASE_URL", "")
+            buildConfigField("String", "BASE_URL", "\"https://thenaappbe-production.up.railway.app\"")
             buildConfigField(
                 "String",
                 "CLOUDINARY_CLOUD_NAME",
