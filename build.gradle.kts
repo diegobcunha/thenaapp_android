@@ -12,10 +12,11 @@ plugins {
 dependencies {
     kover(project(":core"))
     kover(project(":datasource"))
-    kover(project(":feature:login"))
-    kover(project(":feature:signup"))
-    kover(project(":feature:onboarding"))
+    kover(project(":feature:baby"))
     kover(project(":feature:home"))
+    kover(project(":feature:login"))
+    kover(project(":feature:onboarding"))
+    kover(project(":feature:signup"))
 }
 
 kover {
