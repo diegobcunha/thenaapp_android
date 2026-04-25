@@ -13,7 +13,7 @@ jobs:
     name: Test & Coverage
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
 
     steps:
       - name: Checkout
@@ -100,19 +100,16 @@ jobs:
           fi
           echo "BADGE_COLOR=$COLOR" >> $GITHUB_ENV
 
-      - name: Update coverage badge in README
+      - name: Update coverage badge
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: |
-          sed -i "s|!\[Coverage\](https://img.shields.io/badge/coverage-[^)]*)|![Coverage](https://img.shields.io/badge/coverage-${COVERAGE}%25-${BADGE_COLOR})|g" README.md
-
-      - name: Commit and push updated badge
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add README.md
-          git diff --staged --quiet || git commit -m "ci: update coverage badge to ${COVERAGE}% [skip ci]"
-          git push
+        uses: schneegans/dynamic-badges-action@v1.7.0
+        with:
+          auth: ${{ secrets.GIST_TOKEN }}
+          gistID: ${{ secrets.GIST_ID }}
+          filename: thenaapp-coverage.json
+          label: coverage
+          message: ${{ env.COVERAGE }}%
+          color: ${{ env.BADGE_COLOR }}
 
       - name: Enforce coverage threshold
         run: ./gradlew koverVerify
