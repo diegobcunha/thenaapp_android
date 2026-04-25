@@ -260,6 +260,23 @@ class SignupViewModelTest {
         }
 
     @Test
+    fun `WHEN SubmitSignup with isSignupByGoogle true and updateUser fails THEN generalError is set and isLoading is false`() =
+        runTest {
+            coEvery { signupRepository.createUserWithGoogle() } returns Resource.Success(
+                GoogleSignUpResponse(email = "test@example.com", isUserAlreadyCreated = false)
+            )
+            coEvery { signupRepository.updateUser(any()) } returns Resource.Error(Exception("Update failed"))
+
+            viewModel.sendIntent(SignupIntent.TriggerGoogleSignIn)
+            viewModel.sendIntent(SignupIntent.UpdateName("Diego"))
+            viewModel.sendIntent(SignupIntent.SubmitSignup)
+
+            val state = viewModel.state.value
+            assertNotNull(state.generalError)
+            assertEquals(false, state.isLoading)
+        }
+
+    @Test
     fun `WHEN validateConfirmPassword with matching valid passwords THEN returns null`() {
         val result = viewModel.validateConfirmPassword("Password@1", "Password@1")
 

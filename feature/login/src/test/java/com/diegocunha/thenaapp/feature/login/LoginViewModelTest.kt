@@ -139,6 +139,18 @@ class LoginViewModelTest {
     }
 
     @Test
+    fun `WHEN ForgotPassword with valid email and error THEN generalError is set and isLoading is false`() = runTest {
+        coEvery { loginRepository.sendPasswordResetEmail(any()) } returns Resource.Error(Exception("Reset failed"))
+
+        viewModel.sendIntent(LoginIntent.UpdateEmail("test@example.com"))
+        viewModel.sendIntent(LoginIntent.ForgotPassword)
+
+        val state = viewModel.state.value
+        assertNotNull(state.generalError)
+        assertEquals(false, state.isLoading)
+    }
+
+    @Test
     fun `WHEN NavigateToSignUp intent THEN NavigateToSignUp effect emitted`() = runTest {
         viewModel.effects.test {
             viewModel.sendIntent(LoginIntent.NavigateToSignUp)
