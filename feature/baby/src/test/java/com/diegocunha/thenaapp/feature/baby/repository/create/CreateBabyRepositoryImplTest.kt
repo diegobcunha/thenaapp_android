@@ -25,6 +25,7 @@ import org.junit.After
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import java.math.BigDecimal
 import java.util.UUID
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -48,6 +49,8 @@ class CreateBabyRepositoryImplTest {
         gender = "GIRL",
         photoUrl = null,
         responsible = emptyList(),
+        birthWeight = BigDecimal.ZERO,
+        birthHeight = BigDecimal.ZERO,
     )
     private val mockCloudinaryResponse = CloudinaryResponse(
         secureUrl = "https://res.cloudinary.com/test/image/upload/profile.jpg",
@@ -141,5 +144,7 @@ class CreateBabyRepositoryImplTest {
         gender = BabyGender.GIRL,
         responsibleType = ResponsibleType.MOTHER,
         photo = photo,
+        "0",
+        "0"
     )
 }

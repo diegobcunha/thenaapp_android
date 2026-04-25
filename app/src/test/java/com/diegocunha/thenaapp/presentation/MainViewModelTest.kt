@@ -1,6 +1,6 @@
 package com.diegocunha.thenaapp.presentation
 
-import com.diegocunha.thenaapp.feature.baby.presentation.create.navigation.CreateBabyNavigation
+import com.diegocunha.thenaapp.feature.home.presentation.navigation.HomeNavigation
 import com.diegocunha.thenaapp.feature.login.presentation.navigation.LoginNavigation
 import com.diegocunha.thenaapp.feature.onboarding.domain.repository.OnboardingRepository
 import com.diegocunha.thenaapp.feature.onboarding.presentation.navigation.OnboardingNavigation
@@ -62,7 +62,7 @@ class MainViewModelTest {
         }
 
     @Test
-    fun `WHEN onboarding seen and token refresh succeeds THEN startDestination is CreateBabyNavigation`() =
+    fun `WHEN onboarding seen and token refresh succeeds THEN startDestination is HomeNavigation`() =
         runTest {
             every { onboardingRepository.hasSeenOnboarding() } returns true
             every { firebaseAuth.currentUser } returns mockFirebaseUser
@@ -70,7 +70,7 @@ class MainViewModelTest {
 
             val viewModel = MainViewModel(onboardingRepository, firebaseAuth)
 
-            Assert.assertEquals(CreateBabyNavigation, viewModel.startDestination.value)
+            Assert.assertEquals(HomeNavigation, viewModel.startDestination.value)
         }
 
     @Test
