@@ -115,4 +115,4 @@ jobs:
           git push
 
       - name: Enforce coverage threshold
-        run: ./gradlew koverVerifyDebug
+        run: ./gradlew koverVerify

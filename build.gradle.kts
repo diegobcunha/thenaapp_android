@@ -30,20 +30,27 @@ kover {
         filters {
             excludes {
                 packages(
-                    "com.diegocunha.thenaapp.di",
-                    "com.diegocunha.thenaapp.core.di",
-                    "com.diegocunha.thenaapp.datasource.di",
-                    "com.diegocunha.thenaapp.feature.login.di",
-                    "com.diegocunha.thenaapp.feature.signup.di",
-                    "com.diegocunha.thenaapp.feature.onboarding.di",
-                    "com.diegocunha.thenaapp.feature.home.di",
-                    "com.diegocunha.thenaapp.feature.baby.di",
-                    "com.diegocunha.thenaapp.datasource.model",
+                    "com.diegocunha.thenaapp.datasource.network.model",
                     "com.diegocunha.thenaapp.coreui",
                 )
+                annotatedBy("androidx.compose.runtime.Composable")
                 classes(
-                    "com.diegocunha.thenaapp.feature.login.domain.LoginCredentialsManager",
+                    "*.BuildConfig",
+                    "*.ComposableSingletons*",
+                    "*.di.*",
+                    "*.navigation.*",
+                    "*.create.components.*",
+                    "*Screen",
                     "*Exception*",
+                    "*LoginCredentialsManager*",
+                    "*DateMaskVisualTransformation*",
+                    "*OnboardingSlide*",
+                    "*ImageCompressor*",
+                    "*AccessTokenRepositoryImpl*",
+                    "*CustomSharedPreferencesImpl*",
+                    "*RetrofitFactory*",
+                    "*DispatchersProviderImpl*",
+                    "*GoogleSignUpResponse*"
                 )
             }
         }
