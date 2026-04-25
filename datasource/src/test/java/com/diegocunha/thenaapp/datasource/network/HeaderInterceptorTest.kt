@@ -5,14 +5,21 @@ import com.diegocunha.thenaapp.datasource.network.interceptor.HeaderInterceptor
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
+import io.mockk.unmockkAll
 import io.mockk.verify
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class HeaderInterceptorTest {
+
+    @After
+    fun tearDown() {
+        unmockkAll()
+    }
 
     private val accessTokenRepository: AccessTokenRepository = mockk {
         every { getAccessToken() } returns "test-token"

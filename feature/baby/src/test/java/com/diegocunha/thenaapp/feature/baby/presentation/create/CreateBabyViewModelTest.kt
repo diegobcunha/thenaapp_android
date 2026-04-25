@@ -23,6 +23,7 @@ import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
+import java.util.Locale
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CreateBabyViewModelTest {
@@ -30,9 +31,11 @@ class CreateBabyViewModelTest {
     private val testDispatcher = UnconfinedTestDispatcher()
     private val createBabyRepository: CreateBabyRepository = mockk()
     private lateinit var viewModel: CreateBabyViewModel
+    private val originalLocale = Locale.getDefault()
 
     @Before
     fun setUp() {
+        Locale.setDefault(Locale.forLanguageTag("pt-BR"))
         Dispatchers.setMain(testDispatcher)
         viewModel = CreateBabyViewModel(createBabyRepository)
     }
@@ -41,6 +44,7 @@ class CreateBabyViewModelTest {
     fun tearDown() {
         unmockkAll()
         Dispatchers.resetMain()
+        Locale.setDefault(originalLocale)
     }
 
     @Test
