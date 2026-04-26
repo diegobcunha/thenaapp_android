@@ -131,6 +131,31 @@ All versions are in `gradle/libs.versions.toml`. Add entries there first, then r
 - **Coverage:** kotlinx-kover — Compose screens excluded, minimum **80%** threshold enforced in CI via `koverVerify`
 - Test naming convention: `` `WHEN <condition> THEN <expectation>` ``
 
+## Screenshot Testing
+
+Screenshot tests use the [AGP Compose Screenshot Testing](https://developer.android.com/studio/test/compose-screenshot-testing) plugin (`com.android.compose.screenshot`). Currently only `:coreui` has screenshot tests; other modules will be added incrementally.
+
+```bash
+./gradlew :coreui:updateDebugScreenshotTest    # Regenerate golden reference images
+./gradlew :coreui:validateDebugScreenshotTest  # Compare against goldens (runs in CI)
+```
+
+**Rules for adding screenshot tests to a module:**
+
+1. Enable the plugin and experimental flag in `build.gradle.kts`:
+   ```kotlin
+   plugins { alias(libs.plugins.screenshot) }
+   android { experimentalProperties["android.experimental.enableScreenshotTest"] = true }
+   dependencies { screenshotTestImplementation(libs.screenshot.validation.api) }
+   ```
+2. Create test files under `src/screenshotTest/java/…` — **not** `src/main/`.
+3. Functions must **not** be `private` — the runner uses reflection to discover them.
+4. Always annotate with both `@PreviewTest` and `@Preview`. Keep plain `@Preview` in the main source set for Android Studio previews.
+5. **Dark mode:** pass `darkTheme = true` explicitly to `ThenaTheme` — do not rely on `uiMode` in `@Preview` or `isSystemInDarkTheme()`, neither propagates correctly in the Robolectric renderer.
+6. **Stale goldens:** `updateDebugScreenshotTest` never deletes old images when the `@Preview` parameters change (the hash suffix in the filename changes). Delete orphaned files manually before committing.
+
+Golden reference images are stored in `src/screenshotTestDebug/reference/` and **must be committed** to the repository so CI can validate against them.
+
 ## Theme & Design System
 
 Material Design 3, dynamic color (Android 12+), automatic light/dark. Theme entry point: `coreui/.../theme/ThenaTheme`.
