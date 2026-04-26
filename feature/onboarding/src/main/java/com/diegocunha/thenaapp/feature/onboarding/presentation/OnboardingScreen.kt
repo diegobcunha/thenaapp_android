@@ -41,10 +41,13 @@ import androidx.compose.ui.unit.sp
 import com.diegocunha.thenaapp.coreui.theme.ThenaExtendedColors
 import com.diegocunha.thenaapp.coreui.theme.ThenaTheme
 import com.diegocunha.thenaapp.feature.onboarding.R
+import com.skydoves.compose.stability.runtime.TraceRecomposition
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @Composable
+@TraceRecomposition
 fun OnboardingScreen(
     viewModel: OnboardingViewModel,
     onNavigateToLogin: () -> Unit,
@@ -313,7 +316,7 @@ private fun slideContent(
                 accent = colors.primary,
                 title = welcomeTitle,
                 subtitle = welcomeSubtitle,
-                features = emptyList(),
+                features = persistentListOf(),
             ),
             OnboardingSlide(
                 emoji = "🌙",
@@ -321,7 +324,7 @@ private fun slideContent(
                 accent = colors.primary,
                 title = sleepTitle,
                 subtitle = sleepSubtitle,
-                features = listOf(sleepF1, sleepF2, sleepF3),
+                features = persistentListOf(sleepF1, sleepF2, sleepF3),
             ),
             OnboardingSlide(
                 emoji = "🍼",
@@ -329,7 +332,7 @@ private fun slideContent(
                 accent = colors.secondary,
                 title = feedTitle,
                 subtitle = feedSubtitle,
-                features = listOf(feedF1, feedF2, feedF3),
+                features = persistentListOf(feedF1, feedF2, feedF3),
             ),
             OnboardingSlide(
                 emoji = "💉",
@@ -337,7 +340,7 @@ private fun slideContent(
                 accent = Color(0xFF4CAF50),
                 title = vaccineTitle,
                 subtitle = vaccineSubtitle,
-                features = listOf(vaccineF1, vaccineF2, vaccineF3),
+                features = persistentListOf(vaccineF1, vaccineF2, vaccineF3),
             ),
             OnboardingSlide(
                 emoji = "📊",
@@ -345,7 +348,7 @@ private fun slideContent(
                 accent = colors.tertiary,
                 title = insightTitle,
                 subtitle = insightSubtitle,
-                features = listOf(insightF1, insightF2, insightF3),
+                features = persistentListOf(insightF1, insightF2, insightF3),
             ),
         )
     }

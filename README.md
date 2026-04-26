@@ -137,6 +137,20 @@ Run a single test class:
 
 ---
 
+## Compose Performance
+
+The project uses the [Skydoves Compose Stability Analyzer](https://github.com/skydoves/compose-stability-analyzer) to detect unstable Composables that trigger unnecessary recompositions.
+
+| Component | Details |
+|---|---|
+| Plugin | `com.github.skydoves.compose.stability.analyzer` v0.6.4 |
+| Runtime annotation | `@TraceRecomposition` from `com.skydoves.compose.stability.runtime` |
+| Applied to | `:app`, `:coreui`, and all `:feature:*` modules |
+
+Every feature screen Composable is annotated with `@TraceRecomposition` to enable recomposition tracing at build time.
+
+---
+
 ## Design System
 
 Material Design 3 with:

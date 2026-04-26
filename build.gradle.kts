@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization) apply false
     alias(libs.plugins.kover)
     alias(libs.plugins.google.services) apply false
+    alias(libs.plugins.stability.analyzer) apply false
 }
 
 dependencies {

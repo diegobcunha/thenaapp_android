@@ -54,11 +54,13 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.diegocunha.thenaapp.coreui.theme.ThenaTheme
 import com.diegocunha.thenaapp.feature.login.R
+import com.skydoves.compose.stability.runtime.TraceRecomposition
 import kotlinx.coroutines.flow.collectLatest
 import com.diegocunha.thenaapp.coreui.R as CoreUiR
 
 typealias LoginForm = Pair<Boolean, Boolean>
 @Composable
+@TraceRecomposition
 fun LoginScreen(
     viewModel: LoginViewModel,
     onNavigateToHome: () -> Unit,

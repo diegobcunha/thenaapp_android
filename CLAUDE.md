@@ -139,6 +139,25 @@ Material Design 3, dynamic color (Android 12+), automatic light/dark. Theme entr
 - **Spacing:** `ThenaTheme.spacing` via `CompositionLocal` — scale: `xxs → xs → sm → md → m → lg → xl → xxl → xxxl`
 - **Extended color tokens:** `sleepFill`, `feedFill`, `vaccineFill`, `summaryFill` (for feature cards)
 
+## Compose Performance & Recomposition Tracing
+
+The project uses [Skydoves Compose Stability Analyzer](https://github.com/skydoves/compose-stability-analyzer) (version `0.6.4`) to detect unstable Composables that cause unnecessary recompositions.
+
+- **Gradle plugin:** `com.github.skydoves.compose.stability.analyzer` — applied in every feature module and `:app`/`:coreui`
+- **Runtime annotation:** `com.skydoves.compose.stability.runtime.TraceRecomposition`
+
+**Rule:** Every new feature screen Composable **must** be annotated with `@TraceRecomposition`. See `LoginScreen.kt` as the reference:
+
+```kotlin
+import com.skydoves.compose.stability.runtime.TraceRecomposition
+
+@TraceRecomposition
+@Composable
+fun LoginScreen(...) { ... }
+```
+
+Apply the annotation to the top-level screen Composable (the one registered in the NavHost), not to every internal sub-Composable.
+
 ## Architecture Rules
 
 **DTO rule:** DTOs from `:datasource` must never appear in ViewModels or Composables. Map to domain models in the repository layer.
