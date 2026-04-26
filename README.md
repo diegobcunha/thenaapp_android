@@ -1,5 +1,6 @@
 # Thena — Newborn Care Companion
 
+[![Screenshot Tests](https://github.com/diegobcunha/thenaapp_android/actions/workflows/screenshot-tests.yml/badge.svg)](https://github.com/diegobcunha/thenaapp_android/actions/workflows/screenshot-tests.yml)
 ![Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/diegobcunha/50d738ca736d944326dd848d6235f418/raw/thenaapp-coverage.json)
 
 **Thena** is an Android app designed to help parents manage the day-to-day routine of newborns — tracking sleep, feeding, vaccinations, and daily insights, all in one place.
