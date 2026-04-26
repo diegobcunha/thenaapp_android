@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kover)
     alias(libs.plugins.stability.analyzer)
+    alias(libs.plugins.screenshot)
 }
 
 android {
@@ -13,6 +14,7 @@ android {
         }
     }
 
+    experimentalProperties["android.experimental.enableScreenshotTest"] = true
     defaultConfig {
         minSdk = 24
 
@@ -54,5 +56,7 @@ dependencies {
 
     debugImplementation(libs.androidx.compose.ui.tooling)
 
-    debugImplementation(libs.androidx.compose.ui.tooling)
+    screenshotTestImplementation(libs.androidx.compose.ui.tooling)
+    screenshotTestImplementation(libs.androidx.compose.ui.graphics)
+    screenshotTestImplementation(libs.screenshot.validation.api)
 }

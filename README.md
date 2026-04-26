@@ -132,8 +132,20 @@ Run a single test class:
 | Kotlin Coroutines Test | Async testing |
 | Turbine | Flow testing |
 | kotlinx-kover | Coverage reporting |
+| AGP Screenshot Testing | Compose UI golden image validation |
 
 **Coverage threshold:** 80% minimum (Compose views/screens excluded).
+
+### Screenshot Tests
+
+Screenshot tests render Compose previews and compare them against committed golden images. They are **required to pass before merging to `main`**.
+
+```bash
+./gradlew :coreui:updateDebugScreenshotTest    # Regenerate goldens after UI changes
+./gradlew :coreui:validateDebugScreenshotTest  # Validate against goldens (CI)
+```
+
+Currently active in `:coreui`. Golden reference images live in `coreui/src/screenshotTestDebug/reference/` and must be committed alongside any UI changes.
 
 ---
 
