@@ -10,7 +10,7 @@ class HeaderInterceptor(
         val request = chain.request().newBuilder()
             .addHeader("Accept", "application/json")
             .addHeader("Content-Type", "application/json")
-            .addHeader("Authorization", "Bearer ${accessTokenRepository.getAccessToken()}")
+            .header("Authorization", "Bearer ${accessTokenRepository.getAccessToken()}")
             .build()
         return chain.proceed(request)
     }

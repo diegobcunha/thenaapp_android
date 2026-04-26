@@ -38,6 +38,7 @@ import com.diegocunha.thenaapp.feature.signup.presentation.SignupViewModel
 import com.diegocunha.thenaapp.feature.signup.presentation.navigation.SignupNavigation
 import org.koin.androidx.compose.koinViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.core.parameter.parametersOf
 
 class MainActivity : ComponentActivity() {
 
@@ -67,10 +68,14 @@ class MainActivity : ComponentActivity() {
                                 rememberViewModelStoreNavEntryDecorator()
                             ),
                             transitionSpec = {
-                                fadeIn(animationSpec = tween(300)) togetherWith fadeOut(animationSpec = tween(300))
+                                fadeIn(animationSpec = tween(300)) togetherWith fadeOut(
+                                    animationSpec = tween(300)
+                                )
                             },
                             popTransitionSpec = {
-                                fadeIn(animationSpec = tween(300)) togetherWith fadeOut(animationSpec = tween(300))
+                                fadeIn(animationSpec = tween(300)) togetherWith fadeOut(
+                                    animationSpec = tween(300)
+                                )
                             },
                             entryProvider = entryProvider {
                                 entry<OnboardingNavigation> {
@@ -93,25 +98,38 @@ class MainActivity : ComponentActivity() {
                                             }
                                         },
                                         onNavigateToSignUp = {
-                                            backStack.add(SignupNavigation)
+                                            backStack.add(SignupNavigation())
                                         },
                                         onNavigateToCreateBaby = {
                                             backStack.removeLastOrNull()
                                             backStack.add(CreateBabyNavigation)
+                                        },
+                                        {
+                                            with(backStack) {
+                                                removeLastOrNull()
+                                                backStack.add(
+                                                    SignupNavigation(
+                                                        hasBaby = it.first,
+                                                        isProfileCompletion = it.second
+                                                    )
+                                                )
+                                            }
                                         }
                                     )
                                 }
 
-                                entry<SignupNavigation> {
+                                entry<SignupNavigation> { key ->
                                     SignupScreen(
-                                        viewModel = koinViewModel<SignupViewModel>(),
+                                        viewModel = koinViewModel<SignupViewModel>(
+                                            parameters = { parametersOf(key.isProfileCompletion) }
+                                        ),
                                         onBackPressed = {
                                             backStack.removeLastOrNull()
                                         },
-                                        navigateToCreateBaby = {
+                                        navigateAfterSignup = {
                                             with(backStack) {
                                                 clear()
-                                                add(CreateBabyNavigation)
+                                                add(if (key.hasBaby) HomeNavigation else CreateBabyNavigation)
                                             }
                                         }
                                     )

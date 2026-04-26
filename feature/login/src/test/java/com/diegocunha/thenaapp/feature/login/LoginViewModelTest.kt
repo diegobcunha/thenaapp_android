@@ -195,4 +195,35 @@ class LoginViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+
+    @Test
+    fun `WHEN TriggerGoogleSignIn and loginWithGoogle returns isProfileCompletion true THEN NavigateToFinishRegistration effect emitted`() = runTest {
+        coEvery { loginRepository.loginWithGoogle() } returns Resource.Success(
+            UserInformation(hasBaby = true, isProfileCompletion = true)
+        )
+
+        viewModel.effects.test {
+            viewModel.sendIntent(LoginIntent.TriggerGoogleSignIn)
+
+            assertEquals(
+                LoginEffect.NavigateToFinishRegistration(hasBaby = true, isCompletionProfile = true),
+                awaitItem()
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `WHEN TriggerGoogleSignIn and loginWithGoogle returns no baby THEN NavigateToCreateBaby effect emitted`() = runTest {
+        coEvery { loginRepository.loginWithGoogle() } returns Resource.Success(
+            UserInformation(hasBaby = false, isProfileCompletion = false)
+        )
+
+        viewModel.effects.test {
+            viewModel.sendIntent(LoginIntent.TriggerGoogleSignIn)
+
+            assertEquals(LoginEffect.NavigateToCreateBaby, awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
 }

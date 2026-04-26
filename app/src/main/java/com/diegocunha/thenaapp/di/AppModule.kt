@@ -8,7 +8,8 @@ val appModule = module {
     viewModel {
         MainViewModel(
             onboardingRepository = get(),
-            firebaseAuth = get(),
+            userSessionRepository = get(),
+            userProfileRepository = get(),
         )
     }
 }

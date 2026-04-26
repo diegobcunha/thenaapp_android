@@ -210,7 +210,7 @@ class SignupViewModelTest {
             viewModel.sendIntent(SignupIntent.TriggerGoogleSignIn)
 
             val state = viewModel.state.value
-            assertEquals(true, state.isSignupByGoogle)
+            assertEquals(true, state.isNameOnlyMode)
             assertEquals("test@example.com", state.email)
             assertEquals(false, state.isLoading)
         }
@@ -277,6 +277,29 @@ class SignupViewModelTest {
         }
 
     @Test
+    fun `WHEN isProfileCompletion is true THEN initial state has isNameOnlyMode true`() = runTest {
+        coEvery { signupRepository.getUserForCompletion() } returns Resource.Success(mockUser)
+        val vm = SignupViewModel(signupRepository, isProfileCompletion = true)
+
+        assertEquals(true, vm.state.value.isNameOnlyMode)
+    }
+
+    @Test
+    fun `WHEN isProfileCompletion is true and valid name submitted THEN NavigateToOnboarding effect emitted`() = runTest {
+        coEvery { signupRepository.getUserForCompletion() } returns Resource.Success(mockUser)
+        coEvery { signupRepository.updateUser(any()) } returns Resource.Success(mockUser)
+        val vm = SignupViewModel(signupRepository, isProfileCompletion = true)
+
+        vm.effects.test {
+            vm.sendIntent(SignupIntent.UpdateName("Diego"))
+            vm.sendIntent(SignupIntent.SubmitSignup)
+
+            assertEquals(SignupEffect.NavigateToOnboarding, awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun `WHEN validateConfirmPassword with matching valid passwords THEN returns null`() {
         val result = viewModel.validateConfirmPassword("Password@1", "Password@1")
 
@@ -288,5 +311,34 @@ class SignupViewModelTest {
         val result = viewModel.validateConfirmPassword("Password@1", "Password@2")
 
         assertNotNull(result)
+    }
+
+    @Test
+    fun `WHEN isProfileCompletion is true and getUserForCompletion succeeds THEN email is set in state`() = runTest {
+        coEvery { signupRepository.getUserForCompletion() } returns Resource.Success(mockUser)
+        val vm = SignupViewModel(signupRepository, isProfileCompletion = true)
+
+        assertEquals("test@example.com", vm.state.value.email)
+    }
+
+    @Test
+    fun `WHEN isProfileCompletion is true and getUserForCompletion fails THEN nameError is set`() = runTest {
+        coEvery { signupRepository.getUserForCompletion() } returns Resource.Error(Exception("Network error"))
+        val vm = SignupViewModel(signupRepository, isProfileCompletion = true)
+
+        assertNotNull(vm.state.value.nameError)
+    }
+
+    @Test
+    fun `WHEN TriggerGoogleSignIn and user is already created THEN generalError is set`() = runTest {
+        coEvery { signupRepository.createUserWithGoogle() } returns Resource.Success(
+            GoogleSignUpResponse(email = "test@example.com", isUserAlreadyCreated = true)
+        )
+
+        viewModel.sendIntent(SignupIntent.TriggerGoogleSignIn)
+
+        val state = viewModel.state.value
+        assertNotNull(state.generalError)
+        assertEquals(false, state.isLoading)
     }
 }

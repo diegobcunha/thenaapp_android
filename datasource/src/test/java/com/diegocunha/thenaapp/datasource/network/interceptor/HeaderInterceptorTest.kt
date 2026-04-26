@@ -1,7 +1,5 @@
-package com.diegocunha.thenaapp.datasource.network
+package com.diegocunha.thenaapp.datasource.network.interceptor
 
-import com.diegocunha.thenaapp.datasource.network.interceptor.AccessTokenRepository
-import com.diegocunha.thenaapp.datasource.network.interceptor.HeaderInterceptor
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
@@ -11,7 +9,7 @@ import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
 import org.junit.After
-import org.junit.Assert.assertEquals
+import org.junit.Assert
 import org.junit.Test
 
 class HeaderInterceptorTest {
@@ -38,7 +36,7 @@ class HeaderInterceptorTest {
 
         interceptor.intercept(chain)
 
-        assertEquals("application/json", capturedRequest.captured.header("Accept"))
+        Assert.assertEquals("application/json", capturedRequest.captured.header("Accept"))
     }
 
     @Test
@@ -49,7 +47,7 @@ class HeaderInterceptorTest {
 
         interceptor.intercept(chain)
 
-        assertEquals("application/json", capturedRequest.captured.header("Content-Type"))
+        Assert.assertEquals("application/json", capturedRequest.captured.header("Content-Type"))
     }
 
     @Test
@@ -71,7 +69,7 @@ class HeaderInterceptorTest {
 
         val result = interceptor.intercept(chain)
 
-        assertEquals(mockResponse, result)
+        Assert.assertEquals(mockResponse, result)
     }
 
     @Test
@@ -83,6 +81,6 @@ class HeaderInterceptorTest {
 
         interceptor.intercept(chain)
 
-        assertEquals(url, capturedRequest.captured.url.toString())
+        Assert.assertEquals(url, capturedRequest.captured.url.toString())
     }
 }

@@ -55,4 +55,9 @@ class SignupRepositoryImpl(
         safeApiCall(dispatchersProvider) {
             userService.updateProfile(PutUserRequest(name))
         }
+
+    override suspend fun getUserForCompletion(): Resource<UserResponse> =
+        safeApiCall(dispatchersProvider) {
+            userService.getUsersInformation()
+        }
 }
