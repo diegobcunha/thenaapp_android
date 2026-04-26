@@ -36,6 +36,11 @@ android {
         compose = true
     }
 
+    testOptions {
+        screenshotTests {
+            imageDifferenceThreshold = 0.05f // Example tolerance
+        }
+    }
 }
 
 dependencies {
