@@ -30,10 +30,12 @@ import com.diegocunha.thenaapp.feature.baby.domain.model.ResponsibleType
 import com.diegocunha.thenaapp.feature.baby.presentation.create.components.AllSetStep
 import com.diegocunha.thenaapp.feature.baby.presentation.create.components.BabyInfoStep
 import com.diegocunha.thenaapp.feature.baby.presentation.create.components.BirthDetailsStep
+import com.skydoves.compose.stability.runtime.TraceRecomposition
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
+@TraceRecomposition
 fun CreateBabyScreen(
     viewModel: CreateBabyViewModel,
     onNavigateToHome: () -> Unit,

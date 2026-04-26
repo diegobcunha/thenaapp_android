@@ -1,6 +1,7 @@
 package com.diegocunha.thenaapp.feature.onboarding.presentation
 
 import androidx.compose.ui.graphics.Color
+import kotlinx.collections.immutable.ImmutableList
 
 data class OnboardingSlide(
     val emoji: String,
@@ -8,5 +9,5 @@ data class OnboardingSlide(
     val accent: Color,
     val title: String,
     val subtitle: String,
-    val features: List<String>,
+    val features: ImmutableList<String>,
 )

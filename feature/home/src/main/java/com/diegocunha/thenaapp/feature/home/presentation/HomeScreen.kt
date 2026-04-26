@@ -47,9 +47,11 @@ import com.diegocunha.thenaapp.coreui.component.CardButtonInformation
 import com.diegocunha.thenaapp.coreui.component.LoadingComponent
 import com.diegocunha.thenaapp.coreui.theme.ThenaTheme
 import com.diegocunha.thenaapp.feature.home.R
+import com.skydoves.compose.stability.runtime.TraceRecomposition
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
+@TraceRecomposition
 fun HomeScreen(
     viewModel: HomeViewModel
 ) {
