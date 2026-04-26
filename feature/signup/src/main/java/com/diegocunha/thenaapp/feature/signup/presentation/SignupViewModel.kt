@@ -11,8 +11,13 @@ import timber.log.Timber
 import com.diegocunha.thenaapp.coreui.R as CoreUiR
 
 class SignupViewModel(
-    private val signupRepository: SignupRepository
-) : BaseViewModel<SignupState, SignupIntent, SignupEffect>(SignupState()) {
+    private val signupRepository: SignupRepository,
+    isProfileCompletion: Boolean = false,
+) : BaseViewModel<SignupState, SignupIntent, SignupEffect>(SignupState(isNameOnlyMode = isProfileCompletion)) {
+
+    init {
+        validateProfileCompletion(isProfileCompletion)
+    }
 
     override fun processIntent(intent: SignupIntent) {
         when (intent) {
@@ -72,6 +77,35 @@ class SignupViewModel(
         }
     }
 
+    private fun validateProfileCompletion(isProfileCompletion: Boolean) {
+        if (!isProfileCompletion) return
+
+        viewModelScope.launch {
+            when (val result = signupRepository.getUserForCompletion()) {
+                is Resource.Success -> updateState {
+                    copy(
+                        isNameOnlyMode = true,
+                        isLoading = false,
+                        email = result.data.email
+                    )
+                }
+
+                is Resource.Error -> {
+                    Timber.e(result.exception)
+                    updateState {
+                        copy(
+                            isLoading = false,
+                            nameError = validateName("")
+                        )
+                    }
+                }
+
+                else -> Unit
+            }
+
+        }
+    }
+
     private fun performSignUp() {
         val current = state.value
         val emailError = validateEmail(current.email)
@@ -80,7 +114,7 @@ class SignupViewModel(
         val confirmPasswordError =
             validateConfirmPassword(current.password, current.confirmPassword)
 
-        if (current.isSignupByGoogle) {
+        if (current.isNameOnlyMode) {
             performUpdateProfile(current.name)
             return
         }
@@ -179,7 +213,7 @@ class SignupViewModel(
                             copy(
                                 isLoading = false,
                                 email = result.data.email,
-                                isSignupByGoogle = true
+                                isNameOnlyMode = true
                             )
                         }
                     }

@@ -60,10 +60,14 @@ class LoginViewModel(
             updateState { copy(isLoading = true, generalError = null) }
             when (val result = loginRepository.loginWithGoogle()) {
                 is Resource.Success -> {
-                    val effect = if (!result.data.hasBaby) {
-                        LoginEffect.NavigateToCreateBaby
-                    } else {
-                        LoginEffect.NavigateToHome
+                    val effect = when {
+                        result.data.isProfileCompletion -> LoginEffect.NavigateToFinishRegistration(
+                            result.data.hasBaby,
+                            result.data.isProfileCompletion
+                        )
+
+                        !result.data.hasBaby -> LoginEffect.NavigateToCreateBaby
+                        else -> LoginEffect.NavigateToHome
                     }
                     sendEffect(effect)
                 }

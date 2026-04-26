@@ -7,5 +7,6 @@ sealed interface LoginEffect : MviEffect {
     object NavigateToHome : LoginEffect
     object NavigateToSignUp : LoginEffect
     object NavigateToCreateBaby : LoginEffect
+    data class NavigateToFinishRegistration(val hasBaby: Boolean, val isCompletionProfile: Boolean): LoginEffect
     data class ShowSnackbar(@StringRes val message: Int) : LoginEffect
 }

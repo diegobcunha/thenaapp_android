@@ -49,6 +49,10 @@ fun OnboardingScreen(
     viewModel: OnboardingViewModel,
     onNavigateToLogin: () -> Unit,
 ) {
+    val onSkip = remember(viewModel) { { viewModel.sendIntent(OnboardingIntent.Skip) } }
+    val onDone = remember(viewModel) { { viewModel.sendIntent(OnboardingIntent.Done) } }
+    val onPageChanged = remember(viewModel) { { page: Int -> viewModel.sendIntent(OnboardingIntent.PageChanged(page)) } }
+
     LaunchedEffect(Unit) {
         viewModel.effects.collectLatest { effect ->
             when (effect) {
@@ -58,9 +62,9 @@ fun OnboardingScreen(
     }
 
     OnboardingScreenContent(
-        onSkip = { viewModel.sendIntent(OnboardingIntent.Skip) },
-        onDone = { viewModel.sendIntent(OnboardingIntent.Done) },
-        onPageChanged = { page -> viewModel.sendIntent(OnboardingIntent.PageChanged(page)) },
+        onSkip = onSkip,
+        onDone = onDone,
+        onPageChanged = onPageChanged,
     )
 }
 
@@ -79,7 +83,7 @@ private fun OnboardingScreenContent(
     val coroutineScope = rememberCoroutineScope()
     val currentPage = pagerState.currentPage
     val isLast by remember {
-        derivedStateOf { currentPage == slides.size - 1 }
+        derivedStateOf { pagerState.currentPage == slides.size - 1 }
     }
 
     LaunchedEffect(currentPage) {

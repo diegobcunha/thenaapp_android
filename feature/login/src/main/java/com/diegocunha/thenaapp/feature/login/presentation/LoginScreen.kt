@@ -57,12 +57,14 @@ import com.diegocunha.thenaapp.feature.login.R
 import kotlinx.coroutines.flow.collectLatest
 import com.diegocunha.thenaapp.coreui.R as CoreUiR
 
+typealias LoginForm = Pair<Boolean, Boolean>
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel,
     onNavigateToHome: () -> Unit,
     onNavigateToSignUp: () -> Unit,
-    onNavigateToCreateBaby: () -> Unit
+    onNavigateToCreateBaby: () -> Unit,
+    onNavigateToCompleteRegistration: (LoginForm) -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -74,6 +76,7 @@ fun LoginScreen(
                 is LoginEffect.NavigateToHome -> onNavigateToHome()
                 is LoginEffect.NavigateToSignUp -> onNavigateToSignUp()
                 is LoginEffect.NavigateToCreateBaby -> onNavigateToCreateBaby()
+                is LoginEffect.NavigateToFinishRegistration -> onNavigateToCompleteRegistration(effect.hasBaby to effect.isCompletionProfile)
                 is LoginEffect.ShowSnackbar -> snackbarHostState.showSnackbar(context.getString(effect.message))
             }
         }

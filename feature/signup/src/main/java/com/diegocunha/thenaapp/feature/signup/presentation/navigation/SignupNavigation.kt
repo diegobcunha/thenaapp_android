@@ -4,5 +4,7 @@ import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
 @Serializable
-object SignupNavigation : NavKey {
-}
+data class SignupNavigation(
+    val isProfileCompletion: Boolean = false,
+    val hasBaby: Boolean = false,
+) : NavKey

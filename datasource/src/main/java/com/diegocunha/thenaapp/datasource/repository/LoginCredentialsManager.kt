@@ -7,6 +7,7 @@ import androidx.credentials.GetCredentialRequest
 import androidx.credentials.exceptions.GetCredentialException
 import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import timber.log.Timber
 
 class LoginCredentialsManager(
     private val credentialManager: CredentialManager,
@@ -30,6 +31,7 @@ class LoginCredentialsManager(
         val result = try {
             credentialManager.getCredential(context, request)
         } catch (e: GetCredentialException) {
+            Timber.e(e)
             throw GoogleSignInException("Google Sign-In failed", e)
         }
 

@@ -42,7 +42,7 @@ internal class LoginRepositoryImpl(
             if (result.user == null) throw Exception("Google Sign-In failed")
             val user = userService.getUsersInformation()
             userSessionRepository.saveUserId(user.id.toString())
-            UserInformation(hasBaby = user.babies.isNotEmpty())
+            UserInformation(hasBaby = user.babies.isNotEmpty(), isProfileCompletion = user.name == null)
         }
 
     override suspend fun sendPasswordResetEmail(email: String): Resource<Unit> =

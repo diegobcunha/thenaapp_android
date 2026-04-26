@@ -59,7 +59,7 @@ import com.diegocunha.thenaapp.coreui.R as CoreUiR
 fun SignupScreen(
     viewModel: SignupViewModel,
     onBackPressed: () -> Unit,
-    navigateToCreateBaby: () -> Unit,
+    navigateAfterSignup: () -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -67,7 +67,7 @@ fun SignupScreen(
     LaunchedEffect(Unit) {
         viewModel.effects.collectLatest { effect ->
             when (effect) {
-                is SignupEffect.NavigateToOnboarding -> navigateToCreateBaby.invoke()
+                is SignupEffect.NavigateToOnboarding -> navigateAfterSignup.invoke()
             }
         }
     }
@@ -195,7 +195,7 @@ private fun SignupScreenContent(
                 )
 
                 OutlinedTextField(
-                    enabled = !state.isSignupByGoogle || !state.isLoading,
+                    enabled = !state.isNameOnlyMode || !state.isLoading,
                     value = state.email,
                     onValueChange = onEmailChange,
                     modifier = Modifier.fillMaxWidth(),
@@ -207,7 +207,7 @@ private fun SignupScreenContent(
                     singleLine = true,
                 )
 
-                if (!state.isSignupByGoogle) {
+                if (!state.isNameOnlyMode) {
                     OutlinedTextField(
                         enabled = !state.isLoading,
                         value = state.password,
@@ -281,7 +281,7 @@ private fun SignupScreenContent(
                     }
                 }
 
-                if (!state.isSignupByGoogle) {
+                if (!state.isNameOnlyMode) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.fillMaxWidth(),

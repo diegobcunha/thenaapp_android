@@ -7,12 +7,15 @@ import com.diegocunha.thenaapp.datasource.network.createRetrofit
 import com.diegocunha.thenaapp.datasource.network.interceptor.AccessTokenRepository
 import com.diegocunha.thenaapp.datasource.network.interceptor.AccessTokenRepositoryImpl
 import com.diegocunha.thenaapp.datasource.network.interceptor.HeaderInterceptor
+import com.diegocunha.thenaapp.datasource.network.interceptor.TokenAuthenticator
 import com.diegocunha.thenaapp.datasource.network.service.BabyService
 import com.diegocunha.thenaapp.datasource.network.service.CloudinaryService
 import com.diegocunha.thenaapp.datasource.network.service.UserService
 import com.diegocunha.thenaapp.datasource.repository.LoginCredentialsManager
 import com.diegocunha.thenaapp.datasource.repository.UserSessionRepository
 import com.diegocunha.thenaapp.datasource.repository.UserSessionRepositoryImpl
+import com.diegocunha.thenaapp.datasource.repository.userprofile.UserProfileRepository
+import com.diegocunha.thenaapp.datasource.repository.userprofile.UserProfileRepositoryImpl
 import com.diegocunha.thenaapp.datasource.storage.sharedpreferences.CustomSharedPreferences
 import com.diegocunha.thenaapp.datasource.storage.sharedpreferences.CustomSharedPreferencesImpl
 import com.google.firebase.auth.FirebaseAuth
@@ -25,6 +28,7 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
+import java.util.concurrent.TimeUnit
 
 private const val CLOUDINARY_NAME = "cloudinary"
 private const val CLOUDINARY_URL = "https://api.cloudinary.com/"
@@ -50,6 +54,16 @@ val datasourceModule = module {
         )
     }
 
+    single { TokenAuthenticator(accessTokenRepository = get()) }
+
+    single<UserProfileRepository> {
+        UserProfileRepositoryImpl(
+            userService = get(),
+            dispatchersProvider = get(),
+            firebaseAuth = get(),
+        )
+    }
+
     single<AccessTokenRepository> {
         AccessTokenRepositoryImpl(
             firebaseAuth = get(),
@@ -60,7 +74,11 @@ val datasourceModule = module {
     single {
         createRetrofit(
             okHttpClient = get<OkHttpClient.Builder>()
-                .addInterceptor(get<HeaderInterceptor>()).build(),
+                .addInterceptor(get<HeaderInterceptor>())
+                .authenticator(get<TokenAuthenticator>())
+                .readTimeout(30L, TimeUnit.SECONDS) // Server its serverless and could be in sleep mode
+                .writeTimeout(30L, TimeUnit.SECONDS)
+                .build(),
             json = get()
         )
     }
@@ -87,7 +105,11 @@ val datasourceModule = module {
     }
 
     single<UserSessionRepository> {
-        UserSessionRepositoryImpl(preferences = get())
+        UserSessionRepositoryImpl(
+            preferences = get(),
+            firebaseAuth = get(),
+            dispatchersProvider = get(),
+        )
     }
 
     single(named(CLOUDINARY_NAME)) {

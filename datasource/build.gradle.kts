@@ -48,7 +48,7 @@ android {
 
     buildTypes {
         debug {
-            buildConfigField("String", "BASE_URL", "\"http://localhost:8080\"")
+            buildConfigField("String", "BASE_URL", "\"https://thenaappbe-production.up.railway.app\"")
             buildConfigField(
                 "String",
                 "CLOUDINARY_CLOUD_NAME",

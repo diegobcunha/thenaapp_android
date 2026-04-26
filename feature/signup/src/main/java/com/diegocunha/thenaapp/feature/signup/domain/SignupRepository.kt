@@ -10,4 +10,6 @@ interface SignupRepository {
     suspend fun createUserWithGoogle(): Resource<GoogleSignUpResponse>
 
     suspend fun updateUser(name: String): Resource<UserResponse>
+
+    suspend fun getUserForCompletion(): Resource<UserResponse>
 }

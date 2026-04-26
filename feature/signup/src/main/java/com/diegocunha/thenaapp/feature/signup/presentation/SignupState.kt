@@ -10,7 +10,7 @@ data class SignupState(
     val email: String = "",
     val password: String = "",
     val confirmPassword: String = "",
-    val isSignupByGoogle: Boolean = false,
+    val isNameOnlyMode: Boolean = false,
     val isLoading: Boolean = false,
     @StringRes val nameError: Int? = null,
     @StringRes val emailError: Int? = null,

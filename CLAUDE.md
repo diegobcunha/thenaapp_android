@@ -5,76 +5,145 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Build Commands
 
 ```bash
-./gradlew assembleDebug          # Build debug APK
-./gradlew assembleRelease        # Build release APK
-./gradlew test                   # Run unit tests
-./gradlew connectedAndroidTest   # Run instrumented tests on device/emulator
-./gradlew lint                   # Run lint checks
-./gradlew clean                  # Clean build artifacts
+./gradlew assembleDebug                    # Build debug APK
+./gradlew assembleRelease                  # Build release APK
+./gradlew testDebugUnitTest                # Run unit tests (matches CI)
+./gradlew koverXmlReport koverHtmlReport   # Generate coverage reports
+./gradlew koverVerify                      # Enforce 80% coverage threshold
+./gradlew connectedAndroidTest             # Run instrumented tests on device/emulator
+./gradlew lint                             # Run lint checks
+./gradlew clean                            # Clean build artifacts
 ```
 
 To run a single test class:
 ```bash
-./gradlew test --tests "com.diegocunha.thenaapp.ExampleUnitTest"
+./gradlew :feature:login:testDebugUnitTest --tests "com.diegocunha.thenaapp.feature.login.LoginViewModelTest"
 ```
+
+## Local Setup
+
+Two files are required that are not checked in:
+
+- `app/google-services.json` — Firebase config (download from Firebase Console)
+- `local.properties` — must include:
+  ```
+  CLOUDINARY_CLOUD_NAME=<your_cloudinary_cloud_name>
+  CLOUDINARY_UPLOAD_PRESET=<your_upload_preset>
+  ```
+
+Debug builds point to `http://localhost:8080`; release builds point to the Railway backend.
 
 ## Project Overview
 
-Android Thena App app with the purpose to help parents to handle the day-to-day of newborns routine like feed, sleep, vaccines and other important things. Architecture is multi-module clean architecture with MVI pattern, Material3 follow up and 100% Compose UI.
+Android app to help parents manage newborn routines (sleep, feeding, vaccines). Multi-module clean architecture, MVI pattern, 100% Jetpack Compose + Material 3.
 
 ## Module Structure
 
 ```
-:app                  — Application entry point, NavHost, Koin initialization
-:core                 — MVI base classes, Resource sealed class, DispatchersProvider
-:coreui               — Material3 theme, shared Compose components, Spacing system
-:datasource           — Retrofit API, Repository, DTOs, DAOs
+:app                      — Application entry point, NavHost, Koin initialization
+:core                     — MVI base classes, Resource sealed class, DispatchersProvider
+:coreui                   — Material3 theme, shared Compose components, Spacing system
+:datasource               — Retrofit API services, DTOs, OkHttp interceptors, SharedPreferences
+:feature:onboarding       — 5-slide onboarding carousel
+:feature:login            — Email/password + Google Sign-In
+:feature:signup           — Email/password + Google Sign-Up with profile completion
+:feature:baby             — Multi-step baby creation with photo upload
+:feature:home             — Home screen showing user + baby summary
+```
+
+Each feature module follows this internal structure:
+```
+presentation/   — Composables, ViewModels, MVI State/Intent/Effect
+domain/         — Repository interfaces + domain models
+repository/     — Repository implementations
+di/             — Koin module
 ```
 
 ## Architecture & Technology
 
-- **UI:** 100% Jetpack Compose with Material Design 3, no XML layouts
-- **Pattern:** MVI via `BaseViewModel<State, Intent>` in `:core`
-- **Language:** Kotlin 2.2.10
-- **Min SDK:** 24 (Android 7.0), Target/Compile SDK: 36
+- **UI:** 100% Jetpack Compose, Material Design 3, no XML layouts
+- **Pattern:** MVI via `BaseViewModel<State, Intent, Effect>` in `:core`
+- **Language:** Kotlin 2.2.10, JVM target 11
+- **Min SDK:** 24, Target/Compile SDK: 36
 - **Package root:** `com.diegocunha.thenaapp`
-- **DI:** Koin 4.0.4 — modules loaded in `ThenaApplication`
-- **Networking:** Retrofit 2.11.0 + OkHttp 4.12.0 + Kotlinx Serialization
+- **DI:** Koin 4.0.4 — all modules loaded in `ThenaApplication`
+- **Networking:** Retrofit + OkHttp + Kotlinx Serialization (`ignoreUnknownKeys = true`)
 - **Image loading:** Coil 2.7.0
 - **Navigation:** AndroidX Navigation3 Compose 1.1.0
+- **Auth:** Firebase Auth + Google Credential Manager
+
+## MVI Data Flow
+
+```
+Composable
+  ├── sendIntent(Intent) → ViewModel.processIntent()
+  │                             ├── updateState { copy(...) }  → StateFlow → UI re-renders
+  │                             └── sendEffect(Effect)          → Channel  → one-shot events
+  └── LaunchedEffect { effects.collectLatest { ... } }          → navigation / snackbar
+```
+
+`BaseViewModel` queues intents via a `Channel.BUFFERED` channel, processed serially. Effects use `Channel.UNLIMITED` and are consumed with `collectLatest` in the Composable.
+
+## Navigation
+
+Routes are `@Serializable` objects/data classes implementing `NavKey`. The start destination is resolved by `MainViewModel.startDestination` (a `StateFlow<NavKey?>`) before the NavHost renders. `MainActivity` holds the `rememberNavBackStack` and all wiring between screens.
+
+```
+OnboardingNavigation → LoginNavigation → SignupNavigation → CreateBabyNavigation → HomeNavigation
+```
+
+`MainViewModel` checks: onboarding seen? → Firebase user present? → token valid? → profile complete? → navigate accordingly.
 
 ## Key Files
 
-- `app/src/main/java/com/diegocunha/thenaapp/MainActivity.kt` — Entry point with NavHost
-- `app/src/main/java/com/diegocunha/thenaapp/ThenaApplication.kt` — Koin setup
-- `core/src/main/java/com/diegocunha/thenaapp/core/mvi/BaseViewModel.kt` — MVI base
-- `core/src/main/java/com/diegocunha/thenaapp/core/Resource.kt` — Success/Error/Loading sealed class
-- `datasource/src/main/java/com/diegocunha/thenaapp/datasource/network/ThenaAppService.kt` — Retrofit API
-- `coreui/src/main/java/com/diegocunha/thenaapp/coreui/theme/` — Material3 theme
-- `gradle/libs.versions.toml` — Centralized version catalog for all dependencies
+- `app/.../MainActivity.kt` — NavHost + all screen wiring
+- `app/.../MainViewModel.kt` — Startup routing logic
+- `app/.../ThenaApplication.kt` — Koin module registration
+- `core/.../mvi/BaseViewModel.kt` — MVI base (state, intent, effect channels)
+- `core/.../resource/Resource.kt` — `Success / Error / Loading` sealed class
+- `datasource/.../network/SafeApiCall.kt` — `safeApiCall(dispatcher) { ... }` wraps any suspend call into `Resource<T>`
+- `datasource/.../interceptor/HeaderInterceptor.kt` — Adds `Authorization: Bearer <token>` to every request
+- `datasource/.../interceptor/AccessTokenRepositoryImpl.kt` — Calls `Tasks.await(user.getIdToken(false))` synchronously (called from OkHttp thread)
+- `datasource/.../di/DatasourceModule.kt` — OkHttp + Retrofit + service singletons
+- `gradle/libs.versions.toml` — Centralized version catalog
+
+## Repository Pattern
+
+All repository implementations use `safeApiCall` from `:datasource`:
+
+```kotlin
+override suspend fun getSomething(): Resource<MyModel> =
+    safeApiCall(dispatchersProvider) {
+        val dto = service.getSomething()
+        dto.toDomain()   // map DTO → domain model here, never leak DTOs upward
+    }
+```
 
 ## Dependencies
 
-All dependency versions are managed via the version catalog at `gradle/libs.versions.toml`. Add new dependencies there first, then reference them in `build.gradle.kts`.
+All versions are in `gradle/libs.versions.toml`. Add entries there first, then reference with `libs.<alias>` in `build.gradle.kts`.
 
 ## Unit Testing
 
-- **Mocking:** MockK
-- **Async:** Kotlin Coroutines Test
-- **Flow testing:** Turbine
-- **Coverage:** kotlinx-kover
-  - Compose views and Compose screens are excluded from coverage
-  - Minimum coverage threshold: **80%**
+- **Mocking:** MockK (`mockk()`, `coEvery`, `coVerify`)
+- **Async:** `UnconfinedTestDispatcher` set as `Dispatchers.Main` in `@Before`
+- **Flow testing:** Turbine (`flow.test { awaitItem() }`)
+- **Coverage:** kotlinx-kover — Compose screens excluded, minimum **80%** threshold enforced in CI via `koverVerify`
+- Test naming convention: `` `WHEN <condition> THEN <expectation>` ``
 
-## Theme
+## Theme & Design System
 
-Material Design 3 with dynamic color support (Android 12+) and automatic light/dark mode. Theme in `coreui/src/main/java/com/diegocunha/thenaapp/coreui/theme/`. Custom `Spacing` via `CompositionLocal`.
+Material Design 3, dynamic color (Android 12+), automatic light/dark. Theme entry point: `coreui/.../theme/ThenaTheme`.
+
+- **Font:** Nunito family
+- **Spacing:** `ThenaTheme.spacing` via `CompositionLocal` — scale: `xxs → xs → sm → md → m → lg → xl → xxl → xxxl`
+- **Extended color tokens:** `sleepFill`, `feedFill`, `vaccineFill`, `summaryFill` (for feature cards)
 
 ## Architecture Rules
 
-**Clean Architecture DTO rule:** DTOs from `:datasource` must never appear in ViewModels or Composables. Each feature owns its domain models in `feature/<name>/domain/model/` and mappers in `feature/<name>/domain/mapper/`.
+**DTO rule:** DTOs from `:datasource` must never appear in ViewModels or Composables. Map to domain models in the repository layer.
 
-**UseCase rule:** Create a UseCase only when: (1) non-trivial business logic exists beyond fetching and mapping, (2) multiple repositories are orchestrated, or (3) logic is shared across two or more ViewModels. Direct repository calls from the ViewModel are the default.
+**UseCase rule:** Create a UseCase only when: (1) non-trivial business logic beyond fetch + map, (2) multiple repositories are orchestrated, or (3) logic is shared across two or more ViewModels. Direct repository calls from the ViewModel are the default.
 
 ## Development Methodology
 
@@ -86,9 +155,5 @@ This project uses **SDD (Specification-Driven Development)**. All feature work f
 
 **Rules:**
 - Never advance to the next phase until the user explicitly says the current phase is ready
-- The user may return to any previous phase at any time (flow possibility, not a phase). When this happens, analyze the impact and replan forward from there
-- When development is finished, create a SDD documentation file for the feature in the project containing:
-  - Decisions made
-  - Technical features implemented
-  - Current status of the feature
-  - Last updated date
+- The user may return to any previous phase at any time. When this happens, analyze the impact and replan forward from there
+- When development is finished, create a SDD documentation file for the feature (see `feature/baby/SDD_CREATE_BABY.md` as reference) containing: decisions made, technical features implemented, current status, and last updated date

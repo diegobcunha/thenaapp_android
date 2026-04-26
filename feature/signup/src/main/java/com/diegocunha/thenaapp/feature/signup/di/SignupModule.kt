@@ -18,9 +18,10 @@ val signupModule = module {
         )
     }
 
-    viewModel {
+    viewModel { params ->
         SignupViewModel(
             signupRepository = get(),
+            isProfileCompletion = params.getOrNull() ?: false,
         )
     }
 }
