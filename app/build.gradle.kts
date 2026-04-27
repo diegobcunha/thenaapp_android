@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kover)
     alias(libs.plugins.google.services)
     alias(libs.plugins.stability.analyzer)
+    alias(libs.plugins.firebase.crashlytics)
 }
 
 android {
@@ -67,6 +68,8 @@ dependencies {
     implementation(libs.koin.androidx.compose)
     implementation(libs.androidx.lifecycle.viewmodel.navigation3)
     implementation(libs.core.splash)
+    implementation(libs.firebase.crashlytics)
+    implementation(libs.firebase.analytics)
 
     testImplementation(libs.junit)
     testImplementation(libs.mockk)

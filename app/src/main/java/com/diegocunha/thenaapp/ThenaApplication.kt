@@ -9,6 +9,7 @@ import com.diegocunha.thenaapp.feature.home.di.homeModule
 import com.diegocunha.thenaapp.feature.login.di.loginModule
 import com.diegocunha.thenaapp.feature.onboarding.di.onboardingModule
 import com.diegocunha.thenaapp.feature.signup.di.signupModule
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.skydoves.compose.stability.runtime.ComposeStabilityAnalyzer
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -23,8 +24,10 @@ class ThenaApplication : Application() {
 
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
+            FirebaseCrashlytics.getInstance().isCrashlyticsCollectionEnabled = false
+            ComposeStabilityAnalyzer.setEnabled(true)
         }
-        ComposeStabilityAnalyzer.setEnabled(BuildConfig.DEBUG)
+
         startKoin {
             androidLogger(if (BuildConfig.DEBUG) Level.DEBUG else Level.ERROR)
             androidContext(this@ThenaApplication)
