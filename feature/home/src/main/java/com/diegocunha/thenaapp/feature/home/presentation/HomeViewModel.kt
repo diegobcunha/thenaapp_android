@@ -5,6 +5,8 @@ import com.diegocunha.thenaapp.core.mvi.BaseViewModel
 import com.diegocunha.thenaapp.core.resource.Resource
 import com.diegocunha.thenaapp.coreui.R
 import com.diegocunha.thenaapp.feature.home.domain.HomeRepository
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.util.Calendar
 
@@ -14,16 +16,37 @@ class HomeViewModel(
 
     init {
         loadContent()
+        observeActiveFeeding()
+        startFeedingTicker()
     }
 
     override fun processIntent(intent: HomeIntent) {
         when (intent) {
             HomeIntent.EditBabyInfo,
             HomeIntent.UserProfile,
-            HomeIntent.FeedInfo,
             HomeIntent.SleepInfo,
             HomeIntent.SummaryInfo,
             HomeIntent.VaccineInfo -> sendEffect(HomeEffect.NotDevelopedYet)
+            HomeIntent.FeedInfo -> sendEffect(HomeEffect.NavigateToFeeding)
+        }
+    }
+
+    private fun observeActiveFeeding() {
+        viewModelScope.launch {
+            homeRepository.observeActiveFeeding().collectLatest { snapshot ->
+                updateState { copy(activeFeedingSession = snapshot) }
+            }
+        }
+    }
+
+    private fun startFeedingTicker() {
+        viewModelScope.launch {
+            while (true) {
+                delay(1_000L)
+                val session = state.value.activeFeedingSession ?: continue
+                val elapsed = (System.currentTimeMillis() - session.startedAt) / 1_000L
+                updateState { copy(feedingBannerElapsedSeconds = elapsed) }
+            }
         }
     }
 

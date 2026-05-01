@@ -60,6 +60,7 @@ dependencies {
     implementation(project(":feature:onboarding"))
     implementation(project(":feature:baby"))
     implementation(project(":feature:home"))
+    implementation(project(":feature:feeding"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

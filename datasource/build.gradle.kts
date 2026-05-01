@@ -48,7 +48,7 @@ android {
 
     buildTypes {
         debug {
-            buildConfigField("String", "BASE_URL", "\"https://thenaappbe-production.up.railway.app\"")
+            buildConfigField("String", "BASE_URL", "\"http://localhost:8080\"")
             buildConfigField(
                 "String",
                 "CLOUDINARY_CLOUD_NAME",
@@ -93,6 +93,10 @@ dependencies {
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
+
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
 
     testImplementation(libs.junit)
     testImplementation(libs.androidx.room.testing)

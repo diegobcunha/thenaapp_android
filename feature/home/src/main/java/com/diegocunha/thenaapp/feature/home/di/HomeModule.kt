@@ -16,7 +16,8 @@ val homeModule = module {
     single<HomeRepository> {
         HomeRepositoryImpl(
             userService = get(),
-            dispatchersProvider = get()
+            dispatchersProvider = get(),
+            feedingLocalDataSource = get(),
         )
     }
 }

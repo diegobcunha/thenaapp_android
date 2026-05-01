@@ -4,6 +4,7 @@ import androidx.annotation.StringRes
 import androidx.compose.runtime.Immutable
 import com.diegocunha.thenaapp.core.mvi.MviIntent
 import com.diegocunha.thenaapp.core.mvi.MviState
+import com.diegocunha.thenaapp.datasource.database.ActiveFeedingSnapshot
 
 sealed interface HomeIntent : MviIntent {
 
@@ -37,4 +38,6 @@ data class HomeState(
     val babyAge: BabyAge? = null,
     val babyInfo: BabyInfo? = null,
     @StringRes val error: Int? = null,
+    val activeFeedingSession: ActiveFeedingSnapshot? = null,
+    val feedingBannerElapsedSeconds: Long = 0L,
 ) : MviState

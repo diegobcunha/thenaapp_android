@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feeding_title">Feeding</string>
+    <string name="feeding_type_breastfeed">Breastfeed</string>
+    <string name="feeding_type_bottle">Bottle</string>
+    <string name="feeding_breast_left">Left</string>
+    <string name="feeding_breast_right">Right</string>
+    <string name="feeding_active">Active</string>
+    <string name="feeding_tap_to_begin">Tap a side to begin</string>
+    <string name="feeding_paused">Paused</string>
+    <string name="feeding_finish">Finish</string>
+    <string name="feeding_save">Save</string>
+    <string name="feeding_bottle_mothers_milk">Mother\'s milk</string>
+    <string name="feeding_bottle_powdered">Powdered milk</string>
+    <string name="feeding_bottle_ml_hint">Amount (ml)</string>
+    <string name="feeding_total_time">Total: %s</string>
+    <string name="feeding_error_invalid_ml">Enter a valid amount in ml</string>
+    <string name="feeding_error_bottle_type_required">Select the milk type</string>
+</resources>
