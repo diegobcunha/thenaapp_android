@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.sp
 import com.diegocunha.thenaapp.coreui.theme.ThenaTheme
 import com.diegocunha.thenaapp.feature.feeding.R
 import com.diegocunha.thenaapp.feature.feeding.domain.model.Breast
+import com.diegocunha.thenaapp.feature.feeding.domain.model.FeedingType
 import com.diegocunha.thenaapp.feature.feeding.presentation.FeedingState
 
 @Composable
@@ -144,4 +145,23 @@ private fun formatElapsed(totalSeconds: Long): String {
     val minutes = totalSeconds / 60
     val seconds = totalSeconds % 60
     return "%02d:%02d".format(minutes, seconds)
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun BreastfeedingActivePreview() {
+    ThenaTheme {
+        BreastfeedingTimerCard(
+            state = FeedingState(
+                sessionId = "1",
+                feedingType = FeedingType.BREAST,
+                activeBreast = Breast.LEFT,
+                leftElapsedSeconds = 483L,
+                rightElapsedSeconds = 120L,
+                totalElapsedSeconds = 603L,
+            ),
+            onTapBreast = {},
+            onFinish = {},
+        )
+    }
 }
