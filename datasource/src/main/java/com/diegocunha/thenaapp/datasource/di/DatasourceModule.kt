@@ -1,7 +1,11 @@
 package com.diegocunha.thenaapp.datasource.di
 
 import androidx.credentials.CredentialManager
+import androidx.room.Room
 import com.diegocunha.thenaapp.datasource.BuildConfig
+import com.diegocunha.thenaapp.datasource.database.FeedingDatabase
+import com.diegocunha.thenaapp.datasource.database.FeedingLocalDataSource
+import com.diegocunha.thenaapp.datasource.database.FeedingLocalDataSourceImpl
 import com.diegocunha.thenaapp.datasource.network.ThenaAppService
 import com.diegocunha.thenaapp.datasource.network.createRetrofit
 import com.diegocunha.thenaapp.datasource.network.interceptor.AccessTokenRepository
@@ -121,4 +125,11 @@ val datasourceModule = module {
     }
 
     single<CloudinaryService> { get<Retrofit>(named(CLOUDINARY_NAME)).create(CloudinaryService::class.java) }
+
+    single {
+        Room.databaseBuilder(androidApplication(), FeedingDatabase::class.java, "feeding.db").build()
+    }
+    single { get<FeedingDatabase>().feedingSessionDao() }
+    single { get<FeedingDatabase>().breastSegmentDao() }
+    single<FeedingLocalDataSource> { FeedingLocalDataSourceImpl(get(), get()) }
 }

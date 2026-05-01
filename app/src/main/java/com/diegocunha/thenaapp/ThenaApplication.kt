@@ -5,6 +5,7 @@ import com.diegocunha.thenaapp.core.di.coreModule
 import com.diegocunha.thenaapp.datasource.di.datasourceModule
 import com.diegocunha.thenaapp.di.appModule
 import com.diegocunha.thenaapp.feature.baby.di.babyModule
+import com.diegocunha.thenaapp.feature.feeding.di.feedingModule
 import com.diegocunha.thenaapp.feature.home.di.homeModule
 import com.diegocunha.thenaapp.feature.login.di.loginModule
 import com.diegocunha.thenaapp.feature.onboarding.di.onboardingModule
@@ -40,6 +41,7 @@ class ThenaApplication : Application() {
                 onboardingModule,
                 babyModule,
                 homeModule,
+                feedingModule,
             )
         }
     }
