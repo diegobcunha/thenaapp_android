@@ -10,6 +10,7 @@ import com.diegocunha.thenaapp.feature.feeding.presentation.FeedingIntent
 import com.diegocunha.thenaapp.feature.feeding.presentation.FeedingViewModel
 import com.diegocunha.thenaapp.feature.feeding.session.FeedingSessionManager
 import io.mockk.coEvery
+import io.mockk.coJustRun
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
@@ -17,6 +18,7 @@ import io.mockk.unmockkAll
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -38,7 +40,15 @@ class FeedingViewModelTest {
     @Before
     fun setUp() {
         Dispatchers.setMain(dispatcher)
+        with(sessionManager) {
+            coJustRun { pauseCurrentBreast() }
+            coJustRun { finishSession() }
+            coJustRun { switchBreast(any()) }
+            coJustRun { resumeBreast(any()) }
+            coJustRun { startBottleFeeding(any(), any()) }
+        }
         every { sessionManager.activeSession } returns activeSessionFlow
+        every { sessionManager.tickerFlow } returns emptyFlow()
         viewModel = FeedingViewModel(sessionManager = sessionManager)
     }
 
@@ -64,8 +74,8 @@ class FeedingViewModelTest {
 
     @Test
     fun `WHEN TapBreast with no active session THEN startBreastfeeding is called`() = runTest {
-        coEvery { sessionManager.startBreastfeeding(Breast.LEFT) } answers {
-            activeSessionFlow.value = buildSession(activeBreast = Breast.LEFT)
+        coEvery { sessionManager.startBreastfeeding(Breast.LEFT) } coAnswers {
+            activeSessionFlow.emit(buildSession(activeBreast = Breast.LEFT))
         }
 
         with(viewModel) {

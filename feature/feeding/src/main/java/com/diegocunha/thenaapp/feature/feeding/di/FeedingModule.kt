@@ -21,6 +21,7 @@ val feedingModule = module {
         FeedingSessionManager(
             repository = get(),
             context = androidApplication(),
+            dispatchersProvider = get(),
         )
     }
 

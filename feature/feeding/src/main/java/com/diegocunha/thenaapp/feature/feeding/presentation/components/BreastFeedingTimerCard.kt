@@ -55,7 +55,6 @@ fun BreastfeedingTimerCard(
                 .padding(horizontal = ThenaTheme.spacing.lg, vertical = ThenaTheme.spacing.xl),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            // Total timer
             Text(
                 text = formatElapsed(state.totalElapsedSeconds),
                 fontFamily = ThenaTheme.typography.displayMedium.fontFamily,
@@ -77,7 +76,6 @@ fun BreastfeedingTimerCard(
 
             Spacer(modifier = Modifier.height(ThenaTheme.spacing.xl))
 
-            // Left / Right breast pills
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(ThenaTheme.spacing.sm),

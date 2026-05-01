@@ -67,7 +67,6 @@ fun BottleFeedingCard(
 
             Spacer(modifier = Modifier.height(ThenaTheme.spacing.sm))
 
-            // Quick ml presets
             Row(
                 horizontalArrangement = Arrangement.spacedBy(ThenaTheme.spacing.sm),
                 modifier = Modifier.fillMaxWidth(),
@@ -110,7 +109,6 @@ fun BottleFeedingCard(
 
             Spacer(modifier = Modifier.height(ThenaTheme.spacing.md))
 
-            // Milk type selection
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(ThenaTheme.spacing.sm),

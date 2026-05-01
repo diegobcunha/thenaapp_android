@@ -8,7 +8,6 @@ import com.diegocunha.thenaapp.feature.feeding.domain.model.Breast
 import com.diegocunha.thenaapp.feature.feeding.domain.model.BreastSegment
 import com.diegocunha.thenaapp.feature.feeding.domain.model.FeedingType
 import com.diegocunha.thenaapp.feature.feeding.session.FeedingSessionManager
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -37,7 +36,7 @@ class FeedingViewModel(
     private fun observeActiveSession() {
         viewModelScope.launch {
             sessionManager.activeSession.collectLatest { session ->
-                if (session != null) {
+                session?.let {
                     updateState {
                         copy(
                             sessionId = session.sessionId,
@@ -53,11 +52,8 @@ class FeedingViewModel(
 
     private fun startTicker() {
         viewModelScope.launch {
-            while (true) {
-                delay(ONE_SEC)
-                if (state.value.sessionId != null) {
-                    sendIntent(FeedingIntent.Tick)
-                }
+            sessionManager.tickerFlow.collect {
+                sendIntent(FeedingIntent.Tick)
             }
         }
     }
@@ -114,7 +110,7 @@ class FeedingViewModel(
 
     private fun List<BreastSegment>.sumSegment(now: Long) = sumOf { seg ->
         val end = seg.endedAt ?: now
-        (end -seg.startedAt) / ONE_SEC
+        (end - seg.startedAt) / ONE_SEC
     }
 
     companion object {
