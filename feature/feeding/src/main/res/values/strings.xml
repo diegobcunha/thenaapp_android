@@ -9,6 +9,7 @@
     <string name="feeding_tap_to_begin">Tap a side to begin</string>
     <string name="feeding_paused">Paused</string>
     <string name="feeding_finish">Finish</string>
+    <string name="feeding_edit_start">Edit start time</string>
     <string name="feeding_save">Save</string>
     <string name="feeding_bottle_mothers_milk">Mother\'s milk</string>
     <string name="feeding_bottle_powdered">Powdered milk</string>
@@ -16,4 +17,7 @@
     <string name="feeding_total_time">Total: %s</string>
     <string name="feeding_error_invalid_ml">Enter a valid amount in ml</string>
     <string name="feeding_error_bottle_type_required">Select the milk type</string>
+    <string name="feeding_error_network">Something went wrong. Please try again.</string>
+    <string name="feeding_error_start_time_future">Start time cannot be in the future</string>
+    <string name="feeding_select_time">Select time</string>
 </resources>

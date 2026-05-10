@@ -39,6 +39,7 @@ fun BreastfeedingTimerCard(
     state: FeedingState,
     onTapBreast: (Breast) -> Unit,
     onFinish: () -> Unit,
+    onUpdateDateTime: () -> Unit,
 ) {
     val feedFill = ThenaTheme.extendedColors.feedFill
     val gradientBrush = remember(feedFill) {
@@ -120,6 +121,16 @@ fun BreastfeedingTimerCard(
                 ) {
                     Text(stringResource(R.string.feeding_finish))
                 }
+                Spacer(modifier = Modifier.height(ThenaTheme.spacing.sm))
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = onUpdateDateTime,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = ThenaTheme.colors.secondary,
+                    ),
+                ) {
+                    Text(stringResource(R.string.feeding_edit_start))
+                }
             }
         }
     }
@@ -135,7 +146,8 @@ private fun BreastfeedingTimerCardPreview() {
             BreastfeedingTimerCard(
                 state = FeedingState(),
                 onTapBreast = {},
-                onFinish = {}
+                onFinish = {},
+                onUpdateDateTime = {}
             )
         }
     }
@@ -162,6 +174,7 @@ private fun BreastfeedingActivePreview() {
             ),
             onTapBreast = {},
             onFinish = {},
+            onUpdateDateTime = {}
         )
     }
 }

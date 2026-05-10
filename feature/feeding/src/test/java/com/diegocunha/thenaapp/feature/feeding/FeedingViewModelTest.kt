@@ -34,6 +34,7 @@ class FeedingViewModelTest {
     private val dispatcher = UnconfinedTestDispatcher()
     private val sessionManager: FeedingSessionManager = mockk()
     private val activeSessionFlow = MutableStateFlow<ActiveFeedingSession?>(null)
+    private val babyId = "test-baby-id"
 
     private lateinit var viewModel: FeedingViewModel
 
@@ -45,11 +46,12 @@ class FeedingViewModelTest {
             coJustRun { finishSession() }
             coJustRun { switchBreast(any()) }
             coJustRun { resumeBreast(any()) }
-            coJustRun { startBottleFeeding(any(), any()) }
+            coJustRun { startBottleFeeding(any(), any(), any()) }
+            coJustRun { updateSessionStartTime(any()) }
         }
         every { sessionManager.activeSession } returns activeSessionFlow
         every { sessionManager.tickerFlow } returns emptyFlow()
-        viewModel = FeedingViewModel(sessionManager = sessionManager)
+        viewModel = FeedingViewModel(sessionManager = sessionManager, babyId = babyId)
     }
 
     @After
@@ -73,8 +75,8 @@ class FeedingViewModelTest {
     }
 
     @Test
-    fun `WHEN TapBreast with no active session THEN startBreastfeeding is called`() = runTest {
-        coEvery { sessionManager.startBreastfeeding(Breast.LEFT) } coAnswers {
+    fun `WHEN TapBreast with no active session THEN startBreastfeeding is called with babyId`() = runTest {
+        coEvery { sessionManager.startBreastfeeding(Breast.LEFT, babyId) } coAnswers {
             activeSessionFlow.emit(buildSession(activeBreast = Breast.LEFT))
         }
 
@@ -83,7 +85,7 @@ class FeedingViewModelTest {
             sendIntent(FeedingIntent.TapBreast(Breast.LEFT))
         }
 
-        coVerify { sessionManager.startBreastfeeding(Breast.LEFT) }
+        coVerify { sessionManager.startBreastfeeding(Breast.LEFT, babyId) }
     }
 
     @Test
@@ -164,7 +166,7 @@ class FeedingViewModelTest {
         viewModel.effects.test {
             viewModel.sendIntent(FeedingIntent.SaveBottleFeeding)
 
-            coVerify { sessionManager.startBottleFeeding(BottleType.POWDERED, 120) }
+            coVerify { sessionManager.startBottleFeeding(BottleType.POWDERED, 120, babyId) }
             assertEquals(FeedingEffect.NavigateBack, awaitItem())
         }
     }
@@ -181,6 +183,49 @@ class FeedingViewModelTest {
     }
 
     @Test
+    fun `WHEN TapBreast with no session and startBreastfeeding throws THEN ShowError is emitted`() = runTest {
+        coEvery { sessionManager.startBreastfeeding(any(), any()) } throws RuntimeException("network failure")
+
+        viewModel.effects.test {
+            viewModel.sendIntent(FeedingIntent.TapBreast(Breast.LEFT))
+
+            val effect = awaitItem()
+            assert(effect is FeedingEffect.ShowError)
+        }
+    }
+
+    @Test
+    fun `WHEN StopSession and finishSession throws THEN ShowError is emitted and NavigateBack is not`() = runTest {
+        coEvery { sessionManager.finishSession() } throws RuntimeException("network failure")
+
+        viewModel.effects.test {
+            viewModel.sendIntent(FeedingIntent.StopSession)
+
+            val effect = awaitItem()
+            assert(effect is FeedingEffect.ShowError)
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun `WHEN SaveBottleFeeding with valid data and network fails THEN ShowError emitted and no NavigateBack`() = runTest {
+        coEvery { sessionManager.startBottleFeeding(any(), any(), any()) } throws RuntimeException("network failure")
+        with(viewModel) {
+            sendIntent(FeedingIntent.SelectBottle)
+            sendIntent(FeedingIntent.UpdateBottleMl("120"))
+            sendIntent(FeedingIntent.SelectBottleType(BottleType.POWDERED))
+        }
+
+        viewModel.effects.test {
+            viewModel.sendIntent(FeedingIntent.SaveBottleFeeding)
+
+            val effect = awaitItem()
+            assert(effect is FeedingEffect.ShowError)
+            expectNoEvents()
+        }
+    }
+
+    @Test
     fun `WHEN UpdateBottleMl THEN state bottleMl is updated`() = runTest {
         viewModel.sendIntent(FeedingIntent.UpdateBottleMl("90"))
 
@@ -192,6 +237,58 @@ class FeedingViewModelTest {
         viewModel.sendIntent(FeedingIntent.SelectBottleType(BottleType.MOTHERS_MILK))
 
         assertEquals(BottleType.MOTHERS_MILK, viewModel.state.value.bottleType)
+    }
+
+    @Test
+    fun `WHEN UpdateDateTime THEN showStartTimePicker becomes true`() = runTest {
+        viewModel.sendIntent(FeedingIntent.UpdateDateTime)
+
+        assertEquals(true, viewModel.state.value.showStartTimePicker)
+    }
+
+    @Test
+    fun `WHEN DismissStartTimePicker THEN showStartTimePicker becomes false`() = runTest {
+        viewModel.sendIntent(FeedingIntent.UpdateDateTime)
+        viewModel.sendIntent(FeedingIntent.DismissStartTimePicker)
+
+        assertEquals(false, viewModel.state.value.showStartTimePicker)
+    }
+
+    @Test
+    fun `WHEN ConfirmStartTime with future time THEN ShowError emitted and picker stays closed`() = runTest {
+        val futureTime = System.currentTimeMillis() + 60_000L
+
+        viewModel.effects.test {
+            viewModel.sendIntent(FeedingIntent.ConfirmStartTime(futureTime))
+
+            assert(awaitItem() is FeedingEffect.ShowError)
+        }
+        assertEquals(false, viewModel.state.value.showStartTimePicker)
+    }
+
+    @Test
+    fun `WHEN ConfirmStartTime with valid past time THEN updateSessionStartTime called and picker dismissed`() = runTest {
+        activeSessionFlow.value = buildSession(activeBreast = null)
+
+        val pastTime = System.currentTimeMillis() - 60_000L
+        viewModel.sendIntent(FeedingIntent.UpdateDateTime)
+        viewModel.sendIntent(FeedingIntent.ConfirmStartTime(pastTime))
+
+        coVerify { sessionManager.updateSessionStartTime(pastTime) }
+        assertEquals(false, viewModel.state.value.showStartTimePicker)
+    }
+
+    @Test
+    fun `WHEN ConfirmStartTime and updateSessionStartTime throws THEN ShowError emitted`() = runTest {
+        coEvery { sessionManager.updateSessionStartTime(any()) } throws RuntimeException("error")
+        activeSessionFlow.value = buildSession(activeBreast = null)
+
+        val pastTime = System.currentTimeMillis() - 60_000L
+        viewModel.effects.test {
+            viewModel.sendIntent(FeedingIntent.ConfirmStartTime(pastTime))
+
+            assert(awaitItem() is FeedingEffect.ShowError)
+        }
     }
 
     private fun buildSession(activeBreast: Breast?) = ActiveFeedingSession(

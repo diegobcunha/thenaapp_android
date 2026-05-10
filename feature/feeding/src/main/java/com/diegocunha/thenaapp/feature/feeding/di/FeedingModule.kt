@@ -14,6 +14,8 @@ val feedingModule = module {
         FeedingRepositoryImpl(
             sessionDao = get(),
             segmentDao = get(),
+            feedingService = get(),
+            dispatchersProvider = get(),
         )
     }
 
@@ -25,7 +27,7 @@ val feedingModule = module {
         )
     }
 
-    viewModel {
-        FeedingViewModel(sessionManager = get())
+    viewModel { (babyId: String) ->
+        FeedingViewModel(sessionManager = get(), babyId = babyId)
     }
 }

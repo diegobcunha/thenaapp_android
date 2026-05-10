@@ -4,4 +4,4 @@ import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
 @Serializable
-data object FeedingNavigation : NavKey
+data class FeedingNavigation(val babyId: String) : NavKey

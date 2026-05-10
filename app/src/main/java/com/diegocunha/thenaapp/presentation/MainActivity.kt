@@ -154,13 +154,15 @@ class MainActivity : ComponentActivity() {
                                 entry<HomeNavigation> {
                                     HomeScreen(
                                         viewModel = koinViewModel<HomeViewModel>(),
-                                        onNavigateToFeeding = { backStack.add(FeedingNavigation) },
+                                        onNavigateToFeeding = { babyId -> backStack.add(FeedingNavigation(babyId)) },
                                     )
                                 }
 
-                                entry<FeedingNavigation> {
+                                entry<FeedingNavigation> { key ->
                                     FeedingScreen(
-                                        viewModel = koinViewModel<FeedingViewModel>(),
+                                        viewModel = koinViewModel<FeedingViewModel>(
+                                            parameters = { parametersOf(key.babyId) }
+                                        ),
                                         onNavigateBack = { backStack.removeLastOrNull() },
                                     )
                                 }

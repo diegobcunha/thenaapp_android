@@ -24,22 +24,24 @@ class HomeRepositoryImpl(
             val user = userService.getUsersInformation()
             val babyInfo = user.babies.firstOrNull()
                 ?: throw IllegalArgumentException("Baby should not be null")
-
+            val activeSession = feedingLocalDataSource.getActiveSession()
             HomeUserInformation(
                 userName = user.name.orEmpty(),
-                babyInformation = babyInfo.toDomain()
+                babyInformation = babyInfoToDomain(babyInfo, activeSession),
             )
         }
 
     override fun observeActiveFeeding(): Flow<ActiveFeedingSnapshot?> =
         feedingLocalDataSource.observeActiveSession()
 
-    private fun BabyResponse.toDomain() = HomeBabyInformation(
-        babyName = name,
-        babyBirthDate = birthDate,
-        babyPhotoUrl = photoUrl,
-        babyHeight = birthHeight.setScale(SCALE_0, RoundingMode.HALF_UP),
-        babyWeight = birthWeight.setScale(SCALE_2, RoundingMode.HALF_UP)
+    private fun babyInfoToDomain(babyInfo: BabyResponse, activeFeedingSnapshot: ActiveFeedingSnapshot?) = HomeBabyInformation(
+        babyId = babyInfo.id.toString(),
+        babyName = babyInfo.name,
+        babyBirthDate = babyInfo.birthDate,
+        babyPhotoUrl = babyInfo.photoUrl,
+        babyHeight = babyInfo.birthHeight.setScale(SCALE_0, RoundingMode.HALF_UP),
+        babyWeight = babyInfo.birthWeight.setScale(SCALE_2, RoundingMode.HALF_UP),
+        activeFeedingSnapshot = activeFeedingSnapshot
     )
 
     companion object {

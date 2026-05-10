@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 
 class FeedingViewModel(
     private val sessionManager: FeedingSessionManager,
+    private val babyId: String,
 ) : BaseViewModel<FeedingState, FeedingIntent, FeedingEffect>(FeedingState()) {
 
     init {
@@ -29,6 +30,9 @@ class FeedingViewModel(
             is FeedingIntent.UpdateBottleMl -> updateState { copy(bottleMl = intent.ml) }
             is FeedingIntent.SelectBottleType -> updateState { copy(bottleType = intent.type) }
             FeedingIntent.SaveBottleFeeding -> saveBottleFeeding()
+            FeedingIntent.UpdateDateTime -> updateState { copy(showStartTimePicker = true) }
+            FeedingIntent.DismissStartTimePicker -> updateState { copy(showStartTimePicker = false) }
+            is FeedingIntent.ConfirmStartTime -> applyStartTimeChange(intent.newStartedAtMs)
             FeedingIntent.Tick -> recalculateElapsed()
         }
     }
@@ -42,6 +46,7 @@ class FeedingViewModel(
                             sessionId = session.sessionId,
                             feedingType = session.type,
                             activeBreast = session.activeBreast,
+                            sessionStartedAt = session.startedAt,
                         )
                     }
                     recalculateElapsed(session)
@@ -61,18 +66,27 @@ class FeedingViewModel(
     private fun handleTapBreast(breast: Breast) {
         val current = state.value
         viewModelScope.launch {
-            when {
-                current.sessionId == null -> sessionManager.startBreastfeeding(breast)
-                current.activeBreast == breast -> sessionManager.pauseCurrentBreast()
-                current.activeBreast != null -> sessionManager.switchBreast(breast)
-                else -> sessionManager.resumeBreast(breast)
+            runCatching {
+                when {
+                    current.sessionId == null -> sessionManager.startBreastfeeding(breast, babyId)
+                    current.activeBreast == breast -> sessionManager.pauseCurrentBreast()
+                    current.activeBreast != null -> sessionManager.switchBreast(breast)
+                    else -> sessionManager.resumeBreast(breast)
+                }
+            }.onFailure {
+                sendEffect(FeedingEffect.ShowError(R.string.feeding_error_network))
             }
         }
     }
 
     private fun stopSession() {
         viewModelScope.launch {
-            sessionManager.finishSession()
+            runCatching {
+                sessionManager.finishSession()
+            }.onFailure {
+                sendEffect(FeedingEffect.ShowError(R.string.feeding_error_network))
+                return@launch
+            }
             sendEffect(FeedingEffect.NavigateBack)
         }
     }
@@ -89,8 +103,28 @@ class FeedingViewModel(
             return
         }
         viewModelScope.launch {
-            sessionManager.startBottleFeeding(bottleType = bottleType, ml = ml)
+            runCatching {
+                sessionManager.startBottleFeeding(bottleType = bottleType, ml = ml, babyId = babyId)
+            }.onFailure {
+                sendEffect(FeedingEffect.ShowError(R.string.feeding_error_network))
+                return@launch
+            }
             sendEffect(FeedingEffect.NavigateBack)
+        }
+    }
+
+    private fun applyStartTimeChange(newStartedAtMs: Long) {
+        if (newStartedAtMs >= System.currentTimeMillis()) {
+            sendEffect(FeedingEffect.ShowError(R.string.feeding_error_start_time_future))
+            return
+        }
+        updateState { copy(showStartTimePicker = false) }
+        viewModelScope.launch {
+            runCatching {
+                sessionManager.updateSessionStartTime(newStartedAtMs)
+            }.onFailure {
+                sendEffect(FeedingEffect.ShowError(R.string.feeding_error_network))
+            }
         }
     }
 

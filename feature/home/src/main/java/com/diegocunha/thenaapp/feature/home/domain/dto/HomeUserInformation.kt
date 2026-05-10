@@ -1,5 +1,6 @@
 package com.diegocunha.thenaapp.feature.home.domain.dto
 
+import com.diegocunha.thenaapp.datasource.database.ActiveFeedingSnapshot
 import java.math.BigDecimal
 
 data class HomeUserInformation(
@@ -8,9 +9,11 @@ data class HomeUserInformation(
 )
 
 data class HomeBabyInformation(
+    val babyId: String,
     val babyName: String,
     val babyBirthDate: String,
     val babyWeight: BigDecimal,
     val babyHeight: BigDecimal,
     val babyPhotoUrl: String? = null,
+    val activeFeedingSnapshot: ActiveFeedingSnapshot? = null,
 )

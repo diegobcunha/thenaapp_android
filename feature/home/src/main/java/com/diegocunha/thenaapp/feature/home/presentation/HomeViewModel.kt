@@ -27,7 +27,11 @@ class HomeViewModel(
             HomeIntent.SleepInfo,
             HomeIntent.SummaryInfo,
             HomeIntent.VaccineInfo -> sendEffect(HomeEffect.NotDevelopedYet)
-            HomeIntent.FeedInfo -> sendEffect(HomeEffect.NavigateToFeeding)
+
+            HomeIntent.FeedInfo -> {
+                val babyId = state.value.babyId ?: return
+                sendEffect(HomeEffect.NavigateToFeeding(babyId))
+            }
         }
     }
 
@@ -44,7 +48,8 @@ class HomeViewModel(
             while (true) {
                 delay(1_000L)
                 val session = state.value.activeFeedingSession ?: continue
-                val elapsed = (System.currentTimeMillis() - session.startedAt) / 1_000L
+                val segmentStart = session.activeSegmentStartedAt ?: continue
+                val elapsed = (session.closedSegmentsTotalMs + System.currentTimeMillis() - segmentStart) / 1_000L
                 updateState { copy(feedingBannerElapsedSeconds = elapsed) }
             }
         }
@@ -56,16 +61,29 @@ class HomeViewModel(
                 is Resource.Success -> updateState {
                     val data = result.data
                     val baby = data.babyInformation
+                    val session = baby.activeFeedingSnapshot
+                    val elapsed = session?.let { s ->
+                        val segStart = s.activeSegmentStartedAt
+                        if (segStart != null) {
+                            (s.closedSegmentsTotalMs + System.currentTimeMillis() - segStart) / 1_000L
+                        } else {
+                            s.closedSegmentsTotalMs / 1_000L
+                        }
+                    }
+
                     copy(
                         isLoading = false,
                         userName = data.userName,
+                        babyId = baby.babyId,
                         babyPhotoUrl = baby.babyPhotoUrl,
                         babyName = baby.babyName,
                         babyAge = calculateBabyAge(baby.babyBirthDate),
                         babyInfo = BabyInfo(
                             height = baby.babyHeight.toString(),
                             weight = baby.babyWeight.toString(),
-                        )
+                        ),
+                        activeFeedingSession = data.babyInformation.activeFeedingSnapshot,
+                        feedingBannerElapsedSeconds = elapsed
                     )
                 }
 

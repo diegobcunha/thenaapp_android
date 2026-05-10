@@ -6,6 +6,7 @@ import com.diegocunha.thenaapp.datasource.network.model.feeding.BreastSideReques
 import com.diegocunha.thenaapp.datasource.network.model.feeding.FeedingSessionResponse
 import com.diegocunha.thenaapp.datasource.network.model.feeding.FeedingStatisticsResponse
 import com.diegocunha.thenaapp.datasource.network.model.feeding.UpdateBottleFeedingRequest
+import com.diegocunha.thenaapp.datasource.network.model.feeding.UpdateStartTimeRequest
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -53,6 +54,13 @@ interface FeedingService {
         @Path("babyId") babyId: String,
         @Path("sessionId") sessionId: String,
     )
+
+    @PUT("/v1/baby/{babyId}/feeding/{sessionId}/start-time")
+    suspend fun updateSessionStartTime(
+        @Path("babyId") babyId: String,
+        @Path("sessionId") sessionId: String,
+        @Body request: UpdateStartTimeRequest,
+    ): FeedingSessionResponse
 
     @GET("/v1/baby/{babyId}/feeding/active")
     suspend fun getActiveSession(

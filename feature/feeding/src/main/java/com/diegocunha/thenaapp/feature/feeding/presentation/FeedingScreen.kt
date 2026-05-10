@@ -22,6 +22,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.diegocunha.thenaapp.coreui.theme.ThenaTheme
@@ -32,6 +33,7 @@ import com.diegocunha.thenaapp.feature.feeding.domain.model.FeedingType
 import com.diegocunha.thenaapp.feature.feeding.presentation.components.BottleFeedingCard
 import com.diegocunha.thenaapp.feature.feeding.presentation.components.BreastfeedingTimerCard
 import com.diegocunha.thenaapp.feature.feeding.presentation.components.FeedingTypePicker
+import com.diegocunha.thenaapp.feature.feeding.presentation.components.StartTimePickerDialog
 import com.skydoves.compose.stability.runtime.TraceRecomposition
 import kotlinx.coroutines.flow.collectLatest
 
@@ -44,6 +46,7 @@ fun FeedingScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
     val onFeedingBottle =
         remember(viewModel) { { viewModel.sendIntent(FeedingIntent.SelectBottle) } }
@@ -83,13 +86,25 @@ fun FeedingScreen(
             }
         }
 
-
+    val onUpdateDateTime = remember(viewModel) {
+        { viewModel.sendIntent(FeedingIntent.UpdateDateTime) }
+    }
+    val onConfirmStartTime = remember(viewModel) {
+        { ms: Long -> viewModel.sendIntent(FeedingIntent.ConfirmStartTime(ms)) }
+    }
+    val onDismissStartTimePicker = remember(viewModel) {
+        { viewModel.sendIntent(FeedingIntent.DismissStartTimePicker) }
+    }
 
     LaunchedEffect(Unit) {
         viewModel.effects.collectLatest { effect ->
             when (effect) {
                 FeedingEffect.NavigateBack -> onNavigateBack()
-                is FeedingEffect.ShowError -> snackbarHostState.showSnackbar(effect.message.toString())
+                is FeedingEffect.ShowError -> snackbarHostState.showSnackbar(
+                    context.getString(
+                        effect.message
+                    )
+                )
             }
         }
     }
@@ -105,6 +120,9 @@ fun FeedingScreen(
         onMlChange = onMlChange,
         onSave = onSave,
         onTypeSelect = onTypeSelect,
+        onUpdateDateTime = onUpdateDateTime,
+        onConfirmStartTime = onConfirmStartTime,
+        onDismissStartTimePicker = onDismissStartTimePicker,
     )
 
 }
@@ -121,8 +139,19 @@ private fun FeedingScreenContent(
     onTapBreast: (Breast) -> Unit,
     onMlChange: (String) -> Unit,
     onSave: () -> Unit,
-    onTypeSelect: (BottleType) -> Unit
+    onTypeSelect: (BottleType) -> Unit,
+    onUpdateDateTime: () -> Unit,
+    onConfirmStartTime: (Long) -> Unit,
+    onDismissStartTimePicker: () -> Unit,
 ) {
+
+    if (state.showStartTimePicker) {
+        StartTimePickerDialog(
+            initialStartedAtMs = state.sessionStartedAt ?: System.currentTimeMillis(),
+            onConfirm = onConfirmStartTime,
+            onDismiss = onDismissStartTimePicker,
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -161,6 +190,7 @@ private fun FeedingScreenContent(
                     state = state,
                     onTapBreast = onTapBreast,
                     onFinish = onFinish,
+                    onUpdateDateTime = onUpdateDateTime
                 )
 
                 FeedingType.BOTTLE -> BottleFeedingCard(

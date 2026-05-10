@@ -15,6 +15,9 @@ sealed interface FeedingIntent : MviIntent {
     data class UpdateBottleMl(val ml: String) : FeedingIntent
     data class SelectBottleType(val type: BottleType) : FeedingIntent
     data object SaveBottleFeeding : FeedingIntent
+    data object UpdateDateTime : FeedingIntent
+    data class ConfirmStartTime(val newStartedAtMs: Long) : FeedingIntent
+    data object DismissStartTimePicker : FeedingIntent
 
     data object Tick : FeedingIntent
 }

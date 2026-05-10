@@ -5,22 +5,22 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class FeedingStatisticsResponse(
-    @SerialName("periodStart")
+    @SerialName("period_start")
     val periodStart: String,
-    @SerialName("periodEnd")
+    @SerialName("period_end")
     val periodEnd: String,
-    @SerialName("totalSessions")
+    @SerialName("total_sessions")
     val totalSessions: Long,
-    @SerialName("breastfeedingSessions")
+    @SerialName("breastfeeding_sessions")
     val breastfeedingSessions: Long,
-    @SerialName("bottleSessions")
+    @SerialName("bottle_sessions")
     val bottleSessions: Long,
-    @SerialName("totalBreastfeedingDurationSeconds")
+    @SerialName("total_breastfeeding_duration_seconds")
     val totalBreastfeedingDurationSeconds: Long,
-    @SerialName("averageBreastfeedingDurationSeconds")
+    @SerialName("average_breastfeeding_duration_seconds")
     val averageBreastfeedingDurationSeconds: Long,
-    @SerialName("totalBottleVolumeMl")
+    @SerialName("total_bottle_volume_ml")
     val totalBottleVolumeMl: Long,
-    @SerialName("averageBottleVolumeMl")
+    @SerialName("average_bottle_volume_ml")
     val averageBottleVolumeMl: Long,
 )

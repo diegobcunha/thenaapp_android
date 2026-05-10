@@ -8,7 +8,7 @@ import java.math.BigDecimal
 @Serializable
 data class BottleRequest(
     @SerialName("milk_type")
-    val type: String,
+    val type: MilkType,
     @SerialName("volume_ml")
     @Serializable(with = BigDecimalSerializer::class)
     val volume: BigDecimal

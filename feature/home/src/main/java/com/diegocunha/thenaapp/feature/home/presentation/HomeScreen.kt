@@ -57,7 +57,7 @@ import kotlinx.coroutines.flow.collectLatest
 @TraceRecomposition
 fun HomeScreen(
     viewModel: HomeViewModel,
-    onNavigateToFeeding: () -> Unit,
+    onNavigateToFeeding: (babyId: String) -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -76,7 +76,7 @@ fun HomeScreen(
                 is HomeEffect.NotDevelopedYet -> snackbarHostState.showSnackbar(
                     notDevelopedYetMessage
                 )
-                HomeEffect.NavigateToFeeding -> onNavigateToFeeding()
+                is HomeEffect.NavigateToFeeding -> onNavigateToFeeding(effect.babyId)
             }
         }
     }
@@ -90,7 +90,9 @@ fun HomeScreen(
         onFeedingClick = onFeedingClick,
         onVaccineClick = onVaccineClick,
         onSummaryClick = onSummaryClick,
-        onActiveFeedingBannerClick = onNavigateToFeeding,
+        onActiveFeedingBannerClick = {
+            state.babyId?.let { onNavigateToFeeding(it) }
+        },
     )
 }
 
@@ -268,7 +270,7 @@ private fun Home(
                 .fillMaxWidth()
                 .padding(ThenaTheme.spacing.md)
         ) {
-            if (state.activeFeedingSession != null) {
+            if (state.activeFeedingSession != null && state.feedingBannerElapsedSeconds != null) {
                 ActiveFeedingBanner(
                     elapsedSeconds = state.feedingBannerElapsedSeconds,
                     activeBreast = state.activeFeedingSession.activeBreast,

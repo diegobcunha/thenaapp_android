@@ -17,4 +17,6 @@ data class FeedingState(
     val bottleMl: String = "",
     val bottleType: BottleType? = null,
     val isLoading: Boolean = false,
+    val sessionStartedAt: Long? = null,
+    val showStartTimePicker: Boolean = false,
 ) : MviState

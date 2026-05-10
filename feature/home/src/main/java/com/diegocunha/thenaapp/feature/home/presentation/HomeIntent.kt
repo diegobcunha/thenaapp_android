@@ -33,11 +33,12 @@ data class BabyInfo(
 data class HomeState(
     val isLoading: Boolean = false,
     val userName: String = "",
+    val babyId: String? = null,
     val babyPhotoUrl: String? = null,
     val babyName: String = "",
     val babyAge: BabyAge? = null,
     val babyInfo: BabyInfo? = null,
     @StringRes val error: Int? = null,
     val activeFeedingSession: ActiveFeedingSnapshot? = null,
-    val feedingBannerElapsedSeconds: Long = 0L,
+    val feedingBannerElapsedSeconds: Long? = null,
 ) : MviState

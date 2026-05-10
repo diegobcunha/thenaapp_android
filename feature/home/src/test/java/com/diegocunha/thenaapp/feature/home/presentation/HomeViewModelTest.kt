@@ -33,6 +33,8 @@ class HomeViewModelTest {
     private lateinit var viewModel: HomeViewModel
 
     private val mockBabyInfo = HomeBabyInformation(
+
+        babyId = "test-baby-id",
         babyName = "Baby Luna",
         babyBirthDate = "2023-01-01",
         babyWeight = BigDecimal("4.00"),
@@ -109,12 +111,11 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `WHEN any intent is sent THEN NotDevelopedYet effect is emitted`() = runTest {
+    fun `WHEN unimplemented intents are sent THEN NotDevelopedYet effect is emitted`() = runTest {
         val intents = listOf(
             HomeIntent.EditBabyInfo,
             HomeIntent.UserProfile,
             HomeIntent.SleepInfo,
-            HomeIntent.FeedInfo,
             HomeIntent.VaccineInfo,
             HomeIntent.SummaryInfo,
         )
@@ -124,6 +125,15 @@ class HomeViewModelTest {
                 viewModel.sendIntent(intent)
                 assertEquals(HomeEffect.NotDevelopedYet, awaitItem())
             }
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `WHEN FeedInfo intent is sent THEN NavigateToFeeding effect is emitted with babyId`() = runTest {
+        viewModel.effects.test {
+            viewModel.sendIntent(HomeIntent.FeedInfo)
+            assertEquals(HomeEffect.NavigateToFeeding("test-baby-id"), awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
     }
