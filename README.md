@@ -7,6 +7,16 @@
 
 ---
 
+## Screenshots
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/5dee8d42-8306-4624-8c5e-4c582384fb4e" width="270" alt="Home Screen" />
+  <img src="https://github.com/user-attachments/assets/66886149-361c-48dc-833e-0dbafb5a0957" width="270" alt="Feeding Log" />
+  <img src="https://github.com/user-attachments/assets/e30cbde2-d354-4d9b-a8e3-a638eed52284" width="270" alt="Feeding Details" />
+</p>
+
+---
+
 ## Features
 
 ### Currently Implemented
