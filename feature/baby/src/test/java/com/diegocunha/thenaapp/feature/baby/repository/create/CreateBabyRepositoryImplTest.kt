@@ -84,7 +84,7 @@ class CreateBabyRepositoryImplTest {
 
         assertTrue(result is Resource.Success)
         coVerify(exactly = 0) { imageCompressor.compress(any()) }
-        coVerify { babyService.updateBaby(babyId, match { it.photoUrl == null }) }
+        coVerify(inverse = true) { babyService.updateBaby(babyId, match { it.photoUrl == null }) }
     }
 
     @Test
@@ -133,7 +133,7 @@ class CreateBabyRepositoryImplTest {
         coEvery { babyService.createBaby(any()) } returns mockBabyResponse
         coEvery { babyService.updateBaby(any(), any()) } throws Exception("Update failed")
 
-        val result = repository.createBaby(buildRequest(photo = null))
+        val result = repository.createBaby(buildRequest(photo = mockk()))
 
         assertTrue(result is Resource.Error)
     }

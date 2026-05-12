@@ -59,6 +59,8 @@ dependencies {
     api(libs.coil.compose)
     api(libs.kotlinx.collections.immutable)
 
+    testImplementation(libs.junit)
+
     debugImplementation(libs.androidx.compose.ui.tooling)
 
     screenshotTestImplementation(libs.androidx.compose.ui.tooling)

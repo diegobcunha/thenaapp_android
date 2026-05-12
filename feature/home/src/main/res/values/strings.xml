@@ -18,4 +18,5 @@
     <string name="home_quick_log_feed">Feeding</string>
     <string name="home_quick_log_vaccine">Vaccines</string>
     <string name="home_quick_log_summary">Summary</string>
+    <string name="home_feeding_banner_tap">Tap to open →</string>
 </resources>

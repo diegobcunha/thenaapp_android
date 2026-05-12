@@ -24,6 +24,9 @@ import com.diegocunha.thenaapp.coreui.theme.ThenaTheme
 import com.diegocunha.thenaapp.feature.baby.presentation.create.CreateBabyScreen
 import com.diegocunha.thenaapp.feature.baby.presentation.create.CreateBabyViewModel
 import com.diegocunha.thenaapp.feature.baby.presentation.create.navigation.CreateBabyNavigation
+import com.diegocunha.thenaapp.feature.feeding.presentation.FeedingScreen
+import com.diegocunha.thenaapp.feature.feeding.presentation.FeedingViewModel
+import com.diegocunha.thenaapp.feature.feeding.presentation.navigation.FeedingNavigation
 import com.diegocunha.thenaapp.feature.home.presentation.HomeScreen
 import com.diegocunha.thenaapp.feature.home.presentation.HomeViewModel
 import com.diegocunha.thenaapp.feature.home.presentation.navigation.HomeNavigation
@@ -150,7 +153,17 @@ class MainActivity : ComponentActivity() {
 
                                 entry<HomeNavigation> {
                                     HomeScreen(
-                                        viewModel = koinViewModel<HomeViewModel>()
+                                        viewModel = koinViewModel<HomeViewModel>(),
+                                        onNavigateToFeeding = { babyId -> backStack.add(FeedingNavigation(babyId)) },
+                                    )
+                                }
+
+                                entry<FeedingNavigation> { key ->
+                                    FeedingScreen(
+                                        viewModel = koinViewModel<FeedingViewModel>(
+                                            parameters = { parametersOf(key.babyId) }
+                                        ),
+                                        onNavigateBack = { backStack.removeLastOrNull() },
                                     )
                                 }
                             }

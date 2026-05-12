@@ -37,12 +37,14 @@ class CreateBabyRepositoryImpl(
                 )
             )
 
-            val photoUrl = request.photo?.let { uploadPhoto(baby.id, it) }
-            service.updateBaby(
-                baby.id, UpdateBabyRequest(
-                    photoUrl = photoUrl,
+            request.photo?.let {
+                val photo = uploadPhoto(baby.id, it)
+                service.updateBaby(
+                    baby.id, UpdateBabyRequest(
+                        photoUrl = photo,
+                    )
                 )
-            )
+            } ?: baby
         }
 
     private suspend fun uploadPhoto(babyId: UUID, photoUri: Uri): String? {

@@ -5,5 +5,5 @@ import com.diegocunha.thenaapp.core.mvi.MviEffect
 sealed interface HomeEffect : MviEffect {
 
     object NotDevelopedYet : HomeEffect
-
+    data class NavigateToFeeding(val babyId: String) : HomeEffect
 }

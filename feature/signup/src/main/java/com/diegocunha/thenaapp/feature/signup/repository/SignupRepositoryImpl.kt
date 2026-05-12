@@ -32,7 +32,7 @@ class SignupRepositoryImpl(
         if (firebaseToken.user == null) {
             throw Exception("User not created")
         }
-        val user = userService.updateProfile(PutUserRequest(name))
+        val user = userService.updateProfile(PutUserRequest(name, email))
         userSessionRepository.saveUserId(user.id.toString())
         user
     }

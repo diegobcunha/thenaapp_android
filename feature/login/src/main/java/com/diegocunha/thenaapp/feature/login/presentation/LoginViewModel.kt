@@ -45,7 +45,19 @@ class LoginViewModel(
         viewModelScope.launch {
             updateState { copy(isLoading = true, generalError = null) }
             when (val result = loginRepository.performLogin(current.email, current.password)) {
-                is Resource.Success -> sendEffect(LoginEffect.NavigateToHome)
+                is Resource.Success -> {
+                    if (result.data.name.isNullOrEmpty()) {
+                        sendEffect(
+                            LoginEffect.NavigateToFinishRegistration(
+                                hasBaby = result.data.babies.isNotEmpty(),
+                                true
+                            )
+                        )
+                    } else {
+                        sendEffect(LoginEffect.NavigateToHome)
+                    }
+                }
+
                 is Resource.Error -> updateState {
                     copy(isLoading = false, generalError = mapFirebaseError(result.exception))
                 }

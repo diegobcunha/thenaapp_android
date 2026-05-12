@@ -4,5 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class PutUserRequest(
-    val name: String
+    val name: String,
+    val email: String? = null,
 )

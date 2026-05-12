@@ -32,12 +32,13 @@ class HomeRepositoryImplTest {
     private val dispatchersProvider: DispatchersProvider = mockk {
         every { io() } returns testDispatcher
     }
+    private val feedingLocalDataSource: com.diegocunha.thenaapp.datasource.database.FeedingLocalDataSource = mockk()
     private lateinit var repository: HomeRepositoryImpl
 
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        repository = HomeRepositoryImpl(userService, dispatchersProvider)
+        repository = HomeRepositoryImpl(userService, dispatchersProvider, feedingLocalDataSource)
     }
 
     @After
