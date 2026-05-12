@@ -162,6 +162,65 @@ class FeedingRepositoryImpl(
             )
         }
 
+    override suspend fun updateBreastStartTime(
+        sessionId: String,
+        breast: Breast,
+        newStartedAt: Long,
+    ): Resource<Unit> = safeApiCall(dispatchersProvider) {
+        val now = System.currentTimeMillis()
+        val allSegments = segmentDao.getBySession(sessionId)
+        val breastSegments = allSegments.filter { it.breast == breast.name }
+        val otherSegments = allSegments.filter { it.breast != breast.name }
+
+        for (other in otherSegments) {
+            val endAt = other.endedAt ?: now
+            if (other.startedAt <= newStartedAt && newStartedAt < endAt) {
+                throw IllegalArgumentException("overlap")
+            }
+        }
+
+        if (breastSegments.isEmpty()) {
+            val otherFirstStart = otherSegments.minByOrNull { it.startedAt }?.startedAt
+                ?: throw IllegalStateException("No segments in session")
+            if (newStartedAt >= otherFirstStart) {
+                throw IllegalArgumentException("overlap")
+            }
+            segmentDao.insert(
+                BreastSegmentEntity(
+                    id = UUID.randomUUID().toString(),
+                    sessionId = sessionId,
+                    breast = breast.name,
+                    startedAt = newStartedAt,
+                    endedAt = otherFirstStart,
+                )
+            )
+        } else {
+            val firstSegment = breastSegments.minByOrNull { it.startedAt }!!
+            val closedAt = firstSegment.endedAt
+            if (closedAt != null && newStartedAt >= closedAt) {
+                throw IllegalArgumentException("overlap")
+            }
+            segmentDao.update(firstSegment.copy(startedAt = newStartedAt))
+        }
+
+        val otherFirstStart = otherSegments.minByOrNull { it.startedAt }?.startedAt
+        val newSessionStartedAt = if (otherFirstStart != null) {
+            minOf(newStartedAt, otherFirstStart)
+        } else {
+            newStartedAt
+        }
+
+        val entity = sessionDao.getById(sessionId)
+            ?: throw IllegalArgumentException("Session not found")
+        sessionDao.update(entity.copy(startedAt = newSessionStartedAt))
+
+        feedingService.updateSessionStartTime(
+            entity.babyId,
+            sessionId,
+            UpdateStartTimeRequest(newSessionStartedAt.toIso8601()),
+        )
+    }
+
     private fun BreastSegmentEntity.toDomain() = BreastSegment(
         id = id,
         breast = Breast.valueOf(breast),

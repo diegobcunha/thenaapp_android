@@ -18,6 +18,8 @@ sealed interface FeedingIntent : MviIntent {
     data object UpdateDateTime : FeedingIntent
     data class ConfirmStartTime(val newStartedAtMs: Long) : FeedingIntent
     data object DismissStartTimePicker : FeedingIntent
+    data class ConfirmBreastForTimeChange(val breast: Breast) : FeedingIntent
+    data object DismissBreastPickerForTimeChange : FeedingIntent
 
     data object Tick : FeedingIntent
 }

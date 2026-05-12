@@ -32,7 +32,11 @@ class FeedingViewModel(
             FeedingIntent.SaveBottleFeeding -> saveBottleFeeding()
             FeedingIntent.UpdateDateTime -> updateState { copy(showStartTimePicker = true) }
             FeedingIntent.DismissStartTimePicker -> updateState { copy(showStartTimePicker = false) }
-            is FeedingIntent.ConfirmStartTime -> applyStartTimeChange(intent.newStartedAtMs)
+            is FeedingIntent.ConfirmStartTime -> onStartTimeConfirmed(intent.newStartedAtMs)
+            is FeedingIntent.ConfirmBreastForTimeChange -> applyBreastStartTimeChange(intent.breast)
+            FeedingIntent.DismissBreastPickerForTimeChange -> updateState {
+                copy(showBreastPickerForTimeChange = false, pendingNewStartedAtMs = null)
+            }
             FeedingIntent.Tick -> recalculateElapsed()
         }
     }
@@ -113,17 +117,34 @@ class FeedingViewModel(
         }
     }
 
-    private fun applyStartTimeChange(newStartedAtMs: Long) {
+    private fun onStartTimeConfirmed(newStartedAtMs: Long) {
         if (newStartedAtMs >= System.currentTimeMillis()) {
             sendEffect(FeedingEffect.ShowError(R.string.feeding_error_start_time_future))
             return
         }
-        updateState { copy(showStartTimePicker = false) }
+        updateState {
+            copy(
+                showStartTimePicker = false,
+                showBreastPickerForTimeChange = true,
+                pendingNewStartedAtMs = newStartedAtMs,
+            )
+        }
+    }
+
+    private fun applyBreastStartTimeChange(breast: Breast) {
+        val pendingTime = state.value.pendingNewStartedAtMs ?: return
+        updateState { copy(showBreastPickerForTimeChange = false, pendingNewStartedAtMs = null) }
         viewModelScope.launch {
             runCatching {
-                sessionManager.updateSessionStartTime(newStartedAtMs)
-            }.onFailure {
-                sendEffect(FeedingEffect.ShowError(R.string.feeding_error_network))
+                sessionManager.updateBreastStartTime(breast, pendingTime)
+                recalculateElapsed()
+            }.onFailure { e ->
+                val errorRes = if (e is IllegalArgumentException) {
+                    R.string.feeding_error_start_time_overlap
+                } else {
+                    R.string.feeding_error_network
+                }
+                sendEffect(FeedingEffect.ShowError(errorRes))
             }
         }
     }

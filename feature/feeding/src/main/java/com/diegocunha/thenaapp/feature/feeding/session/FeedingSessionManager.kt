@@ -154,6 +154,13 @@ class FeedingSessionManager(
         _activeSession.value = repository.getActiveSession()
     }
 
+    suspend fun updateBreastStartTime(breast: Breast, newStartedAt: Long) {
+        val session = _activeSession.value ?: return
+        val result = repository.updateBreastStartTime(session.sessionId, breast, newStartedAt)
+        if (result is Resource.Error) throw result.exception
+        _activeSession.value = repository.getActiveSession()
+    }
+
     suspend fun startBottleFeeding(bottleType: BottleType, ml: Int, babyId: String) {
         val now = System.currentTimeMillis()
         val result = repository.createBottleSession(

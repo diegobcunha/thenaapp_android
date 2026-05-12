@@ -48,6 +48,7 @@ class FeedingViewModelTest {
             coJustRun { resumeBreast(any()) }
             coJustRun { startBottleFeeding(any(), any(), any()) }
             coJustRun { updateSessionStartTime(any()) }
+            coJustRun { updateBreastStartTime(any(), any()) }
         }
         every { sessionManager.activeSession } returns activeSessionFlow
         every { sessionManager.tickerFlow } returns emptyFlow()
@@ -267,28 +268,70 @@ class FeedingViewModelTest {
     }
 
     @Test
-    fun `WHEN ConfirmStartTime with valid past time THEN updateSessionStartTime called and picker dismissed`() = runTest {
-        activeSessionFlow.value = buildSession(activeBreast = null)
-
+    fun `WHEN ConfirmStartTime with valid past time THEN breast picker shown and start time picker dismissed`() = runTest {
         val pastTime = System.currentTimeMillis() - 60_000L
         viewModel.sendIntent(FeedingIntent.UpdateDateTime)
         viewModel.sendIntent(FeedingIntent.ConfirmStartTime(pastTime))
 
-        coVerify { sessionManager.updateSessionStartTime(pastTime) }
         assertEquals(false, viewModel.state.value.showStartTimePicker)
+        assertEquals(true, viewModel.state.value.showBreastPickerForTimeChange)
+        assertEquals(pastTime, viewModel.state.value.pendingNewStartedAtMs)
     }
 
     @Test
-    fun `WHEN ConfirmStartTime and updateSessionStartTime throws THEN ShowError emitted`() = runTest {
-        coEvery { sessionManager.updateSessionStartTime(any()) } throws RuntimeException("error")
-        activeSessionFlow.value = buildSession(activeBreast = null)
-
+    fun `WHEN ConfirmBreastForTimeChange and updateBreastStartTime throws network error THEN network ShowError emitted`() = runTest {
+        coEvery { sessionManager.updateBreastStartTime(any(), any()) } throws RuntimeException("network error")
         val pastTime = System.currentTimeMillis() - 60_000L
-        viewModel.effects.test {
-            viewModel.sendIntent(FeedingIntent.ConfirmStartTime(pastTime))
+        viewModel.sendIntent(FeedingIntent.ConfirmStartTime(pastTime))
 
-            assert(awaitItem() is FeedingEffect.ShowError)
+        viewModel.effects.test {
+            viewModel.sendIntent(FeedingIntent.ConfirmBreastForTimeChange(Breast.LEFT))
+
+            val effect = awaitItem()
+            assert(effect is FeedingEffect.ShowError)
         }
+    }
+
+    @Test
+    fun `WHEN ConfirmBreastForTimeChange and updateBreastStartTime throws IllegalArgumentException THEN overlap ShowError emitted`() = runTest {
+        coEvery { sessionManager.updateBreastStartTime(any(), any()) } throws IllegalArgumentException("overlap")
+        val pastTime = System.currentTimeMillis() - 60_000L
+        viewModel.sendIntent(FeedingIntent.ConfirmStartTime(pastTime))
+
+        viewModel.effects.test {
+            viewModel.sendIntent(FeedingIntent.ConfirmBreastForTimeChange(Breast.LEFT))
+
+            val effect = awaitItem() as FeedingEffect.ShowError
+            assertEquals(R.string.feeding_error_start_time_overlap, effect.message)
+        }
+    }
+
+    @Test
+    fun `WHEN ConfirmBreastForTimeChange THEN updateBreastStartTime called with correct breast and pending time`() = runTest {
+        val pastTime = System.currentTimeMillis() - 60_000L
+        viewModel.sendIntent(FeedingIntent.ConfirmStartTime(pastTime))
+        viewModel.sendIntent(FeedingIntent.ConfirmBreastForTimeChange(Breast.LEFT))
+
+        coVerify { sessionManager.updateBreastStartTime(Breast.LEFT, pastTime) }
+        assertEquals(false, viewModel.state.value.showBreastPickerForTimeChange)
+        assertEquals(null, viewModel.state.value.pendingNewStartedAtMs)
+    }
+
+    @Test
+    fun `WHEN ConfirmBreastForTimeChange with no pending time THEN nothing happens`() = runTest {
+        viewModel.sendIntent(FeedingIntent.ConfirmBreastForTimeChange(Breast.RIGHT))
+
+        coVerify(inverse = true) { sessionManager.updateBreastStartTime(any(), any()) }
+    }
+
+    @Test
+    fun `WHEN DismissBreastPickerForTimeChange THEN picker dismissed and pending time cleared`() = runTest {
+        val pastTime = System.currentTimeMillis() - 60_000L
+        viewModel.sendIntent(FeedingIntent.ConfirmStartTime(pastTime))
+        viewModel.sendIntent(FeedingIntent.DismissBreastPickerForTimeChange)
+
+        assertEquals(false, viewModel.state.value.showBreastPickerForTimeChange)
+        assertEquals(null, viewModel.state.value.pendingNewStartedAtMs)
     }
 
     private fun buildSession(activeBreast: Breast?) = ActiveFeedingSession(

@@ -384,6 +384,55 @@ class FeedingSessionManagerTest {
     }
 
     @Test
+    fun `WHEN updateBreastStartTime with no active session THEN repository not called`() = runTest {
+        manager.updateBreastStartTime(Breast.LEFT, System.currentTimeMillis() - 60_000L)
+
+        coVerify(inverse = true) { repository.updateBreastStartTime(any(), any(), any()) }
+    }
+
+    @Test
+    fun `WHEN updateBreastStartTime THEN repository called with sessionId, breast, and new time`() = runTest {
+        val session = buildSession()
+        coEvery { repository.getActiveSession() } returns session
+        coEvery { repository.updateBreastStartTime(any(), any(), any()) } returns Resource.Success(Unit)
+        val localManager = buildManager()
+        clearMocks(repository, answers = false)
+
+        val newTime = System.currentTimeMillis() - 120_000L
+        localManager.updateBreastStartTime(Breast.LEFT, newTime)
+
+        coVerify { repository.updateBreastStartTime(session.sessionId, Breast.LEFT, newTime) }
+    }
+
+    @Test
+    fun `WHEN updateBreastStartTime THEN session refreshed from repository`() = runTest {
+        val session = buildSession()
+        val updatedSession = session.copy(startedAt = session.startedAt - 120_000L)
+        coEvery { repository.getActiveSession() } returnsMany listOf(session, updatedSession)
+        coEvery { repository.updateBreastStartTime(any(), any(), any()) } returns Resource.Success(Unit)
+        val localManager = buildManager()
+
+        localManager.updateBreastStartTime(Breast.LEFT, updatedSession.startedAt)
+
+        assertEquals(updatedSession, localManager.activeSession.value)
+    }
+
+    @Test
+    fun `WHEN updateBreastStartTime returns Error THEN throws`() = runTest {
+        val error = RuntimeException("network failure")
+        val session = buildSession()
+        coEvery { repository.getActiveSession() } returns session
+        coEvery { repository.updateBreastStartTime(any(), any(), any()) } returns Resource.Error(error)
+        val localManager = buildManager()
+
+        var thrown: Throwable? = null
+        runCatching { localManager.updateBreastStartTime(Breast.LEFT, System.currentTimeMillis() - 60_000L) }
+            .onFailure { thrown = it }
+
+        assertEquals(error, thrown)
+    }
+
+    @Test
     fun `WHEN no active session THEN tickerFlow does not emit`() = runTest {
         manager.tickerFlow.test {
             advanceTimeBy(3_100L)

@@ -15,4 +15,5 @@ interface FeedingRepository {
     suspend fun closeSegment(segmentId: String, endedAt: Long): Resource<Unit>
     suspend fun getActiveSegmentId(sessionId: String): String?
     suspend fun updateSessionStartTime(sessionId: String, newStartedAt: Long): Resource<Unit>
+    suspend fun updateBreastStartTime(sessionId: String, breast: Breast, newStartedAt: Long): Resource<Unit>
 }

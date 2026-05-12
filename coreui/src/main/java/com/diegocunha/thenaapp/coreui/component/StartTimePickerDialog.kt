@@ -1,4 +1,4 @@
-package com.diegocunha.thenaapp.feature.feeding.presentation.components
+package com.diegocunha.thenaapp.coreui.component
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,8 +19,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import com.diegocunha.thenaapp.coreui.R
 import com.diegocunha.thenaapp.coreui.theme.ThenaTheme
-import com.diegocunha.thenaapp.feature.feeding.R
 import java.util.Calendar
 import java.util.TimeZone
 
@@ -49,14 +49,16 @@ fun StartTimePickerDialog(
             onDismissRequest = onDismiss,
             confirmButton = {
                 TextButton(
-                    onClick = { if (datePickerState.selectedDateMillis != null) showTimePicker = true },
+                    onClick = {
+                        if (datePickerState.selectedDateMillis != null) showTimePicker = true
+                    },
                 ) {
-                    Text(stringResource(android.R.string.ok))
+                    Text(stringResource(R.string.coreui_ok))
                 }
             },
             dismissButton = {
                 TextButton(onClick = onDismiss) {
-                    Text(stringResource(android.R.string.cancel))
+                    Text(stringResource(R.string.coreui_cancel))
                 }
             },
         ) {
@@ -65,21 +67,27 @@ fun StartTimePickerDialog(
     } else {
         AlertDialog(
             onDismissRequest = onDismiss,
-            title = { Text(stringResource(R.string.feeding_select_time)) },
+            title = { Text(stringResource(R.string.coreui_select_date)) },
             text = { TimePicker(state = timePickerState) },
             confirmButton = {
                 TextButton(
                     onClick = {
                         val dateMillis = datePickerState.selectedDateMillis ?: return@TextButton
-                        onConfirm(combineDateAndTime(dateMillis, timePickerState.hour, timePickerState.minute))
+                        onConfirm(
+                            combineDateAndTime(
+                                dateMillis,
+                                timePickerState.hour,
+                                timePickerState.minute
+                            )
+                        )
                     },
                 ) {
-                    Text(stringResource(android.R.string.ok))
+                    Text(stringResource(R.string.coreui_ok))
                 }
             },
             dismissButton = {
                 TextButton(onClick = onDismiss) {
-                    Text(stringResource(android.R.string.cancel))
+                    Text(stringResource(R.string.coreui_cancel))
                 }
             },
         )

@@ -19,4 +19,6 @@ data class FeedingState(
     val isLoading: Boolean = false,
     val sessionStartedAt: Long? = null,
     val showStartTimePicker: Boolean = false,
+    val showBreastPickerForTimeChange: Boolean = false,
+    val pendingNewStartedAtMs: Long? = null,
 ) : MviState

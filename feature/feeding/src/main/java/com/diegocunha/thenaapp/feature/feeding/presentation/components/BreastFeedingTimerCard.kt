@@ -29,6 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.diegocunha.thenaapp.coreui.theme.ThenaTheme
+import com.diegocunha.thenaapp.coreui.util.formatElapsedSeconds
 import com.diegocunha.thenaapp.feature.feeding.R
 import com.diegocunha.thenaapp.feature.feeding.domain.model.Breast
 import com.diegocunha.thenaapp.feature.feeding.domain.model.FeedingType
@@ -58,7 +59,7 @@ fun BreastfeedingTimerCard(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
-                text = formatElapsed(state.totalElapsedSeconds),
+                text = formatElapsedSeconds(state.totalElapsedSeconds),
                 fontFamily = ThenaTheme.typography.displayMedium.fontFamily,
                 fontSize = 52.sp,
                 fontWeight = FontWeight.Bold,
@@ -91,7 +92,7 @@ fun BreastfeedingTimerCard(
                         )
                     },
                     label = stringResource(R.string.feeding_breast_left),
-                    elapsed = formatElapsed(state.leftElapsedSeconds),
+                    elapsed = formatElapsedSeconds(state.leftElapsedSeconds),
                     isActive = state.activeBreast == Breast.LEFT,
                     onClick = { onTapBreast(Breast.LEFT) },
                 )
@@ -104,7 +105,7 @@ fun BreastfeedingTimerCard(
                         )
                     },
                     label = stringResource(R.string.feeding_breast_right),
-                    elapsed = formatElapsed(state.rightElapsedSeconds),
+                    elapsed = formatElapsedSeconds(state.rightElapsedSeconds),
                     isActive = state.activeBreast == Breast.RIGHT,
                     onClick = { onTapBreast(Breast.RIGHT) },
                 )
@@ -151,12 +152,6 @@ private fun BreastfeedingTimerCardPreview() {
             )
         }
     }
-}
-
-private fun formatElapsed(totalSeconds: Long): String {
-    val minutes = totalSeconds / 60
-    val seconds = totalSeconds % 60
-    return "%02d:%02d".format(minutes, seconds)
 }
 
 @Preview(showBackground = true)

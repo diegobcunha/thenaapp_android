@@ -55,7 +55,7 @@ interface FeedingService {
         @Path("sessionId") sessionId: String,
     )
 
-    @PUT("/v1/baby/{babyId}/feeding/{sessionId}/start-time")
+    @PUT("/v1/baby/{babyId}/feeding/{sessionId}/time")
     suspend fun updateSessionStartTime(
         @Path("babyId") babyId: String,
         @Path("sessionId") sessionId: String,

@@ -9,6 +9,7 @@ import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
+import com.diegocunha.thenaapp.coreui.util.formatElapsedSeconds
 import com.diegocunha.thenaapp.feature.feeding.session.FeedingSessionManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -51,7 +52,7 @@ class FeedingTimerService : Service() {
                 }
                 while (true) {
                     val elapsed = calculateElapsedSeconds(session)
-                    updateNotification(formatElapsed(elapsed))
+                    updateNotification(formatElapsedSeconds(elapsed))
                     delay(1_000L)
                 }
             }
@@ -65,12 +66,6 @@ class FeedingTimerService : Service() {
             val end = segment.endedAt ?: now
             (end - segment.startedAt) / 1_000L
         }
-    }
-
-    private fun formatElapsed(totalSeconds: Long): String {
-        val minutes = totalSeconds / 60
-        val seconds = totalSeconds % 60
-        return "%02d:%02d".format(minutes, seconds)
     }
 
     private fun updateNotification(elapsed: String) {
