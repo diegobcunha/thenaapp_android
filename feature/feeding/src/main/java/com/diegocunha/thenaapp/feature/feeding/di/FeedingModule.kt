@@ -1,6 +1,7 @@
 package com.diegocunha.thenaapp.feature.feeding.di
 
 import com.diegocunha.thenaapp.feature.feeding.domain.FeedingRepository
+import com.diegocunha.thenaapp.feature.feeding.presentation.FeedingStatisticsViewModel
 import com.diegocunha.thenaapp.feature.feeding.presentation.FeedingViewModel
 import com.diegocunha.thenaapp.feature.feeding.repository.FeedingRepositoryImpl
 import com.diegocunha.thenaapp.feature.feeding.session.FeedingSessionManager
@@ -28,6 +29,10 @@ val feedingModule = module {
     }
 
     viewModel { (babyId: String) ->
-        FeedingViewModel(sessionManager = get(), babyId = babyId)
+        FeedingViewModel(sessionManager = get(), repository = get(), babyId = babyId)
+    }
+
+    viewModel { (babyId: String) ->
+        FeedingStatisticsViewModel(repository = get(), babyId = babyId)
     }
 }

@@ -4,6 +4,7 @@ import androidx.compose.runtime.Immutable
 import com.diegocunha.thenaapp.core.mvi.MviState
 import com.diegocunha.thenaapp.feature.feeding.domain.model.BottleType
 import com.diegocunha.thenaapp.feature.feeding.domain.model.Breast
+import com.diegocunha.thenaapp.feature.feeding.domain.model.FeedingStatistics
 import com.diegocunha.thenaapp.feature.feeding.domain.model.FeedingType
 
 @Immutable
@@ -21,4 +22,5 @@ data class FeedingState(
     val showStartTimePicker: Boolean = false,
     val showBreastPickerForTimeChange: Boolean = false,
     val pendingNewStartedAtMs: Long? = null,
+    val todayStats: FeedingStatistics? = null,
 ) : MviState

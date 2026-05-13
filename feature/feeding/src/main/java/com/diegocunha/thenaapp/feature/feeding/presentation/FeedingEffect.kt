@@ -5,5 +5,6 @@ import com.diegocunha.thenaapp.core.mvi.MviEffect
 
 sealed interface FeedingEffect : MviEffect {
     data object NavigateBack : FeedingEffect
+    data object NavigateToStatistics : FeedingEffect
     data class ShowError(@StringRes val message: Int) : FeedingEffect
 }

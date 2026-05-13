@@ -23,4 +23,8 @@ data class FeedingStatisticsResponse(
     val totalBottleVolumeMl: Long,
     @SerialName("average_bottle_volume_ml")
     val averageBottleVolumeMl: Long,
+    @SerialName("volume_by_milk_type")
+    val volumeByMilkType: Map<String, Long> = emptyMap(),
+    @SerialName("daily_breakdown")
+    val dailyBreakdown: List<DailyFeedingStatisticsResponse> = emptyList(),
 )

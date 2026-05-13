@@ -12,7 +12,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -27,15 +30,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.diegocunha.thenaapp.coreui.component.StartTimePickerDialog
 import com.diegocunha.thenaapp.coreui.theme.ThenaTheme
 import com.diegocunha.thenaapp.feature.feeding.R
 import com.diegocunha.thenaapp.feature.feeding.domain.model.BottleType
 import com.diegocunha.thenaapp.feature.feeding.domain.model.Breast
+import com.diegocunha.thenaapp.feature.feeding.domain.model.FeedingStatistics
 import com.diegocunha.thenaapp.feature.feeding.domain.model.FeedingType
 import com.diegocunha.thenaapp.feature.feeding.presentation.components.BottleFeedingCard
 import com.diegocunha.thenaapp.feature.feeding.presentation.components.BreastfeedingTimerCard
@@ -50,6 +56,7 @@ import com.diegocunha.thenaapp.coreui.R as CoreUiR
 fun FeedingScreen(
     viewModel: FeedingViewModel,
     onNavigateBack: () -> Unit,
+    onNavigateToStatistics: () -> Unit = {},
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -113,6 +120,7 @@ fun FeedingScreen(
         viewModel.effects.collectLatest { effect ->
             when (effect) {
                 FeedingEffect.NavigateBack -> onNavigateBack()
+                FeedingEffect.NavigateToStatistics -> onNavigateToStatistics()
                 is FeedingEffect.ShowError -> snackbarHostState.showSnackbar(
                     context.getString(
                         effect.message
@@ -121,6 +129,8 @@ fun FeedingScreen(
             }
         }
     }
+
+    val onOpenStatistics = remember(viewModel) { { viewModel.sendIntent(FeedingIntent.OpenStatistics) } }
 
     FeedingScreenContent(
         state = state,
@@ -138,6 +148,7 @@ fun FeedingScreen(
         onDismissStartTimePicker = onDismissStartTimePicker,
         onConfirmBreastForTimeChange = onConfirmBreastForTimeChange,
         onDismissBreastPickerForTimeChange = onDismissBreastPickerForTimeChange,
+        onOpenStatistics = onOpenStatistics,
     )
 
 }
@@ -160,6 +171,7 @@ private fun FeedingScreenContent(
     onDismissStartTimePicker: () -> Unit,
     onConfirmBreastForTimeChange: (Breast) -> Unit,
     onDismissBreastPickerForTimeChange: () -> Unit,
+    onOpenStatistics: () -> Unit,
 ) {
 
     if (state.showStartTimePicker) {
@@ -184,6 +196,14 @@ private fun FeedingScreenContent(
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
+                    }
+                },
+                actions = {
+                    IconButton(onClick = onOpenStatistics) {
+                        Icon(
+                            Icons.Default.BarChart,
+                            contentDescription = stringResource(R.string.feeding_stats_view),
+                        )
                     }
                 },
             )
@@ -224,7 +244,78 @@ private fun FeedingScreenContent(
                     onSave = onSave,
                 )
             }
+
+            if (state.todayStats != null && state.sessionId == null) {
+                Spacer(modifier = Modifier.height(ThenaTheme.spacing.md))
+                TodayFeedingSummary(stats = state.todayStats)
+            }
         }
+    }
+}
+
+@Composable
+private fun TodayFeedingSummary(stats: FeedingStatistics) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = ThenaTheme.extendedColors.feedFill,
+        ),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(ThenaTheme.spacing.sm),
+        ) {
+            Text(
+                text = stringResource(R.string.feeding_stats_title),
+                style = ThenaTheme.typography.labelMedium,
+            )
+            Spacer(modifier = Modifier.height(ThenaTheme.spacing.xs))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(ThenaTheme.spacing.sm),
+            ) {
+                TodayStatItem(
+                    modifier = Modifier.weight(1f),
+                    emoji = "🍼",
+                    value = stats.totalSessions.toString(),
+                    label = stringResource(R.string.feeding_stats_total_sessions),
+                )
+                TodayStatItem(
+                    modifier = Modifier.weight(1f),
+                    emoji = "🤱",
+                    value = "${stats.totalBreastfeedingDurationSeconds / 60}",
+                    label = stringResource(R.string.feeding_stats_total_duration_min, "min"),
+                )
+                TodayStatItem(
+                    modifier = Modifier.weight(1f),
+                    emoji = "🧴",
+                    value = "${stats.totalBottleVolumeMl}ml",
+                    label = stringResource(R.string.feeding_stats_bottle),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun TodayStatItem(
+    modifier: Modifier = Modifier,
+    emoji: String,
+    value: String,
+    label: String,
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(text = emoji, style = ThenaTheme.typography.titleMedium)
+        Text(text = value, style = ThenaTheme.typography.titleSmall)
+        Text(
+            text = label,
+            style = ThenaTheme.typography.labelSmall,
+            textAlign = TextAlign.Center,
+        )
     }
 }
 

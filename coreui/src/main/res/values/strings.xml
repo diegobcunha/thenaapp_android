@@ -23,4 +23,9 @@
     <string name="login_error_password_no_uppercase">Password must contain an uppercase letter</string>
     <string name="login_error_password_no_digit">Password must contain a digit</string>
     <string name="login_error_password_no_special">Password must contain a special character</string>
+
+    <string name="coreui_period_today">Today</string>
+    <string name="coreui_period_week">Week</string>
+    <string name="coreui_period_month">Month</string>
+    <string name="coreui_period_custom">Custom</string>
 </resources>

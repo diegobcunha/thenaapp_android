@@ -22,4 +22,21 @@
     <string name="feeding_select_time">Select time</string>
     <string name="feeding_which_breast_started">Which breast started at this time?</string>
     <string name="feeding_error_start_time_overlap">This time overlaps with the other breast\'s feeding</string>
+    <string name="feeding_stats_title">Feeding Statistics</string>
+    <string name="feeding_stats_total_sessions">Total sessions</string>
+    <string name="feeding_stats_breastfeeding">Breastfeeding</string>
+    <string name="feeding_stats_bottle">Bottle</string>
+    <string name="feeding_stats_avg_duration_min">Avg %s</string>
+    <string name="feeding_stats_total_duration_min">Total %s</string>
+    <string name="feeding_stats_total_volume_ml">Total %sml</string>
+    <string name="feeding_stats_avg_volume_ml">Avg %sml</string>
+    <string name="feeding_stats_daily_breakdown">Daily Breakdown</string>
+    <string name="feeding_stats_no_data">No feeding data for this period</string>
+    <string name="feeding_stats_breast_milk">Breast milk</string>
+    <string name="feeding_stats_powdered_milk">Powdered milk</string>
+    <string name="feeding_stats_view">View Statistics</string>
+    <string name="feeding_today_total">Today: %d feedings</string>
+    <string name="feeding_total">Total</string>
+    <string name="feeding_breast">Breast</string>
+    <string name="feeding_bottle">Bottle</string>
 </resources>

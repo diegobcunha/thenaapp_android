@@ -200,4 +200,5 @@ This project uses **SDD (Specification-Driven Development)**. All feature work f
 **Rules:**
 - Never advance to the next phase until the user explicitly says the current phase is ready
 - The user may return to any previous phase at any time. When this happens, analyze the impact and replan forward from there
-- When development is finished, create a SDD documentation file for the feature (see `feature/baby/SDD_CREATE_BABY.md` as reference) containing: decisions made, technical features implemented, current status, and last updated date
+- When development is finished, create a SDD documentation file for the feature (see `/documents/SDD_CREATE_BABY.md` as reference) containing: decisions made, technical features implemented, current status, and last updated date
+- Before any implementation should clear the context to avoid halucination

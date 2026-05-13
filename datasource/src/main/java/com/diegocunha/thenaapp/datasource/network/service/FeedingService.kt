@@ -87,7 +87,8 @@ interface FeedingService {
     @GET("/v1/baby/{babyId}/feeding/statistics")
     suspend fun getStatistics(
         @Path("babyId") babyId: String,
-        @Query("startDate") startDate: String,
-        @Query("endDate") endDate: String,
+        @Query("date") date: String? = null,
+        @Query("startDate") startDate: String? = null,
+        @Query("endDate") endDate: String? = null,
     ): FeedingStatisticsResponse
 }

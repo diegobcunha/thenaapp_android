@@ -9,6 +9,8 @@ import com.diegocunha.thenaapp.datasource.database.entity.FeedingSessionEntity
 import com.diegocunha.thenaapp.datasource.network.model.feeding.BottleRequest
 import com.diegocunha.thenaapp.datasource.network.model.feeding.BreastSide
 import com.diegocunha.thenaapp.datasource.network.model.feeding.BreastSideRequest
+import com.diegocunha.thenaapp.datasource.network.model.feeding.DailyFeedingStatisticsResponse
+import com.diegocunha.thenaapp.datasource.network.model.feeding.FeedingStatisticsResponse
 import com.diegocunha.thenaapp.datasource.network.model.feeding.MilkType
 import com.diegocunha.thenaapp.datasource.network.model.feeding.UpdateStartTimeRequest
 import com.diegocunha.thenaapp.datasource.network.safeApiCall
@@ -18,6 +20,8 @@ import com.diegocunha.thenaapp.feature.feeding.domain.model.ActiveFeedingSession
 import com.diegocunha.thenaapp.feature.feeding.domain.model.BottleType
 import com.diegocunha.thenaapp.feature.feeding.domain.model.Breast
 import com.diegocunha.thenaapp.feature.feeding.domain.model.BreastSegment
+import com.diegocunha.thenaapp.feature.feeding.domain.model.DailyFeedingStatistics
+import com.diegocunha.thenaapp.feature.feeding.domain.model.FeedingStatistics
 import com.diegocunha.thenaapp.feature.feeding.domain.model.FeedingType
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
@@ -220,6 +224,38 @@ class FeedingRepositoryImpl(
             UpdateStartTimeRequest(newSessionStartedAt.toIso8601()),
         )
     }
+
+    override suspend fun getStatistics(
+        babyId: String,
+        date: String?,
+        startDate: String?,
+        endDate: String?,
+    ): Resource<FeedingStatistics> = safeApiCall(dispatchersProvider) {
+        feedingService.getStatistics(babyId, date, startDate, endDate).toDomain()
+    }
+
+    private fun FeedingStatisticsResponse.toDomain() = FeedingStatistics(
+        periodStart = periodStart,
+        periodEnd = periodEnd,
+        totalSessions = totalSessions,
+        breastfeedingSessions = breastfeedingSessions,
+        bottleSessions = bottleSessions,
+        totalBreastfeedingDurationSeconds = totalBreastfeedingDurationSeconds,
+        averageBreastfeedingDurationSeconds = averageBreastfeedingDurationSeconds,
+        totalBottleVolumeMl = totalBottleVolumeMl,
+        averageBottleVolumeMl = averageBottleVolumeMl,
+        volumeByMilkType = volumeByMilkType,
+        dailyBreakdown = dailyBreakdown.map { it.toDomain() },
+    )
+
+    private fun DailyFeedingStatisticsResponse.toDomain() = DailyFeedingStatistics(
+        date = date,
+        totalSessions = totalSessions,
+        breastfeedingSessions = breastfeedingSessions,
+        bottleSessions = bottleSessions,
+        totalBreastfeedingDurationSeconds = totalBreastfeedingDurationSeconds,
+        totalBottleVolumeMl = totalBottleVolumeMl,
+    )
 
     private fun BreastSegmentEntity.toDomain() = BreastSegment(
         id = id,

@@ -22,4 +22,5 @@ sealed interface FeedingIntent : MviIntent {
     data object DismissBreastPickerForTimeChange : FeedingIntent
 
     data object Tick : FeedingIntent
+    data object OpenStatistics : FeedingIntent
 }

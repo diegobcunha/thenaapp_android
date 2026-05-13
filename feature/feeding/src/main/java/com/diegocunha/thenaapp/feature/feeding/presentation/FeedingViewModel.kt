@@ -2,7 +2,9 @@ package com.diegocunha.thenaapp.feature.feeding.presentation
 
 import androidx.lifecycle.viewModelScope
 import com.diegocunha.thenaapp.core.mvi.BaseViewModel
+import com.diegocunha.thenaapp.core.resource.Resource
 import com.diegocunha.thenaapp.feature.feeding.R
+import com.diegocunha.thenaapp.feature.feeding.domain.FeedingRepository
 import com.diegocunha.thenaapp.feature.feeding.domain.model.ActiveFeedingSession
 import com.diegocunha.thenaapp.feature.feeding.domain.model.Breast
 import com.diegocunha.thenaapp.feature.feeding.domain.model.BreastSegment
@@ -13,12 +15,14 @@ import kotlinx.coroutines.launch
 
 class FeedingViewModel(
     private val sessionManager: FeedingSessionManager,
+    private val repository: FeedingRepository,
     private val babyId: String,
 ) : BaseViewModel<FeedingState, FeedingIntent, FeedingEffect>(FeedingState()) {
 
     init {
         observeActiveSession()
         startTicker()
+        loadTodayStats()
     }
 
     override fun processIntent(intent: FeedingIntent) {
@@ -38,13 +42,23 @@ class FeedingViewModel(
                 copy(showBreastPickerForTimeChange = false, pendingNewStartedAtMs = null)
             }
             FeedingIntent.Tick -> recalculateElapsed()
+            FeedingIntent.OpenStatistics -> sendEffect(FeedingEffect.NavigateToStatistics)
+        }
+    }
+
+    private fun loadTodayStats() {
+        viewModelScope.launch {
+            val result = repository.getStatistics(babyId)
+            if (result is Resource.Success) {
+                updateState { copy(todayStats = result.data) }
+            }
         }
     }
 
     private fun observeActiveSession() {
         viewModelScope.launch {
             sessionManager.activeSession.collectLatest { session ->
-                session?.let {
+                if (session != null) {
                     updateState {
                         copy(
                             sessionId = session.sessionId,
@@ -54,6 +68,18 @@ class FeedingViewModel(
                         )
                     }
                     recalculateElapsed(session)
+                } else {
+                    updateState {
+                        copy(
+                            sessionId = null,
+                            feedingType = null,
+                            activeBreast = null,
+                            sessionStartedAt = null,
+                            leftElapsedSeconds = 0L,
+                            rightElapsedSeconds = 0L,
+                            totalElapsedSeconds = 0L,
+                        )
+                    }
                 }
             }
         }
@@ -91,7 +117,7 @@ class FeedingViewModel(
                 sendEffect(FeedingEffect.ShowError(R.string.feeding_error_network))
                 return@launch
             }
-            sendEffect(FeedingEffect.NavigateBack)
+            loadTodayStats()
         }
     }
 
@@ -113,7 +139,8 @@ class FeedingViewModel(
                 sendEffect(FeedingEffect.ShowError(R.string.feeding_error_network))
                 return@launch
             }
-            sendEffect(FeedingEffect.NavigateBack)
+            updateState { copy(feedingType = null, bottleMl = "", bottleType = null) }
+            loadTodayStats()
         }
     }
 

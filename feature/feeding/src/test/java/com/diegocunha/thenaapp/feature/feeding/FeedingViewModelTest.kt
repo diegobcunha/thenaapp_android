@@ -1,9 +1,12 @@
 package com.diegocunha.thenaapp.feature.feeding
 
 import app.cash.turbine.test
+import com.diegocunha.thenaapp.core.resource.Resource
+import com.diegocunha.thenaapp.feature.feeding.domain.FeedingRepository
 import com.diegocunha.thenaapp.feature.feeding.domain.model.ActiveFeedingSession
 import com.diegocunha.thenaapp.feature.feeding.domain.model.BottleType
 import com.diegocunha.thenaapp.feature.feeding.domain.model.Breast
+import com.diegocunha.thenaapp.feature.feeding.domain.model.FeedingStatistics
 import com.diegocunha.thenaapp.feature.feeding.domain.model.FeedingType
 import com.diegocunha.thenaapp.feature.feeding.presentation.FeedingEffect
 import com.diegocunha.thenaapp.feature.feeding.presentation.FeedingIntent
@@ -33,6 +36,7 @@ class FeedingViewModelTest {
 
     private val dispatcher = UnconfinedTestDispatcher()
     private val sessionManager: FeedingSessionManager = mockk()
+    private val repository: FeedingRepository = mockk()
     private val activeSessionFlow = MutableStateFlow<ActiveFeedingSession?>(null)
     private val babyId = "test-baby-id"
 
@@ -52,7 +56,8 @@ class FeedingViewModelTest {
         }
         every { sessionManager.activeSession } returns activeSessionFlow
         every { sessionManager.tickerFlow } returns emptyFlow()
-        viewModel = FeedingViewModel(sessionManager = sessionManager, babyId = babyId)
+        coEvery { repository.getStatistics(any(), any(), any(), any()) } returns Resource.Error(Exception())
+        viewModel = FeedingViewModel(sessionManager = sessionManager, repository = repository, babyId = babyId)
     }
 
     @After
@@ -117,15 +122,27 @@ class FeedingViewModelTest {
     }
 
     @Test
-    fun `WHEN StopSession THEN finishSession called and NavigateBack effect emitted`() = runTest {
+    fun `WHEN StopSession THEN finishSession called and no NavigateBack effect emitted`() = runTest {
         activeSessionFlow.value = buildSession(activeBreast = Breast.LEFT)
+        coEvery { repository.getStatistics(any(), any(), any(), any()) } returns Resource.Success(buildStats())
 
         viewModel.effects.test {
             viewModel.sendIntent(FeedingIntent.StopSession)
 
             coVerify { sessionManager.finishSession() }
-            assertEquals(FeedingEffect.NavigateBack, awaitItem())
+            expectNoEvents()
         }
+    }
+
+    @Test
+    fun `WHEN StopSession succeeds THEN todayStats is reloaded`() = runTest {
+        val stats = buildStats()
+        coEvery { repository.getStatistics(any(), any(), any(), any()) } returns Resource.Success(stats)
+        activeSessionFlow.value = buildSession(activeBreast = Breast.LEFT)
+
+        viewModel.sendIntent(FeedingIntent.StopSession)
+
+        assertEquals(stats, viewModel.state.value.todayStats)
     }
 
     @Test
@@ -157,7 +174,8 @@ class FeedingViewModelTest {
     }
 
     @Test
-    fun `WHEN SaveBottleFeeding with valid data THEN startBottleFeeding called and NavigateBack emitted`() = runTest {
+    fun `WHEN SaveBottleFeeding with valid data THEN startBottleFeeding called and no NavigateBack emitted`() = runTest {
+        coEvery { repository.getStatistics(any(), any(), any(), any()) } returns Resource.Success(buildStats())
         with(viewModel) {
             sendIntent(FeedingIntent.SelectBottle)
             sendIntent(FeedingIntent.UpdateBottleMl("120"))
@@ -168,8 +186,27 @@ class FeedingViewModelTest {
             viewModel.sendIntent(FeedingIntent.SaveBottleFeeding)
 
             coVerify { sessionManager.startBottleFeeding(BottleType.POWDERED, 120, babyId) }
-            assertEquals(FeedingEffect.NavigateBack, awaitItem())
+            expectNoEvents()
         }
+    }
+
+    @Test
+    fun `WHEN SaveBottleFeeding succeeds THEN bottle fields reset and todayStats reloaded`() = runTest {
+        val stats = buildStats()
+        coEvery { repository.getStatistics(any(), any(), any(), any()) } returns Resource.Success(stats)
+        with(viewModel) {
+            sendIntent(FeedingIntent.SelectBottle)
+            sendIntent(FeedingIntent.UpdateBottleMl("120"))
+            sendIntent(FeedingIntent.SelectBottleType(BottleType.POWDERED))
+        }
+
+        viewModel.sendIntent(FeedingIntent.SaveBottleFeeding)
+
+        val state = viewModel.state.value
+        assertEquals(null, state.feedingType)
+        assertEquals("", state.bottleMl)
+        assertEquals(null, state.bottleType)
+        assertEquals(stats, state.todayStats)
     }
 
     @Test
@@ -334,6 +371,22 @@ class FeedingViewModelTest {
         assertEquals(null, viewModel.state.value.pendingNewStartedAtMs)
     }
 
+    @Test
+    fun `WHEN active session becomes null THEN session state fields are cleared`() = runTest {
+        activeSessionFlow.value = buildSession(activeBreast = Breast.LEFT)
+
+        activeSessionFlow.value = null
+
+        val state = viewModel.state.value
+        assertEquals(null, state.sessionId)
+        assertEquals(null, state.feedingType)
+        assertEquals(null, state.activeBreast)
+        assertEquals(null, state.sessionStartedAt)
+        assertEquals(0L, state.leftElapsedSeconds)
+        assertEquals(0L, state.rightElapsedSeconds)
+        assertEquals(0L, state.totalElapsedSeconds)
+    }
+
     private fun buildSession(activeBreast: Breast?) = ActiveFeedingSession(
         sessionId = "test-session",
         type = FeedingType.BREAST,
@@ -341,5 +394,19 @@ class FeedingViewModelTest {
         activeBreast = activeBreast,
         leftSegments = emptyList(),
         rightSegments = emptyList(),
+    )
+
+    private fun buildStats() = FeedingStatistics(
+        periodStart = "2026-05-12",
+        periodEnd = "2026-05-12",
+        totalSessions = 3,
+        breastfeedingSessions = 2,
+        bottleSessions = 1,
+        totalBreastfeedingDurationSeconds = 600L,
+        averageBreastfeedingDurationSeconds = 300L,
+        totalBottleVolumeMl = 120,
+        averageBottleVolumeMl = 120,
+        volumeByMilkType = emptyMap(),
+        dailyBreakdown = emptyList(),
     )
 }

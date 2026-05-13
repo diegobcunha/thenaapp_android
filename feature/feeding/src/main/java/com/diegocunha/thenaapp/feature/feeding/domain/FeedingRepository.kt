@@ -4,6 +4,7 @@ import com.diegocunha.thenaapp.core.resource.Resource
 import com.diegocunha.thenaapp.feature.feeding.domain.model.ActiveFeedingSession
 import com.diegocunha.thenaapp.feature.feeding.domain.model.BottleType
 import com.diegocunha.thenaapp.feature.feeding.domain.model.Breast
+import com.diegocunha.thenaapp.feature.feeding.domain.model.FeedingStatistics
 
 interface FeedingRepository {
     suspend fun getActiveSession(): ActiveFeedingSession?
@@ -16,4 +17,10 @@ interface FeedingRepository {
     suspend fun getActiveSegmentId(sessionId: String): String?
     suspend fun updateSessionStartTime(sessionId: String, newStartedAt: Long): Resource<Unit>
     suspend fun updateBreastStartTime(sessionId: String, breast: Breast, newStartedAt: Long): Resource<Unit>
+    suspend fun getStatistics(
+        babyId: String,
+        date: String? = null,
+        startDate: String? = null,
+        endDate: String? = null,
+    ): Resource<FeedingStatistics>
 }
