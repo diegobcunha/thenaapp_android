@@ -19,13 +19,13 @@ class TokenAuthenticatorTest {
     }
 
     private val accessTokenRepository: AccessTokenRepository = mockk {
-        every { getAccessToken() } returns "test-token"
+        every { getAccessToken(forceRefresh = true) } returns "test-token"
     }
     private val authenticator = TokenAuthenticator(accessTokenRepository)
 
     @Test
     fun `WHEN access token is null THEN returns null`() {
-        every { accessTokenRepository.getAccessToken() } returns null
+        every { accessTokenRepository.getAccessToken(forceRefresh = true) } returns null
         val response = mockk<Response> {
             every { priorResponse } returns null
         }
