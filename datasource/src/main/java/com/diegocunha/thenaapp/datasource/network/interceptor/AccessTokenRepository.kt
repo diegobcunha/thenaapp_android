@@ -2,5 +2,5 @@ package com.diegocunha.thenaapp.datasource.network.interceptor
 
 interface AccessTokenRepository {
 
-    fun getAccessToken(): String?
+    fun getAccessToken(forceRefresh: Boolean = false): String?
 }

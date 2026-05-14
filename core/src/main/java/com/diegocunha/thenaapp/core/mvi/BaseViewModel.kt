@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 abstract class BaseViewModel<State : MviState, Intent : MviIntent, Effect: MviEffect>(
     initialState: State
@@ -17,7 +18,7 @@ abstract class BaseViewModel<State : MviState, Intent : MviIntent, Effect: MviEf
     private val _state = MutableStateFlow(initialState)
     val state: StateFlow<State> = _state.asStateFlow()
 
-    private val _effects = Channel<Effect>(Channel.UNLIMITED)
+    private val _effects = Channel<Effect>(Channel.BUFFERED)
     val effects: Flow<Effect> = _effects.receiveAsFlow()
 
     private val _intents = Channel<Intent>(Channel.BUFFERED)
@@ -31,7 +32,10 @@ abstract class BaseViewModel<State : MviState, Intent : MviIntent, Effect: MviEf
     }
 
     fun sendIntent(intent: Intent) {
-        _intents.trySend(intent)
+        val result = _intents.trySend(intent)
+        if (result.isFailure) {
+            Timber.w("Intent dropped (channel full or closed): $intent")
+        }
     }
 
     protected fun updateState(reducer: State.() -> State) {
