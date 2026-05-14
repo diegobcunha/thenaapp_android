@@ -1,16 +1,20 @@
 package com.diegocunha.thenaapp.feature.home.presentation
 
+import androidx.lifecycle.viewModelScope
 import app.cash.turbine.test
 import com.diegocunha.thenaapp.core.resource.Resource
 import com.diegocunha.thenaapp.feature.home.domain.HomeRepository
 import com.diegocunha.thenaapp.feature.home.domain.dto.HomeBabyInformation
 import com.diegocunha.thenaapp.feature.home.domain.dto.HomeUserInformation
 import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.mockk
 import io.mockk.unmockkAll
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -50,6 +54,7 @@ class HomeViewModelTest {
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
         coEvery { homeRepository.getUserInformation() } returns Resource.Success(mockHomeData)
+        every { homeRepository.observeActiveFeeding() } returns emptyFlow()
         viewModel = HomeViewModel(homeRepository)
     }
 
@@ -60,38 +65,39 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `WHEN ViewModel is created THEN initial state has isLoading = true`() = runTest {
+    fun `WHEN ViewModel is created THEN initial state has isLoading = true`() {
         val deferred = CompletableDeferred<Resource<HomeUserInformation>>()
         coEvery { homeRepository.getUserInformation() } coAnswers { deferred.await() }
         val vm = HomeViewModel(homeRepository)
 
+        // With UnconfinedTestDispatcher, loadContent suspends at deferred.await() so isLoading stays true
         assertTrue(vm.state.value.isLoading)
 
         deferred.complete(Resource.Success(mockHomeData))
     }
 
     @Test
-    fun `WHEN loadContent succeeds THEN isLoading is false`() = runTest {
+    fun `WHEN loadContent succeeds THEN isLoading is false`() {
         assertFalse(viewModel.state.value.isLoading)
     }
 
     @Test
-    fun `WHEN loadContent succeeds THEN userName is populated`() = runTest {
+    fun `WHEN loadContent succeeds THEN userName is populated`() {
         assertEquals("Test User", viewModel.state.value.userName)
     }
 
     @Test
-    fun `WHEN loadContent succeeds THEN babyName is populated`() = runTest {
+    fun `WHEN loadContent succeeds THEN babyName is populated`() {
         assertEquals("Baby Luna", viewModel.state.value.babyName)
     }
 
     @Test
-    fun `WHEN loadContent succeeds with valid birthDate THEN babyAge is not null`() = runTest {
+    fun `WHEN loadContent succeeds with valid birthDate THEN babyAge is not null`() {
         assertNotNull(viewModel.state.value.babyAge)
     }
 
     @Test
-    fun `WHEN loadContent succeeds with invalid birthDate THEN babyAge is null`() = runTest {
+    fun `WHEN loadContent succeeds with invalid birthDate THEN babyAge is null`() {
         val dataWithInvalidDate = mockHomeData.copy(
             babyInformation = mockBabyInfo.copy(babyBirthDate = "invalid-date")
         )
@@ -102,7 +108,7 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `WHEN loadContent fails THEN error is set and isLoading is false`() = runTest {
+    fun `WHEN loadContent fails THEN error is set and isLoading is false`() {
         coEvery { homeRepository.getUserInformation() } returns Resource.Error(Exception("API error"))
         val vm = HomeViewModel(homeRepository)
 
@@ -127,6 +133,7 @@ class HomeViewModelTest {
             }
             cancelAndIgnoreRemainingEvents()
         }
+        viewModel.viewModelScope.cancel()
     }
 
     @Test
@@ -136,10 +143,11 @@ class HomeViewModelTest {
             assertEquals(HomeEffect.NavigateToFeeding("test-baby-id"), awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
+        viewModel.viewModelScope.cancel()
     }
 
     @Test
-    fun `WHEN loadContent succeeds THEN babyInfo height and weight are populated`() = runTest {
+    fun `WHEN loadContent succeeds THEN babyInfo height and weight are populated`() {
         val babyInfo = viewModel.state.value.babyInfo
 
         assertNotNull(babyInfo)

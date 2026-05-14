@@ -38,6 +38,7 @@ class HomeRepositoryImplTest {
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
+        coEvery { feedingLocalDataSource.getActiveSession() } returns null
         repository = HomeRepositoryImpl(userService, dispatchersProvider, feedingLocalDataSource)
     }
 
