@@ -9,7 +9,7 @@ class TokenAuthenticator(private val accessTokenRepository: AccessTokenRepositor
 
     override fun authenticate(route: Route?, response: Response): Request? {
         if (responseCount(response) >= 2) return null
-        val token = accessTokenRepository.getAccessToken() ?: return null
+        val token = accessTokenRepository.getAccessToken(forceRefresh = true) ?: return null
         return response.request.newBuilder()
             .header("Authorization", "Bearer $token")
             .build()

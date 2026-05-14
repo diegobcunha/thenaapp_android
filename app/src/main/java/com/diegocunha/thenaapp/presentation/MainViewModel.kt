@@ -43,8 +43,10 @@ class MainViewModel(
             }
         }
         emit(navigation)
-    }.catch { Timber.e(it) }
-        .stateIn(viewModelScope, SharingStarted.Eagerly, initialValue = null)
+    }.catch { ex ->
+        Timber.e(ex)
+        emit(LoginNavigation)
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, initialValue = null)
 
     private fun profileStatusToDestination(status: ProfileStatus): NavKey = when (status) {
         is ProfileStatus.MissingName -> SignupNavigation(

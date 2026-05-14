@@ -9,12 +9,12 @@ class AccessTokenRepositoryImpl(
     private val firebaseAuth: FirebaseAuth,
 ) : AccessTokenRepository {
 
-    override fun getAccessToken(): String? {
+    override fun getAccessToken(forceRefresh: Boolean): String? {
         val user = firebaseAuth.currentUser ?: return null
 
         return try {
             Tasks.await(
-                user.getIdToken(false),
+                user.getIdToken(forceRefresh),
                 10,
                 TimeUnit.SECONDS
             ).token

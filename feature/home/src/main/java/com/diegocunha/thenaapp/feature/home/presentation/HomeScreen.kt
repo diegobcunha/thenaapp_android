@@ -361,7 +361,7 @@ private fun Home(
                 CardButtonInformation(
                     modifier = Modifier
                         .weight(1f)
-                        .clickable(onClick = onVaccineClick),
+                        .clickable(onClick = onSummaryClick),
                     color = ThenaTheme.extendedColors.summaryFill,
                     headerInformation = { Text("📊") },
                     titleInformation = {

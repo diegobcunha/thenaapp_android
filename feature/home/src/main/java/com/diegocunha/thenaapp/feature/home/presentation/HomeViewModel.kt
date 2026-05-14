@@ -7,6 +7,8 @@ import com.diegocunha.thenaapp.coreui.R
 import com.diegocunha.thenaapp.feature.home.domain.HomeRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.util.Calendar
 
@@ -38,20 +40,39 @@ class HomeViewModel(
     private fun observeActiveFeeding() {
         viewModelScope.launch {
             homeRepository.observeActiveFeeding().collectLatest { snapshot ->
-                updateState { copy(activeFeedingSession = snapshot) }
+                val elapsed = snapshot?.let { s ->
+                    val segStart = s.activeSegmentStartedAt
+                    if (segStart != null) {
+                        (s.closedSegmentsTotalMs + System.currentTimeMillis() - segStart) / 1_000L
+                    } else {
+                        s.closedSegmentsTotalMs / 1_000L
+                    }
+                }
+                updateState {
+                    copy(
+                        activeFeedingSession = snapshot,
+                        feedingBannerElapsedSeconds = elapsed,
+                    )
+                }
             }
         }
     }
 
     private fun startFeedingTicker() {
         viewModelScope.launch {
-            while (true) {
-                delay(1_000L)
-                val session = state.value.activeFeedingSession ?: continue
-                val segmentStart = session.activeSegmentStartedAt ?: continue
-                val elapsed = (session.closedSegmentsTotalMs + System.currentTimeMillis() - segmentStart) / 1_000L
-                updateState { copy(feedingBannerElapsedSeconds = elapsed) }
-            }
+            state
+                .map { it.activeFeedingSession?.activeSegmentStartedAt != null }
+                .distinctUntilChanged()
+                .collectLatest { isSegmentActive ->
+                    if (!isSegmentActive) return@collectLatest
+                    while (true) {
+                        delay(1_000L)
+                        val session = state.value.activeFeedingSession ?: break
+                        val segmentStart = session.activeSegmentStartedAt ?: break
+                        val elapsed = (session.closedSegmentsTotalMs + System.currentTimeMillis() - segmentStart) / 1_000L
+                        updateState { copy(feedingBannerElapsedSeconds = elapsed) }
+                    }
+                }
         }
     }
 
@@ -61,16 +82,6 @@ class HomeViewModel(
                 is Resource.Success -> updateState {
                     val data = result.data
                     val baby = data.babyInformation
-                    val session = baby.activeFeedingSnapshot
-                    val elapsed = session?.let { s ->
-                        val segStart = s.activeSegmentStartedAt
-                        if (segStart != null) {
-                            (s.closedSegmentsTotalMs + System.currentTimeMillis() - segStart) / 1_000L
-                        } else {
-                            s.closedSegmentsTotalMs / 1_000L
-                        }
-                    }
-
                     copy(
                         isLoading = false,
                         userName = data.userName,
@@ -82,15 +93,13 @@ class HomeViewModel(
                             height = baby.babyHeight.toString(),
                             weight = baby.babyWeight.toString(),
                         ),
-                        activeFeedingSession = data.babyInformation.activeFeedingSnapshot,
-                        feedingBannerElapsedSeconds = elapsed
                     )
                 }
 
                 is Resource.Error -> updateState {
                     copy(
                         isLoading = false,
-                        error = R.string.generic_error
+                        error = R.string.generic_error,
                     )
                 }
 
