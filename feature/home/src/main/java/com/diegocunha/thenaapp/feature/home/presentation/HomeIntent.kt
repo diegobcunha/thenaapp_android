@@ -4,7 +4,7 @@ import androidx.annotation.StringRes
 import androidx.compose.runtime.Immutable
 import com.diegocunha.thenaapp.core.mvi.MviIntent
 import com.diegocunha.thenaapp.core.mvi.MviState
-import com.diegocunha.thenaapp.datasource.database.ActiveFeedingSnapshot
+import com.diegocunha.thenaapp.datasource.database.model.ActiveFeedingSnapshot
 
 sealed interface HomeIntent : MviIntent {
 

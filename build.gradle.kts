@@ -33,6 +33,8 @@ kover {
             excludes {
                 packages(
                     "com.diegocunha.thenaapp.datasource.network.model",
+                    "com.diegocunha.thenaapp.datasource.network.service",
+                    "com.diegocunha.thenaapp.datasource.database.entity",
                     "com.diegocunha.thenaapp.coreui",
                 )
                 annotatedBy("androidx.compose.runtime.Composable")
@@ -52,7 +54,10 @@ kover {
                     "*CustomSharedPreferencesImpl*",
                     "*RetrofitFactory*",
                     "*DispatchersProviderImpl*",
-                    "*GoogleSignUpResponse*"
+                    "*GoogleSignUpResponse*",
+                    "*ActiveFeedingSnapshot*",
+                    "*_Impl",
+                    "*_Impl\$*",
                 )
             }
         }

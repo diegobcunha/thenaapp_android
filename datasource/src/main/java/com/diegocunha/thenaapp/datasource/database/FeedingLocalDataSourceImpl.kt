@@ -2,6 +2,7 @@ package com.diegocunha.thenaapp.datasource.database
 
 import com.diegocunha.thenaapp.datasource.database.dao.BreastSegmentDao
 import com.diegocunha.thenaapp.datasource.database.dao.FeedingSessionDao
+import com.diegocunha.thenaapp.datasource.database.model.ActiveFeedingSnapshot
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest

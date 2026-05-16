@@ -2,8 +2,8 @@ package com.diegocunha.thenaapp.feature.home.repository
 
 import com.diegocunha.thenaapp.core.coroutines.DispatchersProvider
 import com.diegocunha.thenaapp.core.resource.Resource
-import com.diegocunha.thenaapp.datasource.database.ActiveFeedingSnapshot
 import com.diegocunha.thenaapp.datasource.database.FeedingLocalDataSource
+import com.diegocunha.thenaapp.datasource.database.model.ActiveFeedingSnapshot
 import com.diegocunha.thenaapp.datasource.network.model.baby.BabyResponse
 import com.diegocunha.thenaapp.datasource.network.safeApiCall
 import com.diegocunha.thenaapp.datasource.network.service.UserService

@@ -1,7 +1,10 @@
 package com.diegocunha.thenaapp.datasource.serializer
 
+import io.mockk.every
+import io.mockk.mockk
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
+import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.json.Json
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -65,5 +68,15 @@ class BigDecimalSerializerTest {
         val result = Json.decodeFromString<Wrapper>("{\"value\":\"0.123456789\"}")
 
         assertEquals(0, BigDecimal("0.123456789").compareTo(result.value))
+    }
+
+    @Test
+    fun `WHEN deserializing via non-JSON decoder THEN decodeString is used`() {
+        val decoder: Decoder = mockk()
+        every { decoder.decodeString() } returns "99.99"
+
+        val result = BigDecimalSerializer.deserialize(decoder)
+
+        assertEquals(0, BigDecimal("99.99").compareTo(result))
     }
 }
