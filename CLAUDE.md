@@ -194,7 +194,7 @@ Apply the annotation to the top-level screen Composable (the one registered in t
 This project uses **SDD (Specification-Driven Development)**. All feature work follows these phases:
 
 1. **Interview** — Ask the user about functional, technical, and documentation requirements before any implementation
-2. **Specification** — Enter plan mode, present the full implementation plan for review before any code is written
+2. **Specification** — Enter plan mode, present the full implementation plan for review before any code is written. After the plan it's approved the context should be clear using /clear of claude code to ensure the development its running by documentation and with clear context.
 3. **Implementation** — Execute step by step, phase-gated, only after the user approves the plan
 
 **Rules:**
