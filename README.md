@@ -27,13 +27,12 @@
 | Login       | ✅ Done | Email/password + Google Sign-In with validation         |
 | Signup      | ✅ Done | Email/password + Google Sign-Up with profile completion |
 | Create_Baby | ✅ Done | Create a new baby and upload a photo                    |
-
+| 🍼 Feeding Log | ✅ Done | Breast & bottle logging, feeding reminders, volume & duration tracking |
 ### In Development
 
 | Feature | Description |
 |---|---|
 | 🌙 Sleep Tracking | Live sleep timer, daily & weekly goals, sleep quality insights |
-| 🍼 Feeding Log | Breast & bottle logging, feeding reminders, volume & duration tracking |
 | 💉 Vaccination Schedule | Full vaccine calendar, due date reminders, progress tracking |
 | 📊 Daily Insights | Daily & weekly reports, growth tracking, personalized tips |
 
@@ -78,6 +77,9 @@ Signup flow:   Onboarding → Login → Signup → Create Baby
 :feature:login        — Login screen with email/password and Google Sign-In
 :feature:signup       — Signup screen with email/password and Google Sign-Up
 :feature:baby         — Responsible to handle the baby CRUD and informations
+:feature:home.        — Responsible to handle with Home of the app like navigation and resume infos
+:feature:feeding      — Responsible to handle informations and CRUD of baby feeding
+:feature:sleep.       — Responsble to handle informations and CRUD of baby sleeping
 ```
 
 Each feature module follows clean architecture with:
