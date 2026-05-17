@@ -3,7 +3,9 @@ package com.diegocunha.thenaapp.feature.home.repository
 import com.diegocunha.thenaapp.core.coroutines.DispatchersProvider
 import com.diegocunha.thenaapp.core.resource.Resource
 import com.diegocunha.thenaapp.datasource.network.model.baby.BabyResponse
+import com.diegocunha.thenaapp.datasource.network.model.sleep.SleepDailyStatsResponse
 import com.diegocunha.thenaapp.datasource.network.model.user.UserResponse
+import com.diegocunha.thenaapp.datasource.network.service.SleepApiService
 import com.diegocunha.thenaapp.datasource.network.service.UserService
 import io.mockk.coEvery
 import io.mockk.every
@@ -33,12 +35,13 @@ class HomeRepositoryImplTest {
         every { io() } returns testDispatcher
     }
     private val feedingLocalDataSource: com.diegocunha.thenaapp.datasource.database.FeedingLocalDataSource = mockk()
+    private val sleepApiService: SleepApiService = mockk()
     private lateinit var repository: HomeRepositoryImpl
 
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        repository = HomeRepositoryImpl(userService, dispatchersProvider, feedingLocalDataSource)
+        repository = HomeRepositoryImpl(userService, dispatchersProvider, feedingLocalDataSource, sleepApiService)
     }
 
     @After
@@ -125,6 +128,24 @@ class HomeRepositoryImplTest {
         val result = repository.getUserInformation()
 
         assertNull((result as Resource.Success).data.babyInformation.babyPhotoUrl)
+    }
+
+    @Test
+    fun `WHEN getDailyStats succeeds THEN getTodaySleepMinutes returns Resource Success with minutes`() = runTest {
+        coEvery { sleepApiService.getDailyStats(any(), any()) } returns SleepDailyStatsResponse(date = "2026-05-16", totalSleepMinutes = 90L)
+
+        val result = repository.getTodaySleepMinutes("baby-id")
+
+        assertEquals(90, (result as Resource.Success).data)
+    }
+
+    @Test
+    fun `WHEN getDailyStats throws THEN getTodaySleepMinutes returns Resource Error`() = runTest {
+        coEvery { sleepApiService.getDailyStats(any(), any()) } throws Exception("network error")
+
+        val result = repository.getTodaySleepMinutes("baby-id")
+
+        assertTrue(result is Resource.Error)
     }
 
     private fun makeBabyResponse(

@@ -41,4 +41,5 @@ data class HomeState(
     @StringRes val error: Int? = null,
     val activeFeedingSession: ActiveFeedingSnapshot? = null,
     val feedingBannerElapsedSeconds: Long? = null,
+    val todaySleepMinutes: Int? = null,
 ) : MviState

@@ -9,4 +9,5 @@ interface HomeRepository {
 
     suspend fun getUserInformation(): Resource<HomeUserInformation>
     fun observeActiveFeeding(): Flow<ActiveFeedingSnapshot?>
+    suspend fun getTodaySleepMinutes(babyId: String): Resource<Int>
 }

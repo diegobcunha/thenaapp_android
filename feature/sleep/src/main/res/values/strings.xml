@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sleep_title">Sleep</string>
+    <string name="sleep_start">Start Sleep</string>
+    <string name="sleep_stop">Stop Sleep</string>
+    <string name="sleep_log_past">Log past session</string>
+    <string name="sleep_stats_open">Statistics</string>
+
+    <string name="sleep_goal_title">Daily Goal</string>
+    <string name="sleep_sessions_count">%d sessions today</string>
+    <string name="sleep_sessions_today">Today\'s Sessions</string>
+    <string name="sleep_session_active">Active</string>
+
+    <string name="sleep_log_dialog_title">Log Past Sleep</string>
+    <string name="sleep_log_start">Start time</string>
+    <string name="sleep_log_end">End time</string>
+
+    <string name="sleep_stats_title">Sleep Statistics</string>
+    <string name="sleep_stats_no_data">No sleep data available</string>
+    <string name="sleep_stats_date">Date: %s</string>
+    <string name="sleep_stats_total">Total</string>
+    <string name="sleep_stats_sessions">Sessions</string>
+    <string name="sleep_stats_efficiency">Efficiency</string>
+    <string name="sleep_stats_weekly_avg">Weekly Avg</string>
+    <string name="sleep_stats_trend">Trend</string>
+    <string name="sleep_stats_daily_breakdown">Daily Breakdown</string>
+
+    <string name="sleep_error_network">Network error. Please try again.</string>
+    <string name="sleep_error_end_before_start">End time must be after start time.</string>
+</resources>

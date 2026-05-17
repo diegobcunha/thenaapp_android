@@ -104,9 +104,9 @@ class FeedingStatisticsViewModel(
     // MaterialDateRangePicker returns UTC-midnight timestamps, so keep UTC here.
     private fun Long.toDateString(): String = utcDateFormatter().format(Date(this))
 
-    private fun localDateFormatter() = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+    private fun localDateFormatter() = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
-    private fun utcDateFormatter() = SimpleDateFormat("yyyy-MM-dd", Locale.US).apply {
+    private fun utcDateFormatter() = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).apply {
         timeZone = TimeZone.getTimeZone("UTC")
     }
 

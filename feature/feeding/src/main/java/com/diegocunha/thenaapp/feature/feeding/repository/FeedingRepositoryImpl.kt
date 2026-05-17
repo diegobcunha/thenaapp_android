@@ -274,7 +274,7 @@ class FeedingRepositoryImpl(
         BottleType.POWDERED -> MilkType.POWDERED_MILK
     }
 
-    private fun Long.toIso8601(): String = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US)
+    private fun Long.toIso8601(): String = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
         .apply { timeZone = TimeZone.getTimeZone("UTC") }
         .format(Date(this))
 }
