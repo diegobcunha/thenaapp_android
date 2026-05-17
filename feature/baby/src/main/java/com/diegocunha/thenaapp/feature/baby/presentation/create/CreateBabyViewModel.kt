@@ -146,7 +146,7 @@ class CreateBabyViewModel(
         val isYMD = !Locale.getDefault().language.startsWith("pt")
         val pattern = if (isYMD) "yyyyMMdd" else "ddMMyyyy"
         return try {
-            val sdf = SimpleDateFormat(pattern, Locale.US)
+            val sdf = SimpleDateFormat(pattern, Locale.getDefault())
             sdf.isLenient = false
             sdf.parse(digits) != null
         } catch (e: Exception) {

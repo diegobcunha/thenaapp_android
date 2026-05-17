@@ -12,7 +12,10 @@ suspend fun <T> safeApiCall(
     call: suspend () -> T
 ): Resource<T> = withContext(dispatcher.io()) {
     runCatching { call() }
-        .onFailure { if (it is CancellationException) throw it }
+        .onFailure {
+            Timber.e(it, "safeApiCall failed with error: $it")
+            if (it is CancellationException) throw it
+        }
         .map {
             Timber.d(it.toString())
             it

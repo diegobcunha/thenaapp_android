@@ -4,16 +4,19 @@ import androidx.lifecycle.viewModelScope
 import com.diegocunha.thenaapp.core.mvi.BaseViewModel
 import com.diegocunha.thenaapp.core.resource.Resource
 import com.diegocunha.thenaapp.coreui.R
+import com.diegocunha.thenaapp.datasource.database.model.ActiveFeedingSnapshot
+import com.diegocunha.thenaapp.feature.home.domain.BabyAgeResult
+import com.diegocunha.thenaapp.feature.home.domain.CalculateBabyAgeUseCase
 import com.diegocunha.thenaapp.feature.home.domain.HomeRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import java.util.Calendar
 
 class HomeViewModel(
     private val homeRepository: HomeRepository,
+    private val calculateBabyAge: CalculateBabyAgeUseCase,
 ) : BaseViewModel<HomeState, HomeIntent, HomeEffect>(HomeState(isLoading = true)) {
 
     init {
@@ -26,7 +29,6 @@ class HomeViewModel(
         when (intent) {
             HomeIntent.EditBabyInfo,
             HomeIntent.UserProfile,
-            HomeIntent.SleepInfo,
             HomeIntent.SummaryInfo,
             HomeIntent.VaccineInfo -> sendEffect(HomeEffect.NotDevelopedYet)
 
@@ -34,24 +36,21 @@ class HomeViewModel(
                 val babyId = state.value.babyId ?: return
                 sendEffect(HomeEffect.NavigateToFeeding(babyId))
             }
+
+            HomeIntent.SleepInfo -> {
+                val babyId = state.value.babyId ?: return
+                sendEffect(HomeEffect.NavigateToSleep(babyId))
+            }
         }
     }
 
     private fun observeActiveFeeding() {
         viewModelScope.launch {
             homeRepository.observeActiveFeeding().collectLatest { snapshot ->
-                val elapsed = snapshot?.let { s ->
-                    val segStart = s.activeSegmentStartedAt
-                    if (segStart != null) {
-                        (s.closedSegmentsTotalMs + System.currentTimeMillis() - segStart) / 1_000L
-                    } else {
-                        s.closedSegmentsTotalMs / 1_000L
-                    }
-                }
                 updateState {
                     copy(
                         activeFeedingSession = snapshot,
-                        feedingBannerElapsedSeconds = elapsed,
+                        feedingBannerElapsedSeconds = snapshot?.elapsedSeconds(),
                     )
                 }
             }
@@ -68,9 +67,8 @@ class HomeViewModel(
                     while (true) {
                         delay(1_000L)
                         val session = state.value.activeFeedingSession ?: break
-                        val segmentStart = session.activeSegmentStartedAt ?: break
-                        val elapsed = (session.closedSegmentsTotalMs + System.currentTimeMillis() - segmentStart) / 1_000L
-                        updateState { copy(feedingBannerElapsedSeconds = elapsed) }
+                        if (session.activeSegmentStartedAt == null) break
+                        updateState { copy(feedingBannerElapsedSeconds = session.elapsedSeconds()) }
                     }
                 }
         }
@@ -79,21 +77,27 @@ class HomeViewModel(
     private fun loadContent() {
         viewModelScope.launch {
             when (val result = homeRepository.getUserInformation()) {
-                is Resource.Success -> updateState {
+                is Resource.Success -> {
                     val data = result.data
                     val baby = data.babyInformation
-                    copy(
-                        isLoading = false,
-                        userName = data.userName,
-                        babyId = baby.babyId,
-                        babyPhotoUrl = baby.babyPhotoUrl,
-                        babyName = baby.babyName,
-                        babyAge = calculateBabyAge(baby.babyBirthDate),
-                        babyInfo = BabyInfo(
-                            height = baby.babyHeight.toString(),
-                            weight = baby.babyWeight.toString(),
-                        ),
-                    )
+                    updateState {
+                        copy(
+                            isLoading = false,
+                            userName = data.userName,
+                            babyId = baby.babyId,
+                            babyPhotoUrl = baby.babyPhotoUrl,
+                            babyName = baby.babyName,
+                            babyAge = calculateBabyAge(baby.babyBirthDate)?.toPresentation(),
+                            babyInfo = BabyInfo(
+                                height = baby.babyHeight.toString(),
+                                weight = baby.babyWeight.toString(),
+                            ),
+                        )
+                    }
+                    val sleepResult = homeRepository.getTodaySleepMinutes(baby.babyId)
+                    if (sleepResult is Resource.Success) {
+                        updateState { copy(todaySleepMinutes = sleepResult.data) }
+                    }
                 }
 
                 is Resource.Error -> updateState {
@@ -108,29 +112,22 @@ class HomeViewModel(
         }
     }
 
-    private fun calculateBabyAge(birthDateString: String): BabyAge? {
-        return try {
-            val parts = birthDateString.split("-")
-            val birth = Calendar.getInstance().apply {
-                set(parts[0].toInt(), parts[1].toInt() - 1, parts[2].toInt())
-            }
-            val now = Calendar.getInstance()
+    private fun BabyAgeResult.toPresentation() = BabyAge(
+        totalMonths = totalMonths,
+        years = years,
+        remainderMonths = remainderMonths,
+    )
 
-            var years = now.get(Calendar.YEAR) - birth.get(Calendar.YEAR)
-            var months = now.get(Calendar.MONTH) - birth.get(Calendar.MONTH)
-
-            if (months < 0) {
-                years--
-                months += 12
-            }
-
-            BabyAge(
-                totalMonths = years * 12 + months,
-                years = years,
-                remainderMonths = months,
-            )
-        } catch (_: Exception) {
-            null
+    private fun ActiveFeedingSnapshot.elapsedSeconds(): Long {
+        val segStart = activeSegmentStartedAt
+        return if (segStart != null) {
+            (closedSegmentsTotalMs + System.currentTimeMillis() - segStart) / 1_000L
+        } else {
+            closedSegmentsTotalMs / ONE_SEC
         }
+    }
+
+    companion object {
+        private const val ONE_SEC = 1_000L
     }
 }

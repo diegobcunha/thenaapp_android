@@ -58,6 +58,7 @@ import kotlinx.coroutines.flow.collectLatest
 fun HomeScreen(
     viewModel: HomeViewModel,
     onNavigateToFeeding: (babyId: String) -> Unit,
+    onNavigateToSleep: (babyId: String) -> Unit = {},
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -77,6 +78,7 @@ fun HomeScreen(
                     notDevelopedYetMessage
                 )
                 is HomeEffect.NavigateToFeeding -> onNavigateToFeeding(effect.babyId)
+                is HomeEffect.NavigateToSleep -> onNavigateToSleep(effect.babyId)
             }
         }
     }

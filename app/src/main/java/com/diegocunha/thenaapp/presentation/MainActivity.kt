@@ -42,6 +42,12 @@ import com.diegocunha.thenaapp.feature.onboarding.presentation.navigation.Onboar
 import com.diegocunha.thenaapp.feature.signup.presentation.SignupScreen
 import com.diegocunha.thenaapp.feature.signup.presentation.SignupViewModel
 import com.diegocunha.thenaapp.feature.signup.presentation.navigation.SignupNavigation
+import com.diegocunha.thenaapp.sleep.presentation.SleepScreen
+import com.diegocunha.thenaapp.sleep.presentation.SleepStatisticsScreen
+import com.diegocunha.thenaapp.sleep.presentation.SleepStatisticsViewModel
+import com.diegocunha.thenaapp.sleep.presentation.SleepViewModel
+import com.diegocunha.thenaapp.sleep.presentation.navigation.SleepNavigation
+import com.diegocunha.thenaapp.sleep.presentation.navigation.SleepStatisticsNavigation
 import org.koin.androidx.compose.koinViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
@@ -158,6 +164,7 @@ class MainActivity : ComponentActivity() {
                                     HomeScreen(
                                         viewModel = koinViewModel<HomeViewModel>(),
                                         onNavigateToFeeding = { babyId -> backStack.add(FeedingNavigation(babyId)) },
+                                        onNavigateToSleep = { babyId -> backStack.add(SleepNavigation(babyId)) },
                                     )
                                 }
 
@@ -176,6 +183,27 @@ class MainActivity : ComponentActivity() {
                                 entry<FeedingStatisticsNavigation> { key ->
                                     FeedingStatisticsScreen(
                                         viewModel = koinViewModel<FeedingStatisticsViewModel>(
+                                            parameters = { parametersOf(key.babyId) }
+                                        ),
+                                        onNavigateBack = { backStack.removeLastOrNull() },
+                                    )
+                                }
+
+                                entry<SleepNavigation> { key ->
+                                    SleepScreen(
+                                        viewModel = koinViewModel<SleepViewModel>(
+                                            parameters = { parametersOf(key.babyId) }
+                                        ),
+                                        onNavigateBack = { backStack.removeLastOrNull() },
+                                        onNavigateToStatistics = {
+                                            backStack.add(SleepStatisticsNavigation(key.babyId))
+                                        },
+                                    )
+                                }
+
+                                entry<SleepStatisticsNavigation> { key ->
+                                    SleepStatisticsScreen(
+                                        viewModel = koinViewModel<SleepStatisticsViewModel>(
                                             parameters = { parametersOf(key.babyId) }
                                         ),
                                         onNavigateBack = { backStack.removeLastOrNull() },

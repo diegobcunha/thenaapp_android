@@ -3,6 +3,8 @@ package com.diegocunha.thenaapp.feature.home.presentation
 import androidx.lifecycle.viewModelScope
 import app.cash.turbine.test
 import com.diegocunha.thenaapp.core.resource.Resource
+import com.diegocunha.thenaapp.feature.home.domain.BabyAgeResult
+import com.diegocunha.thenaapp.feature.home.domain.CalculateBabyAgeUseCase
 import com.diegocunha.thenaapp.feature.home.domain.HomeRepository
 import com.diegocunha.thenaapp.feature.home.domain.dto.HomeBabyInformation
 import com.diegocunha.thenaapp.feature.home.domain.dto.HomeUserInformation
@@ -34,10 +36,10 @@ class HomeViewModelTest {
 
     private val testDispatcher = UnconfinedTestDispatcher()
     private val homeRepository: HomeRepository = mockk()
+    private val calculateBabyAge: CalculateBabyAgeUseCase = mockk()
     private lateinit var viewModel: HomeViewModel
 
     private val mockBabyInfo = HomeBabyInformation(
-
         babyId = "test-baby-id",
         babyName = "Baby Luna",
         babyBirthDate = "2023-01-01",
@@ -49,13 +51,16 @@ class HomeViewModelTest {
         userName = "Test User",
         babyInformation = mockBabyInfo,
     )
+    private val mockBabyAgeResult = BabyAgeResult(totalMonths = 28, years = 2, remainderMonths = 4)
 
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
         coEvery { homeRepository.getUserInformation() } returns Resource.Success(mockHomeData)
         every { homeRepository.observeActiveFeeding() } returns emptyFlow()
-        viewModel = HomeViewModel(homeRepository)
+        coEvery { homeRepository.getTodaySleepMinutes(any()) } returns Resource.Error(Exception())
+        every { calculateBabyAge(any()) } returns mockBabyAgeResult
+        viewModel = HomeViewModel(homeRepository, calculateBabyAge)
     }
 
     @After
@@ -68,9 +73,8 @@ class HomeViewModelTest {
     fun `WHEN ViewModel is created THEN initial state has isLoading = true`() {
         val deferred = CompletableDeferred<Resource<HomeUserInformation>>()
         coEvery { homeRepository.getUserInformation() } coAnswers { deferred.await() }
-        val vm = HomeViewModel(homeRepository)
+        val vm = HomeViewModel(homeRepository, calculateBabyAge)
 
-        // With UnconfinedTestDispatcher, loadContent suspends at deferred.await() so isLoading stays true
         assertTrue(vm.state.value.isLoading)
 
         deferred.complete(Resource.Success(mockHomeData))
@@ -92,17 +96,19 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `WHEN loadContent succeeds with valid birthDate THEN babyAge is not null`() {
-        assertNotNull(viewModel.state.value.babyAge)
+    fun `WHEN calculateBabyAge returns a result THEN babyAge is mapped to presentation model`() {
+        val babyAge = viewModel.state.value.babyAge
+
+        assertNotNull(babyAge)
+        assertEquals(28, babyAge!!.totalMonths)
+        assertEquals(2, babyAge.years)
+        assertEquals(4, babyAge.remainderMonths)
     }
 
     @Test
-    fun `WHEN loadContent succeeds with invalid birthDate THEN babyAge is null`() {
-        val dataWithInvalidDate = mockHomeData.copy(
-            babyInformation = mockBabyInfo.copy(babyBirthDate = "invalid-date")
-        )
-        coEvery { homeRepository.getUserInformation() } returns Resource.Success(dataWithInvalidDate)
-        val vm = HomeViewModel(homeRepository)
+    fun `WHEN calculateBabyAge returns null THEN babyAge is null`() {
+        every { calculateBabyAge(any()) } returns null
+        val vm = HomeViewModel(homeRepository, calculateBabyAge)
 
         assertNull(vm.state.value.babyAge)
     }
@@ -110,10 +116,26 @@ class HomeViewModelTest {
     @Test
     fun `WHEN loadContent fails THEN error is set and isLoading is false`() {
         coEvery { homeRepository.getUserInformation() } returns Resource.Error(Exception("API error"))
-        val vm = HomeViewModel(homeRepository)
+        val vm = HomeViewModel(homeRepository, calculateBabyAge)
 
         assertNotNull(vm.state.value.error)
         assertFalse(vm.state.value.isLoading)
+    }
+
+    @Test
+    fun `WHEN getTodaySleepMinutes succeeds THEN todaySleepMinutes is populated`() {
+        coEvery { homeRepository.getTodaySleepMinutes(any()) } returns Resource.Success(120)
+        val vm = HomeViewModel(homeRepository, calculateBabyAge)
+
+        assertEquals(120, vm.state.value.todaySleepMinutes)
+    }
+
+    @Test
+    fun `WHEN getTodaySleepMinutes fails THEN todaySleepMinutes remains null`() {
+        coEvery { homeRepository.getTodaySleepMinutes(any()) } returns Resource.Error(Exception())
+        val vm = HomeViewModel(homeRepository, calculateBabyAge)
+
+        assertNull(vm.state.value.todaySleepMinutes)
     }
 
     @Test
@@ -121,7 +143,6 @@ class HomeViewModelTest {
         val intents = listOf(
             HomeIntent.EditBabyInfo,
             HomeIntent.UserProfile,
-            HomeIntent.SleepInfo,
             HomeIntent.VaccineInfo,
             HomeIntent.SummaryInfo,
         )

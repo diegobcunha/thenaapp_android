@@ -19,6 +19,8 @@ dependencies {
     kover(project(":feature:login"))
     kover(project(":feature:onboarding"))
     kover(project(":feature:signup"))
+    kover(project(":feature:feeding"))
+    kover(project(":feature:sleep"))
 }
 
 kover {
