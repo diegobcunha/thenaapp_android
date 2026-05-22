@@ -1,0 +1,51 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- 5 petals rotated around center (12,12), each is an ellipse centered at (12,5.5) -->
+    <group
+        android:pivotX="12"
+        android:pivotY="12"
+        android:rotation="0">
+        <path
+            android:fillColor="#FF000000"
+            android:pathData="M12,5.5 m-2.5,0 a2.5,4 0 1,0 5,0 a2.5,4 0 1,0 -5,0" />
+    </group>
+    <group
+        android:pivotX="12"
+        android:pivotY="12"
+        android:rotation="72">
+        <path
+            android:fillColor="#FF000000"
+            android:pathData="M12,5.5 m-2.5,0 a2.5,4 0 1,0 5,0 a2.5,4 0 1,0 -5,0" />
+    </group>
+    <group
+        android:pivotX="12"
+        android:pivotY="12"
+        android:rotation="144">
+        <path
+            android:fillColor="#FF000000"
+            android:pathData="M12,5.5 m-2.5,0 a2.5,4 0 1,0 5,0 a2.5,4 0 1,0 -5,0" />
+    </group>
+    <group
+        android:pivotX="12"
+        android:pivotY="12"
+        android:rotation="216">
+        <path
+            android:fillColor="#FF000000"
+            android:pathData="M12,5.5 m-2.5,0 a2.5,4 0 1,0 5,0 a2.5,4 0 1,0 -5,0" />
+    </group>
+    <group
+        android:pivotX="12"
+        android:pivotY="12"
+        android:rotation="288">
+        <path
+            android:fillColor="#FF000000"
+            android:pathData="M12,5.5 m-2.5,0 a2.5,4 0 1,0 5,0 a2.5,4 0 1,0 -5,0" />
+    </group>
+    <!-- Center circle -->
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="M12,12 m-2.5,0 a2.5,2.5 0 1,0 5,0 a2.5,2.5 0 1,0 -5,0" />
+</vector>

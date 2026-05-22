@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
@@ -48,6 +49,8 @@ import com.diegocunha.thenaapp.coreui.component.LoadingComponent
 import com.diegocunha.thenaapp.coreui.component.PagerIndicator
 import com.diegocunha.thenaapp.coreui.component.Period
 import com.diegocunha.thenaapp.coreui.component.PeriodFilerComponent
+import com.diegocunha.thenaapp.coreui.icon.ThenaIcon
+import com.diegocunha.thenaapp.coreui.icon.ThenaIcons
 import com.diegocunha.thenaapp.coreui.theme.ThenaTheme
 import com.diegocunha.thenaapp.feature.feeding.R
 import com.skydoves.compose.stability.runtime.TraceRecomposition
@@ -242,14 +245,14 @@ private fun AggregateStatsSection(stats: FeedingStatisticsInfo) {
     ) {
         StatCard(
             modifier = Modifier.weight(1f),
-            emoji = "🍼",
+            icon = ThenaIcons.Bottle,
             value = stats.totalSessions.toString(),
             label = stringResource(R.string.feeding_stats_total_sessions),
             color = ThenaTheme.extendedColors.feedFill,
         )
         StatCard(
             modifier = Modifier.weight(1f),
-            emoji = "🤱",
+            icon = ThenaIcons.Breastfeeding,
             value = stats.breastfeedingSessions.toString(),
             label = stringResource(R.string.feeding_stats_breastfeeding),
             color = ThenaTheme.colors.primaryContainer,
@@ -262,14 +265,14 @@ private fun AggregateStatsSection(stats: FeedingStatisticsInfo) {
     ) {
         StatCard(
             modifier = Modifier.weight(1f),
-            emoji = "⏱️",
+            icon = ThenaIcons.Timer,
             value = "${stats.averageBreastfeedingDurationSeconds / 60}",
             label = stringResource(R.string.feeding_stats_avg_duration_min, "min"),
             color = ThenaTheme.colors.secondaryContainer,
         )
         StatCard(
             modifier = Modifier.weight(1f),
-            emoji = "🧴",
+            icon = ThenaIcons.Bottle,
             value = "${stats.totalBottleVolumeMl}ml",
             label = stringResource(R.string.feeding_stats_total_volume_ml, ""),
             color = ThenaTheme.extendedColors.vaccineFill,
@@ -280,7 +283,7 @@ private fun AggregateStatsSection(stats: FeedingStatisticsInfo) {
 @Composable
 private fun StatCard(
     modifier: Modifier = Modifier,
-    emoji: String,
+    icon: ThenaIcon,
     value: String,
     label: String,
     color: Color,
@@ -295,7 +298,7 @@ private fun StatCard(
                 .padding(ThenaTheme.spacing.sm),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Text(text = emoji, style = ThenaTheme.typography.titleMedium)
+            ThenaIcon(icon = icon, modifier = Modifier.size(ThenaTheme.spacing.lg))
             Spacer(modifier = Modifier.height(ThenaTheme.spacing.xxs))
             Text(text = value, style = ThenaTheme.typography.titleLarge)
             Text(
@@ -315,10 +318,16 @@ private fun MilkTypeCard(volumeByMilkType: Map<String, Long>) {
                 .fillMaxWidth()
                 .padding(ThenaTheme.spacing.sm),
         ) {
-            Text(
-                text = "🥛 ${stringResource(R.string.feeding_stats_bottle)}",
-                style = ThenaTheme.typography.titleSmall,
-            )
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(ThenaTheme.spacing.xs),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                ThenaIcon(icon = ThenaIcons.Bottle, modifier = Modifier.size(ThenaTheme.spacing.lg))
+                Text(
+                    text = stringResource(R.string.feeding_stats_bottle),
+                    style = ThenaTheme.typography.titleSmall,
+                )
+            }
             Spacer(modifier = Modifier.height(ThenaTheme.spacing.xs))
             volumeByMilkType.forEach { (type, volume) ->
                 val label = when (type) {
@@ -444,20 +453,32 @@ private fun DailyStatPage(
             Row(modifier = Modifier.fillMaxWidth()) {
                 Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
                     if (day.totalBreastfeedingDurationSeconds > 0) {
-                        Text(
-                            text = "⏱️ ${day.totalBreastfeedingDurationSeconds / 60} min",
-                            style = ThenaTheme.typography.bodySmall,
-                            textAlign = TextAlign.Center,
-                        )
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(ThenaTheme.spacing.xs),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            ThenaIcon(icon = ThenaIcons.Timer, modifier = Modifier.size(14.dp))
+                            Text(
+                                text = "${day.totalBreastfeedingDurationSeconds / 60} min",
+                                style = ThenaTheme.typography.bodySmall,
+                                textAlign = TextAlign.Center,
+                            )
+                        }
                     }
                 }
                 Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
                     if (day.totalBottleVolumeMl > 0) {
-                        Text(
-                            text = "🧴 ${day.totalBottleVolumeMl} ml",
-                            style = ThenaTheme.typography.bodySmall,
-                            textAlign = TextAlign.Center,
-                        )
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(ThenaTheme.spacing.xs),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            ThenaIcon(icon = ThenaIcons.Bottle, modifier = Modifier.size(14.dp))
+                            Text(
+                                text = "${day.totalBottleVolumeMl} ml",
+                                style = ThenaTheme.typography.bodySmall,
+                                textAlign = TextAlign.Center,
+                            )
+                        }
                     }
                 }
             }

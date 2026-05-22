@@ -50,8 +50,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.diegocunha.thenaapp.coreui.icon.ThenaIcon
+import com.diegocunha.thenaapp.coreui.icon.ThenaIcons
 import com.diegocunha.thenaapp.coreui.theme.ThenaTheme
 import com.diegocunha.thenaapp.feature.login.R
 import com.skydoves.compose.stability.runtime.TraceRecomposition
@@ -151,7 +152,7 @@ private fun LoginScreenContent(
                             .background(colors.primary),
                         contentAlignment = Alignment.Center,
                     ) {
-                        Text(text = "🌸", fontSize = 40.sp)
+                        ThenaIcon(icon = ThenaIcons.Blossom, modifier = Modifier.size(40.dp), tint = colors.onPrimary)
                     }
                     Spacer(Modifier.height(spacing.lg))
                     Text(

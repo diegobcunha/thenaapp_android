@@ -44,10 +44,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import coil.compose.AsyncImage
+import com.diegocunha.thenaapp.coreui.icon.ThenaIcon
+import com.diegocunha.thenaapp.coreui.icon.ThenaIcons
 import com.diegocunha.thenaapp.coreui.theme.ThenaTheme
 import com.diegocunha.thenaapp.feature.baby.R
 import com.diegocunha.thenaapp.feature.baby.domain.model.BabyGender
@@ -189,7 +190,7 @@ fun BabyInfoStep(
                         contentScale = ContentScale.Crop,
                     )
                 } else {
-                    Text(text = "🍼", fontSize = 48.sp)
+                    ThenaIcon(icon = ThenaIcons.Bottle, modifier = Modifier.size(48.dp))
                 }
             }
             TextButton(onClick = { showPhotoDialog = true }) {
