@@ -6,6 +6,8 @@ import com.diegocunha.thenaapp.core.resource.Resource
 import com.diegocunha.thenaapp.feature.home.domain.BabyAgeResult
 import com.diegocunha.thenaapp.feature.home.domain.CalculateBabyAgeUseCase
 import com.diegocunha.thenaapp.feature.home.domain.HomeRepository
+import com.diegocunha.thenaapp.feature.home.domain.dto.ActiveFeedingInfo
+import com.diegocunha.thenaapp.feature.home.domain.dto.ActiveSleepSessionInfo
 import com.diegocunha.thenaapp.feature.home.domain.dto.HomeBabyInformation
 import com.diegocunha.thenaapp.feature.home.domain.dto.HomeUserInformation
 import io.mockk.coEvery
@@ -17,6 +19,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -50,15 +53,17 @@ class HomeViewModelTest {
     private val mockHomeData = HomeUserInformation(
         userName = "Test User",
         babyInformation = mockBabyInfo,
+        todaySleepMinutes = null,
+        expectedSleepMinutes = null,
     )
     private val mockBabyAgeResult = BabyAgeResult(totalMonths = 28, years = 2, remainderMonths = 4)
 
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        coEvery { homeRepository.getUserInformation() } returns Resource.Success(mockHomeData)
+        coEvery { homeRepository.getHomeData() } returns Resource.Success(mockHomeData)
         every { homeRepository.observeActiveFeeding() } returns emptyFlow()
-        coEvery { homeRepository.getTodaySleepMinutes(any()) } returns Resource.Error(Exception())
+        coEvery { homeRepository.closeSleepSession(any(), any(), any()) } returns Resource.Success(Unit)
         every { calculateBabyAge(any()) } returns mockBabyAgeResult
         viewModel = HomeViewModel(homeRepository, calculateBabyAge)
     }
@@ -72,7 +77,7 @@ class HomeViewModelTest {
     @Test
     fun `WHEN ViewModel is created THEN initial state has isLoading = true`() {
         val deferred = CompletableDeferred<Resource<HomeUserInformation>>()
-        coEvery { homeRepository.getUserInformation() } coAnswers { deferred.await() }
+        coEvery { homeRepository.getHomeData() } coAnswers { deferred.await() }
         val vm = HomeViewModel(homeRepository, calculateBabyAge)
 
         assertTrue(vm.state.value.isLoading)
@@ -115,7 +120,7 @@ class HomeViewModelTest {
 
     @Test
     fun `WHEN loadContent fails THEN error is set and isLoading is false`() {
-        coEvery { homeRepository.getUserInformation() } returns Resource.Error(Exception("API error"))
+        coEvery { homeRepository.getHomeData() } returns Resource.Error(Exception("API error"))
         val vm = HomeViewModel(homeRepository, calculateBabyAge)
 
         assertNotNull(vm.state.value.error)
@@ -123,19 +128,25 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `WHEN getTodaySleepMinutes succeeds THEN todaySleepMinutes is populated`() {
-        coEvery { homeRepository.getTodaySleepMinutes(any()) } returns Resource.Success(120)
+    fun `WHEN getHomeData returns sleepMinutes THEN todaySleepMinutes is populated`() {
+        coEvery { homeRepository.getHomeData() } returns Resource.Success(
+            mockHomeData.copy(todaySleepMinutes = 120, expectedSleepMinutes = 240)
+        )
         val vm = HomeViewModel(homeRepository, calculateBabyAge)
 
-        assertEquals(120, vm.state.value.todaySleepMinutes)
+        assertEquals(120L, vm.state.value.todaySleepMinutes)
+        assertEquals(240L, vm.state.value.expectedSleepMinutes)
     }
 
     @Test
-    fun `WHEN getTodaySleepMinutes fails THEN todaySleepMinutes remains null`() {
-        coEvery { homeRepository.getTodaySleepMinutes(any()) } returns Resource.Error(Exception())
+    fun `WHEN getHomeData returns null sleepMinutes THEN todaySleepMinutes is null`() {
+        coEvery { homeRepository.getHomeData() } returns Resource.Success(
+            mockHomeData.copy(todaySleepMinutes = null, expectedSleepMinutes = null)
+        )
         val vm = HomeViewModel(homeRepository, calculateBabyAge)
 
         assertNull(vm.state.value.todaySleepMinutes)
+        assertNull(vm.state.value.expectedSleepMinutes)
     }
 
     @Test
@@ -168,11 +179,116 @@ class HomeViewModelTest {
     }
 
     @Test
+    fun `WHEN loadContent returns activeSleepSession THEN activeSleepSession state is populated`() {
+        val sessionInfo = ActiveSleepSessionInfo(
+            id = "session-id",
+            startTimeMs = System.currentTimeMillis() - 60_000L,
+            sleepType = "NAP",
+        )
+        coEvery { homeRepository.getHomeData() } returns Resource.Success(
+            mockHomeData.copy(activeSleepSession = sessionInfo)
+        )
+        val vm = HomeViewModel(homeRepository, calculateBabyAge)
+
+        assertEquals("session-id", vm.state.value.activeSleepSession?.id)
+        assertEquals("NAP", vm.state.value.activeSleepSession?.sleepType)
+        assertNotNull(vm.state.value.sleepBannerElapsedSeconds)
+    }
+
+    @Test
+    fun `WHEN loadContent returns null activeSleepSession THEN activeSleepSession is null`() {
+        coEvery { homeRepository.getHomeData() } returns Resource.Success(
+            mockHomeData.copy(activeSleepSession = null)
+        )
+        val vm = HomeViewModel(homeRepository, calculateBabyAge)
+
+        assertNull(vm.state.value.activeSleepSession)
+        assertNull(vm.state.value.sleepBannerElapsedSeconds)
+    }
+
+    @Test
+    fun `WHEN ActiveSleepBannerTapped THEN showCloseSessionPicker is true`() {
+        viewModel.sendIntent(HomeIntent.ActiveSleepBannerTapped)
+
+        assertTrue(viewModel.state.value.showCloseSessionPicker)
+    }
+
+    @Test
+    fun `WHEN CloseSleepSession succeeds THEN activeSleepSession is cleared and SleepSessionClosed effect is emitted`() = runTest {
+        val sessionInfo = ActiveSleepSessionInfo(
+            id = "session-id",
+            startTimeMs = System.currentTimeMillis() - 60_000L,
+            sleepType = "NAP",
+        )
+        coEvery { homeRepository.getHomeData() } returns Resource.Success(
+            mockHomeData.copy(activeSleepSession = sessionInfo)
+        )
+        val vm = HomeViewModel(homeRepository, calculateBabyAge)
+
+        vm.effects.test {
+            vm.sendIntent(HomeIntent.CloseSleepSession(System.currentTimeMillis()))
+            assertEquals(HomeEffect.SleepSessionClosed, awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        assertNull(vm.state.value.activeSleepSession)
+        assertFalse(vm.state.value.showCloseSessionPicker)
+        assertFalse(vm.state.value.isClosingSession)
+        vm.viewModelScope.cancel()
+    }
+
+    @Test
+    fun `WHEN CloseSleepSession fails THEN CloseSessionError effect is emitted`() = runTest {
+        val sessionInfo = ActiveSleepSessionInfo(
+            id = "session-id",
+            startTimeMs = System.currentTimeMillis() - 60_000L,
+            sleepType = "NAP",
+        )
+        coEvery { homeRepository.getHomeData() } returns Resource.Success(
+            mockHomeData.copy(activeSleepSession = sessionInfo)
+        )
+        coEvery { homeRepository.closeSleepSession(any(), any(), any()) } returns Resource.Error(Exception("error"))
+        val vm = HomeViewModel(homeRepository, calculateBabyAge)
+
+        vm.effects.test {
+            vm.sendIntent(HomeIntent.CloseSleepSession(System.currentTimeMillis()))
+            assertEquals(HomeEffect.CloseSessionError, awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        assertFalse(vm.state.value.isClosingSession)
+        vm.viewModelScope.cancel()
+    }
+
+    @Test
     fun `WHEN loadContent succeeds THEN babyInfo height and weight are populated`() {
         val babyInfo = viewModel.state.value.babyInfo
 
         assertNotNull(babyInfo)
         assertTrue(babyInfo!!.height.isNotBlank())
         assertTrue(babyInfo.weight.isNotBlank())
+    }
+
+    @Test
+    fun `WHEN observeActiveFeeding emits a session THEN activeFeedingSession and feedingBannerElapsedSeconds are populated`() {
+        val feedingInfo = ActiveFeedingInfo(
+            activeBreast = "LEFT",
+            closedSegmentsTotalMs = 0L,
+            activeSegmentStartedAt = System.currentTimeMillis() - 30_000L,
+        )
+        every { homeRepository.observeActiveFeeding() } returns flowOf(feedingInfo)
+        val vm = HomeViewModel(homeRepository, calculateBabyAge)
+
+        assertEquals(feedingInfo, vm.state.value.activeFeedingSession)
+        assertNotNull(vm.state.value.feedingBannerElapsedSeconds)
+    }
+
+    @Test
+    fun `WHEN observeActiveFeeding emits null THEN activeFeedingSession is null and feedingBannerElapsedSeconds is null`() {
+        every { homeRepository.observeActiveFeeding() } returns flowOf(null)
+        val vm = HomeViewModel(homeRepository, calculateBabyAge)
+
+        assertNull(vm.state.value.activeFeedingSession)
+        assertNull(vm.state.value.feedingBannerElapsedSeconds)
     }
 }
