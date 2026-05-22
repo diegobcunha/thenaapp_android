@@ -15,6 +15,7 @@ import com.diegocunha.thenaapp.datasource.network.interceptor.TokenAuthenticator
 import com.diegocunha.thenaapp.datasource.network.service.BabyService
 import com.diegocunha.thenaapp.datasource.network.service.CloudinaryService
 import com.diegocunha.thenaapp.datasource.network.service.FeedingService
+import com.diegocunha.thenaapp.datasource.network.service.HomeService
 import com.diegocunha.thenaapp.datasource.network.service.SleepApiService
 import com.diegocunha.thenaapp.datasource.network.service.UserService
 import com.diegocunha.thenaapp.datasource.repository.LoginCredentialsManager
@@ -96,6 +97,7 @@ val datasourceModule = module {
     single { get<Retrofit>().create(BabyService::class.java) }
     single { get<Retrofit>().create(FeedingService::class.java) }
     single { get<Retrofit>().create(SleepApiService::class.java) }
+    single { get<Retrofit>().create(HomeService::class.java) }
 
     single<CredentialManager> {
         CredentialManager.create(androidApplication())

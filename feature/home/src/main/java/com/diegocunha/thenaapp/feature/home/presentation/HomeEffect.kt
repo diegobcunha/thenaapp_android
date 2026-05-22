@@ -7,4 +7,6 @@ sealed interface HomeEffect : MviEffect {
     object NotDevelopedYet : HomeEffect
     data class NavigateToFeeding(val babyId: String) : HomeEffect
     data class NavigateToSleep(val babyId: String) : HomeEffect
+    object SleepSessionClosed : HomeEffect
+    object CloseSessionError : HomeEffect
 }

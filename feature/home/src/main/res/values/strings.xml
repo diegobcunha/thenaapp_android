@@ -19,4 +19,20 @@
     <string name="home_quick_log_vaccine">Vaccines</string>
     <string name="home_quick_log_summary">Summary</string>
     <string name="home_feeding_banner_tap">Tap to open →</string>
+    <string name="home_today_log_title">Today log</string>
+    <string name="home_today_log_sleep_info_title">%1$.02f%% of daily goal reached</string>
+    <string name="home_active_sleep_banner_tap">Tap to close →</string>
+    <string name="home_active_sleep_session_closed">Sleep session closed!</string>
+
+    <string name="home_sleep_goal">Sleep Goal</string>
+    <string name="home_sleep_type_nap">Nap</string>
+    <string name="home_sleep_type_night">Night sleep</string>
+    <string name="home_sleep_type_early_morning">Early morning</string>
+    <string name="home_sleep_type_catnap">Catnap</string>
+    <string name="home_sleep_type_car_nap">Car nap</string>
+    <string name="home_sleep_type_contact_nap">Contact nap</string>
+    <string name="home_sleep_type_unknown">Sleep</string>
+    <string name="home_feeding_breast_left">🤱 Left · </string>
+    <string name="home_feeding_breast_right">🤱 Right · </string>
+    <string name="home_feeding_breast_paused">🤱 Paused · </string>
 </resources>

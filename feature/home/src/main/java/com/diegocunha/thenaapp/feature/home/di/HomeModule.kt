@@ -17,10 +17,10 @@ val homeModule = module {
 
     single<HomeRepository> {
         HomeRepositoryImpl(
-            userService = get(),
+            homeService = get(),
+            sleepApiService = get(),
             dispatchersProvider = get(),
             feedingLocalDataSource = get(),
-            sleepApiService = get(),
         )
     }
 

@@ -4,16 +4,22 @@ import androidx.lifecycle.viewModelScope
 import com.diegocunha.thenaapp.core.mvi.BaseViewModel
 import com.diegocunha.thenaapp.core.resource.Resource
 import com.diegocunha.thenaapp.coreui.R
-import com.diegocunha.thenaapp.datasource.database.model.ActiveFeedingSnapshot
 import com.diegocunha.thenaapp.feature.home.domain.BabyAgeResult
 import com.diegocunha.thenaapp.feature.home.domain.CalculateBabyAgeUseCase
 import com.diegocunha.thenaapp.feature.home.domain.HomeRepository
+import com.diegocunha.thenaapp.feature.home.domain.dto.ActiveFeedingInfo
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class HomeViewModel(
     private val homeRepository: HomeRepository,
     private val calculateBabyAge: CalculateBabyAgeUseCase,
@@ -21,8 +27,8 @@ class HomeViewModel(
 
     init {
         loadContent()
-        observeActiveFeeding()
-        startFeedingTicker()
+        observeActiveFeedingWithTick()
+        startSleepTicker()
     }
 
     override fun processIntent(intent: HomeIntent) {
@@ -41,34 +47,35 @@ class HomeViewModel(
                 val babyId = state.value.babyId ?: return
                 sendEffect(HomeEffect.NavigateToSleep(babyId))
             }
+
+            HomeIntent.ActiveSleepBannerTapped ->
+                updateState { copy(showCloseSessionPicker = true) }
+
+            HomeIntent.DismissCloseSessionPicker ->
+                updateState { copy(showCloseSessionPicker = false) }
+
+            is HomeIntent.CloseSleepSession -> closeSession(intent.endTimeMs)
         }
     }
 
-    private fun observeActiveFeeding() {
+    private fun observeActiveFeedingWithTick() {
         viewModelScope.launch {
-            homeRepository.observeActiveFeeding().collectLatest { snapshot ->
-                updateState {
-                    copy(
-                        activeFeedingSession = snapshot,
-                        feedingBannerElapsedSeconds = snapshot?.elapsedSeconds(),
-                    )
+            homeRepository.observeActiveFeeding()
+                .flatMapLatest { session ->
+                    if (session == null) {
+                        flowOf<Pair<ActiveFeedingInfo?, Long?>>(null to null)
+                    } else {
+                        flow {
+                            while (true) {
+                                emit(session to session.elapsedSeconds())
+                                delay(ONE_SEC)
+                            }
+                        }
+                    }
                 }
-            }
-        }
-    }
-
-    private fun startFeedingTicker() {
-        viewModelScope.launch {
-            state
-                .map { it.activeFeedingSession?.activeSegmentStartedAt != null }
-                .distinctUntilChanged()
-                .collectLatest { isSegmentActive ->
-                    if (!isSegmentActive) return@collectLatest
-                    while (true) {
-                        delay(1_000L)
-                        val session = state.value.activeFeedingSession ?: break
-                        if (session.activeSegmentStartedAt == null) break
-                        updateState { copy(feedingBannerElapsedSeconds = session.elapsedSeconds()) }
+                .collectLatest { (session, elapsed) ->
+                    updateState {
+                        copy(activeFeedingSession = session, feedingBannerElapsedSeconds = elapsed)
                     }
                 }
         }
@@ -76,7 +83,7 @@ class HomeViewModel(
 
     private fun loadContent() {
         viewModelScope.launch {
-            when (val result = homeRepository.getUserInformation()) {
+            when (val result = homeRepository.getHomeData()) {
                 is Resource.Success -> {
                     val data = result.data
                     val baby = data.babyInformation
@@ -92,11 +99,11 @@ class HomeViewModel(
                                 height = baby.babyHeight.toString(),
                                 weight = baby.babyWeight.toString(),
                             ),
+                            todaySleepMinutes = data.todaySleepMinutes,
+                            expectedSleepMinutes = data.expectedSleepMinutes,
+                            activeSleepSession = data.activeSleepSession,
+                            sleepBannerElapsedSeconds = data.activeSleepSession?.elapsedSeconds(),
                         )
-                    }
-                    val sleepResult = homeRepository.getTodaySleepMinutes(baby.babyId)
-                    if (sleepResult is Resource.Success) {
-                        updateState { copy(todaySleepMinutes = sleepResult.data) }
                     }
                 }
 
@@ -112,20 +119,57 @@ class HomeViewModel(
         }
     }
 
+    private fun closeSession(endTimeMs: Long) {
+        val babyId = state.value.babyId ?: return
+        val sessionId = state.value.activeSleepSession?.id ?: return
+        viewModelScope.launch {
+            updateState { copy(isClosingSession = true) }
+            when (homeRepository.closeSleepSession(babyId, sessionId, endTimeMs)) {
+                is Resource.Success -> {
+                    updateState {
+                        copy(
+                            activeSleepSession = null,
+                            sleepBannerElapsedSeconds = null,
+                            showCloseSessionPicker = false,
+                            isClosingSession = false,
+                        )
+                    }
+                    sendEffect(HomeEffect.SleepSessionClosed)
+                }
+                is Resource.Error -> {
+                    updateState { copy(isClosingSession = false) }
+                    sendEffect(HomeEffect.CloseSessionError)
+                }
+                else -> Unit
+            }
+        }
+    }
+
+    private fun startSleepTicker() {
+        viewModelScope.launch {
+            state
+                .map { it.activeSleepSession }
+                .distinctUntilChanged()
+                .flatMapLatest { session ->
+                    if (session == null) emptyFlow()
+                    else flow {
+                        while (true) {
+                            delay(ONE_SEC)
+                            emit(session.elapsedSeconds())
+                        }
+                    }
+                }
+                .collectLatest { elapsed ->
+                    updateState { copy(sleepBannerElapsedSeconds = elapsed) }
+                }
+        }
+    }
+
     private fun BabyAgeResult.toPresentation() = BabyAge(
         totalMonths = totalMonths,
         years = years,
         remainderMonths = remainderMonths,
     )
-
-    private fun ActiveFeedingSnapshot.elapsedSeconds(): Long {
-        val segStart = activeSegmentStartedAt
-        return if (segStart != null) {
-            (closedSegmentsTotalMs + System.currentTimeMillis() - segStart) / 1_000L
-        } else {
-            closedSegmentsTotalMs / ONE_SEC
-        }
-    }
 
     companion object {
         private const val ONE_SEC = 1_000L
