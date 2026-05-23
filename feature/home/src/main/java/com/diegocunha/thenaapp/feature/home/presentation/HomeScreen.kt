@@ -365,7 +365,8 @@ private fun QuickLogSection(
                 .weight(1f)
                 .clickable(onClick = onSleepClick),
             color = ThenaTheme.extendedColors.sleepFill,
-            headerInformation = { ThenaIcon(icon = ThenaIcons.Sleep, modifier = Modifier.size(28.dp)) },
+            headerInformation = { ThenaIcon(icon = ThenaIcons.Sleep, modifier = Modifier.size(
+                ThenaTheme.spacing.xl)) },
             titleInformation = {
                 Text(
                     stringResource(R.string.home_quick_log_sleep),
@@ -387,7 +388,7 @@ private fun QuickLogSection(
                 .weight(1f)
                 .clickable(onClick = onFeedingClick),
             color = ThenaTheme.extendedColors.feedFill,
-            headerInformation = { ThenaIcon(icon = ThenaIcons.Bottle, modifier = Modifier.size(28.dp)) },
+            headerInformation = { ThenaIcon(icon = ThenaIcons.Bottle, modifier = Modifier.size(ThenaTheme.spacing.xl)) },
             titleInformation = {
                 Text(
                     stringResource(R.string.home_quick_log_feed),
@@ -409,7 +410,7 @@ private fun QuickLogSection(
                 .weight(1f)
                 .clickable(onClick = onVaccineClick),
             color = ThenaTheme.extendedColors.vaccineFill,
-            headerInformation = { ThenaIcon(icon = ThenaIcons.Vaccine, modifier = Modifier.size(28.dp)) },
+            headerInformation = { ThenaIcon(icon = ThenaIcons.Vaccine, modifier = Modifier.size(ThenaTheme.spacing.xl)) },
             titleInformation = {
                 Text(
                     stringResource(R.string.home_quick_log_vaccine),
@@ -431,7 +432,7 @@ private fun QuickLogSection(
                 .weight(1f)
                 .clickable(onClick = onSummaryClick),
             color = ThenaTheme.extendedColors.summaryFill,
-            headerInformation = { ThenaIcon(icon = ThenaIcons.Statistics, modifier = Modifier.size(28.dp)) },
+            headerInformation = { ThenaIcon(icon = ThenaIcons.Statistics, modifier = Modifier.size(ThenaTheme.spacing.xl)) },
             titleInformation = {
                 Text(
                     stringResource(R.string.home_quick_log_summary),
@@ -603,7 +604,7 @@ private fun ActiveSleepBanner(
             ) {
                 ThenaIcon(
                     icon = ThenaIcons.Sleep,
-                    modifier = Modifier.size(18.dp),
+                    modifier = Modifier.size(ThenaTheme.spacing.md),
                     tint = ThenaTheme.colors.secondary,
                 )
                 Text(

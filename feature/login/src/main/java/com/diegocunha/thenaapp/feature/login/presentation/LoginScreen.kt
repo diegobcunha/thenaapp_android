@@ -60,6 +60,7 @@ import kotlinx.coroutines.flow.collectLatest
 import com.diegocunha.thenaapp.coreui.R as CoreUiR
 
 typealias LoginForm = Pair<Boolean, Boolean>
+
 @Composable
 @TraceRecomposition
 fun LoginScreen(
@@ -79,17 +80,33 @@ fun LoginScreen(
                 is LoginEffect.NavigateToHome -> onNavigateToHome()
                 is LoginEffect.NavigateToSignUp -> onNavigateToSignUp()
                 is LoginEffect.NavigateToCreateBaby -> onNavigateToCreateBaby()
-                is LoginEffect.NavigateToFinishRegistration -> onNavigateToCompleteRegistration(effect.hasBaby to effect.isCompletionProfile)
-                is LoginEffect.ShowSnackbar -> snackbarHostState.showSnackbar(context.getString(effect.message))
+                is LoginEffect.NavigateToFinishRegistration -> onNavigateToCompleteRegistration(
+                    effect.hasBaby to effect.isCompletionProfile
+                )
+
+                is LoginEffect.ShowSnackbar -> snackbarHostState.showSnackbar(
+                    context.getString(
+                        effect.message
+                    )
+                )
             }
         }
     }
 
-    val onEmailChange = remember(viewModel) { { email: String -> viewModel.sendIntent(LoginIntent.UpdateEmail(email)) } }
-    val onPasswordChange = remember(viewModel) { { password: String -> viewModel.sendIntent(LoginIntent.UpdatePassword(password)) } }
+    val onEmailChange =
+        remember(viewModel) { { email: String -> viewModel.sendIntent(LoginIntent.UpdateEmail(email)) } }
+    val onPasswordChange = remember(viewModel) {
+        { password: String ->
+            viewModel.sendIntent(
+                LoginIntent.UpdatePassword(password)
+            )
+        }
+    }
     val onSubmitLogin = remember(viewModel) { { viewModel.sendIntent(LoginIntent.SubmitLogin) } }
-    val onGoogleSignIn = remember(viewModel) { { viewModel.sendIntent(LoginIntent.TriggerGoogleSignIn) } }
-    val onForgotPassword = remember(viewModel) { { viewModel.sendIntent(LoginIntent.ForgotPassword) } }
+    val onGoogleSignIn =
+        remember(viewModel) { { viewModel.sendIntent(LoginIntent.TriggerGoogleSignIn) } }
+    val onForgotPassword =
+        remember(viewModel) { { viewModel.sendIntent(LoginIntent.ForgotPassword) } }
     val onSignUp = remember(viewModel) { { viewModel.sendIntent(LoginIntent.NavigateToSignUp) } }
 
     LoginScreenContent(
@@ -152,7 +169,11 @@ private fun LoginScreenContent(
                             .background(colors.primary),
                         contentAlignment = Alignment.Center,
                     ) {
-                        ThenaIcon(icon = ThenaIcons.Blossom, modifier = Modifier.size(40.dp), tint = colors.onPrimary)
+                        ThenaIcon(
+                            icon = ThenaIcons.Blossom,
+                            modifier = Modifier.size(ThenaTheme.spacing.xxl),
+                            tint = colors.onPrimary
+                        )
                     }
                     Spacer(Modifier.height(spacing.lg))
                     Text(

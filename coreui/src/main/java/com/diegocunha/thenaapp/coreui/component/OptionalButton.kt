@@ -17,7 +17,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.diegocunha.thenaapp.coreui.icon.ThenaIcon
 import com.diegocunha.thenaapp.coreui.icon.ThenaIcons
 import com.diegocunha.thenaapp.coreui.theme.ThenaTheme
@@ -48,10 +47,10 @@ fun OptionalButton(
         contentAlignment = Alignment.Center,
     ) {
         Row(
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            horizontalArrangement = Arrangement.spacedBy(ThenaTheme.spacing.xs),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            ThenaIcon(icon = icon, modifier = Modifier.size(18.dp), tint = contentColor)
+            ThenaIcon(icon = icon, modifier = Modifier.size(ThenaTheme.spacing.md), tint = contentColor)
             Text(
                 text = label,
                 style = MaterialTheme.typography.labelMedium,

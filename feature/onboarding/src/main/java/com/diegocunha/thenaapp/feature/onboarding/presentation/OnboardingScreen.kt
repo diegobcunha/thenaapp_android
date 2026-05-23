@@ -222,7 +222,7 @@ private fun OnboardingSlideContent(slide: OnboardingSlide) {
                         .background(Color.White.copy(alpha = 0.6f)),
                     contentAlignment = Alignment.Center,
                 ) {
-                    ThenaIcon(icon = slide.icon, modifier = Modifier.size(52.dp))
+                    ThenaIcon(icon = slide.icon, modifier = Modifier.size(ThenaTheme.spacing.xxxl))
                 }
 
                 Text(

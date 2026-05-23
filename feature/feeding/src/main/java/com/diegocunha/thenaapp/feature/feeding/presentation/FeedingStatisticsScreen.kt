@@ -384,7 +384,7 @@ private fun DailyBreakdownSection(
         )
     }
 
-    if (dailyBreakdown.size > 0) {
+    if (dailyBreakdown.isNotEmpty()) {
         Spacer(modifier = Modifier.height(ThenaTheme.spacing.xs))
         PagerIndicator(
             pageCount = dailyBreakdown.size,
@@ -457,7 +457,10 @@ private fun DailyStatPage(
                             horizontalArrangement = Arrangement.spacedBy(ThenaTheme.spacing.xs),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            ThenaIcon(icon = ThenaIcons.Timer, modifier = Modifier.size(14.dp))
+                            ThenaIcon(
+                                icon = ThenaIcons.Timer,
+                                modifier = Modifier.size(ThenaTheme.spacing.md)
+                            )
                             Text(
                                 text = "${day.totalBreastfeedingDurationSeconds / 60} min",
                                 style = ThenaTheme.typography.bodySmall,
