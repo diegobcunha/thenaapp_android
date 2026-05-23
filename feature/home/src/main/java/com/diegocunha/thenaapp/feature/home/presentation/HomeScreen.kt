@@ -50,6 +50,8 @@ import coil.compose.AsyncImage
 import com.diegocunha.thenaapp.coreui.component.CardButtonInformation
 import com.diegocunha.thenaapp.coreui.component.LoadingComponent
 import com.diegocunha.thenaapp.coreui.component.StartTimePickerDialog
+import com.diegocunha.thenaapp.coreui.icon.ThenaIcon
+import com.diegocunha.thenaapp.coreui.icon.ThenaIcons
 import com.diegocunha.thenaapp.coreui.theme.ThenaTheme
 import com.diegocunha.thenaapp.feature.home.R
 import com.skydoves.compose.stability.runtime.TraceRecomposition
@@ -303,7 +305,7 @@ private fun HomeHeader(
                                 contentScale = ContentScale.Crop,
                             )
                         } else {
-                            Text(text = "🍼", fontSize = 24.sp)
+                            ThenaIcon(icon = ThenaIcons.Bottle, modifier = Modifier.size(24.dp))
                         }
                     }
 
@@ -363,7 +365,8 @@ private fun QuickLogSection(
                 .weight(1f)
                 .clickable(onClick = onSleepClick),
             color = ThenaTheme.extendedColors.sleepFill,
-            headerInformation = { Text("🌙") },
+            headerInformation = { ThenaIcon(icon = ThenaIcons.Sleep, modifier = Modifier.size(
+                ThenaTheme.spacing.xl)) },
             titleInformation = {
                 Text(
                     stringResource(R.string.home_quick_log_sleep),
@@ -385,7 +388,7 @@ private fun QuickLogSection(
                 .weight(1f)
                 .clickable(onClick = onFeedingClick),
             color = ThenaTheme.extendedColors.feedFill,
-            headerInformation = { Text("🍼") },
+            headerInformation = { ThenaIcon(icon = ThenaIcons.Bottle, modifier = Modifier.size(ThenaTheme.spacing.xl)) },
             titleInformation = {
                 Text(
                     stringResource(R.string.home_quick_log_feed),
@@ -407,7 +410,7 @@ private fun QuickLogSection(
                 .weight(1f)
                 .clickable(onClick = onVaccineClick),
             color = ThenaTheme.extendedColors.vaccineFill,
-            headerInformation = { Text("💉") },
+            headerInformation = { ThenaIcon(icon = ThenaIcons.Vaccine, modifier = Modifier.size(ThenaTheme.spacing.xl)) },
             titleInformation = {
                 Text(
                     stringResource(R.string.home_quick_log_vaccine),
@@ -429,7 +432,7 @@ private fun QuickLogSection(
                 .weight(1f)
                 .clickable(onClick = onSummaryClick),
             color = ThenaTheme.extendedColors.summaryFill,
-            headerInformation = { Text("📊") },
+            headerInformation = { ThenaIcon(icon = ThenaIcons.Statistics, modifier = Modifier.size(ThenaTheme.spacing.xl)) },
             titleInformation = {
                 Text(
                     stringResource(R.string.home_quick_log_summary),
@@ -595,11 +598,21 @@ private fun ActiveSleepBanner(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Text(
-                text = "🌙 $typeLabel · %02d:%02d".format(minutes, seconds),
-                style = ThenaTheme.typography.titleSmall,
-                color = ThenaTheme.colors.secondary,
-            )
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(ThenaTheme.spacing.xs),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                ThenaIcon(
+                    icon = ThenaIcons.Sleep,
+                    modifier = Modifier.size(ThenaTheme.spacing.md),
+                    tint = ThenaTheme.colors.secondary,
+                )
+                Text(
+                    text = "$typeLabel · %02d:%02d".format(minutes, seconds),
+                    style = ThenaTheme.typography.titleSmall,
+                    color = ThenaTheme.colors.secondary,
+                )
+            }
             if (isLoading) {
                 CircularProgressIndicator(
                     modifier = Modifier.size(ThenaTheme.spacing.lg),

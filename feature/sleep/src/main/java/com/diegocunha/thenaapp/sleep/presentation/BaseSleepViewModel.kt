@@ -64,12 +64,5 @@ abstract class BaseSleepViewModel<State : MviState, Intent : MviIntent, Effect :
         SleepType.CAR_NAP -> "Car Nap"
     }
 
-    private fun SleepType.icon() = when (this) {
-        SleepType.NAP -> "😴"
-        SleepType.NIGHT_SLEEP -> "🌙"
-        SleepType.EARLY_MORNING -> "🌅"
-        SleepType.CATNAP -> "💤"
-        SleepType.CONTACT_NAP -> "🤱"
-        SleepType.CAR_NAP -> "🚗"
-    }
+    private fun SleepType.icon(): String = name
 }

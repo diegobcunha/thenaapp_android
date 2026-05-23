@@ -37,7 +37,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.diegocunha.thenaapp.coreui.icon.ThenaIcon
+import com.diegocunha.thenaapp.coreui.icon.ThenaIcons
 import com.diegocunha.thenaapp.coreui.theme.ThenaExtendedColors
 import com.diegocunha.thenaapp.coreui.theme.ThenaTheme
 import com.diegocunha.thenaapp.feature.onboarding.R
@@ -153,7 +154,7 @@ private fun OnboardingScreenContent(
                         onClick = onDone,
                         modifier = Modifier.fillMaxWidth(),
                     ) {
-                        Text("Get started 🌸")
+                        Text("Get started")
                     }
                 } else {
                     Row(
@@ -221,7 +222,7 @@ private fun OnboardingSlideContent(slide: OnboardingSlide) {
                         .background(Color.White.copy(alpha = 0.6f)),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Text(text = slide.emoji, fontSize = 52.sp)
+                    ThenaIcon(icon = slide.icon, modifier = Modifier.size(ThenaTheme.spacing.xxxl))
                 }
 
                 Text(
@@ -311,7 +312,7 @@ private fun slideContent(
     return remember(colors, extendedColors) {
         listOf(
             OnboardingSlide(
-                emoji = "🌸",
+                icon = ThenaIcons.Blossom,
                 color = colors.primaryContainer,
                 accent = colors.primary,
                 title = welcomeTitle,
@@ -319,7 +320,7 @@ private fun slideContent(
                 features = persistentListOf(),
             ),
             OnboardingSlide(
-                emoji = "🌙",
+                icon = ThenaIcons.Sleep,
                 color = extendedColors.sleepFill,
                 accent = colors.primary,
                 title = sleepTitle,
@@ -327,7 +328,7 @@ private fun slideContent(
                 features = persistentListOf(sleepF1, sleepF2, sleepF3),
             ),
             OnboardingSlide(
-                emoji = "🍼",
+                icon = ThenaIcons.Bottle,
                 color = extendedColors.feedFill,
                 accent = colors.secondary,
                 title = feedTitle,
@@ -335,7 +336,7 @@ private fun slideContent(
                 features = persistentListOf(feedF1, feedF2, feedF3),
             ),
             OnboardingSlide(
-                emoji = "💉",
+                icon = ThenaIcons.Vaccine,
                 color = extendedColors.vaccineFill,
                 accent = Color(0xFF4CAF50),
                 title = vaccineTitle,
@@ -343,7 +344,7 @@ private fun slideContent(
                 features = persistentListOf(vaccineF1, vaccineF2, vaccineF3),
             ),
             OnboardingSlide(
-                emoji = "📊",
+                icon = ThenaIcons.Statistics,
                 color = extendedColors.summaryFill,
                 accent = colors.tertiary,
                 title = insightTitle,

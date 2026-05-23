@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import com.diegocunha.thenaapp.coreui.icon.ThenaIcons
 import com.diegocunha.thenaapp.coreui.theme.ThenaTheme
 import com.diegocunha.thenaapp.feature.feeding.R
 import com.diegocunha.thenaapp.feature.feeding.domain.model.FeedingType
@@ -21,14 +22,14 @@ fun FeedingTypePicker(
     ) {
         FeedingTypeChip(
             modifier = Modifier.weight(1f),
-            emoji = "🤱",
+            icon = ThenaIcons.Breastfeeding,
             label = stringResource(R.string.feeding_type_breastfeed),
             isSelected = selected == null || selected == FeedingType.BREAST,
             onClick = { onSelect(FeedingType.BREAST) },
         )
         FeedingTypeChip(
             modifier = Modifier.weight(1f),
-            emoji = "🍼",
+            icon = ThenaIcons.Bottle,
             label = stringResource(R.string.feeding_type_bottle),
             isSelected = selected == FeedingType.BOTTLE,
             onClick = { onSelect(FeedingType.BOTTLE) },

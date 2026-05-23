@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.diegocunha.thenaapp.coreui.component.OptionalButton
+import com.diegocunha.thenaapp.coreui.icon.ThenaIcons
 import com.diegocunha.thenaapp.feature.baby.R
 import com.diegocunha.thenaapp.feature.baby.domain.model.ResponsibleType
 
@@ -23,21 +24,21 @@ fun ResponsibleSelector(
     ) {
         OptionalButton(
             label = stringResource(R.string.create_baby_responsible_mother),
-            emoji = "👧",
+            icon = ThenaIcons.Female,
             selected = selected == ResponsibleType.MOTHER,
             onClick = { onSelect(ResponsibleType.MOTHER) },
             modifier = Modifier.weight(1f),
         )
         OptionalButton(
             label = stringResource(R.string.create_baby_responsible_father),
-            emoji = "👦",
+            icon = ThenaIcons.Male,
             selected = selected == ResponsibleType.FATHER,
             onClick = { onSelect(ResponsibleType.FATHER) },
             modifier = Modifier.weight(1f),
         )
         OptionalButton(
             label = stringResource(R.string.create_baby_gender_other),
-            emoji = "🌈",
+            icon = ThenaIcons.People,
             selected = selected == ResponsibleType.OTHER,
             onClick = { onSelect(ResponsibleType.OTHER) },
             modifier = Modifier.weight(1f),

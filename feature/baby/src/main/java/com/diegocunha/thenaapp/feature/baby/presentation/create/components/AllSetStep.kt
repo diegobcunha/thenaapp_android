@@ -23,16 +23,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.diegocunha.thenaapp.coreui.icon.ThenaIcon
+import com.diegocunha.thenaapp.coreui.icon.ThenaIcons
 import com.diegocunha.thenaapp.coreui.theme.ThenaTheme
 import com.diegocunha.thenaapp.feature.baby.R
 
-private data class FeatureItem(val emoji: String, val titleRes: Int, val descRes: Int)
+private data class FeatureItem(val icon: ThenaIcon, @StringRes val titleRes: Int, @StringRes val descRes: Int)
 
 private val featureItems = listOf(
-    FeatureItem("🌙", R.string.create_baby_feature_sleep, R.string.create_baby_feature_sleep_desc),
-    FeatureItem("🍼", R.string.create_baby_feature_feeding, R.string.create_baby_feature_feeding_desc),
-    FeatureItem("💉", R.string.create_baby_feature_vaccines, R.string.create_baby_feature_vaccines_desc),
+    FeatureItem(ThenaIcons.Sleep, R.string.create_baby_feature_sleep, R.string.create_baby_feature_sleep_desc),
+    FeatureItem(ThenaIcons.Bottle, R.string.create_baby_feature_feeding, R.string.create_baby_feature_feeding_desc),
+    FeatureItem(ThenaIcons.Vaccine, R.string.create_baby_feature_vaccines, R.string.create_baby_feature_vaccines_desc),
 )
 
 @Composable
@@ -56,7 +57,7 @@ fun AllSetStep(
     ) {
         Spacer(modifier = Modifier.weight(1f))
 
-        Text(text = "🎉", fontSize = 80.sp)
+        ThenaIcon(icon = ThenaIcons.Celebration, modifier = Modifier.size(80.dp))
 
         Text(
             text = stringResource(R.string.create_baby_success_title, babyName.ifBlank { "Your baby" }),
@@ -88,7 +89,7 @@ fun AllSetStep(
                         horizontalArrangement = Arrangement.spacedBy(spacing.md),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Text(text = item.emoji, fontSize = 28.sp)
+                        ThenaIcon(icon = item.icon, modifier = Modifier.size(28.dp))
                         Column {
                             Text(
                                 text = stringResource(item.titleRes),

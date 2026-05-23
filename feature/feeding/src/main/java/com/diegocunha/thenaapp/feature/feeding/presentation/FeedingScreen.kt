@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -37,6 +38,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.diegocunha.thenaapp.coreui.component.StartTimePickerDialog
+import com.diegocunha.thenaapp.coreui.icon.ThenaIcon
+import com.diegocunha.thenaapp.coreui.icon.ThenaIcons
 import com.diegocunha.thenaapp.coreui.theme.ThenaTheme
 import com.diegocunha.thenaapp.feature.feeding.R
 import com.diegocunha.thenaapp.feature.feeding.domain.model.BottleType
@@ -277,19 +280,19 @@ private fun TodayFeedingSummary(stats: FeedingStatistics) {
             ) {
                 TodayStatItem(
                     modifier = Modifier.weight(1f),
-                    emoji = "🍼",
+                    icon = ThenaIcons.Bottle,
                     value = stats.totalSessions.toString(),
                     label = stringResource(R.string.feeding_stats_total_sessions),
                 )
                 TodayStatItem(
                     modifier = Modifier.weight(1f),
-                    emoji = "🤱",
+                    icon = ThenaIcons.Breastfeeding,
                     value = "${stats.totalBreastfeedingDurationSeconds / 60}",
                     label = stringResource(R.string.feeding_stats_total_duration_min, "min"),
                 )
                 TodayStatItem(
                     modifier = Modifier.weight(1f),
-                    emoji = "🧴",
+                    icon = ThenaIcons.Bottle,
                     value = "${stats.totalBottleVolumeMl}ml",
                     label = stringResource(R.string.feeding_stats_bottle),
                 )
@@ -301,7 +304,7 @@ private fun TodayFeedingSummary(stats: FeedingStatistics) {
 @Composable
 private fun TodayStatItem(
     modifier: Modifier = Modifier,
-    emoji: String,
+    icon: ThenaIcon,
     value: String,
     label: String,
 ) {
@@ -309,7 +312,7 @@ private fun TodayStatItem(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(text = emoji, style = ThenaTheme.typography.titleMedium)
+        ThenaIcon(icon = icon, modifier = Modifier.size(ThenaTheme.spacing.lg))
         Text(text = value, style = ThenaTheme.typography.titleSmall)
         Text(
             text = label,

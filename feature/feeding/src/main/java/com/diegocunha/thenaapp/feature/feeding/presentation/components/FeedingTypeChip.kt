@@ -3,8 +3,11 @@ package com.diegocunha.thenaapp.feature.feeding.presentation.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -13,17 +16,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.diegocunha.thenaapp.coreui.icon.ThenaIcon
 import com.diegocunha.thenaapp.coreui.theme.ThenaTheme
 
 @Composable
 fun FeedingTypeChip(
     modifier: Modifier = Modifier,
-    emoji: String,
+    icon: ThenaIcon,
     label: String,
     isSelected: Boolean,
     onClick: () -> Unit,
 ) {
     val colors = ThenaTheme.colors
+    val contentColor = if (isSelected) colors.onSecondaryContainer else colors.onSurfaceVariant
     Box(
         modifier = modifier
             .height(44.dp)
@@ -37,10 +42,16 @@ fun FeedingTypeChip(
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
-        Text(
-            text = "$emoji $label",
-            style = ThenaTheme.typography.titleSmall,
-            color = if (isSelected) colors.onSecondaryContainer else colors.onSurfaceVariant,
-        )
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            ThenaIcon(icon = icon, modifier = Modifier.size(20.dp), tint = contentColor)
+            Text(
+                text = label,
+                style = ThenaTheme.typography.titleSmall,
+                color = contentColor,
+            )
+        }
     }
 }

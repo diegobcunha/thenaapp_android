@@ -1,0 +1,18 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Nipple/tip -->
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="M10.5,2 L13.5,2 Q14,2 14,2.5 L14,4 L10,4 L10,2.5 Q10,2 10.5,2 Z" />
+    <!-- Collar -->
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="M9,4 L15,4 L15,6.5 L9,6.5 Z" />
+    <!-- Body -->
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="M8,6.5 Q6.5,6.5 6.5,8 L6.5,19 Q6.5,22 12,22 Q17.5,22 17.5,19 L17.5,8 Q17.5,6.5 16,6.5 Z" />
+</vector>

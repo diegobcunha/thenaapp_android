@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.android.tools.screenshot.PreviewTest
+import com.diegocunha.thenaapp.coreui.icon.ThenaIcons
 import com.diegocunha.thenaapp.coreui.theme.ThenaTheme
 
 @PreviewTest
@@ -16,7 +17,7 @@ fun OptionalButtonComponentNotSelectedPreview() {
         Column(modifier = Modifier.fillMaxSize()) {
             OptionalButton(
                 label = "label",
-                "👦",
+                icon = ThenaIcons.Male,
                 onClick = {},
                 selected = false
             )
@@ -32,7 +33,7 @@ fun OptionalButtonComponentSelectedPreview() {
         Column(modifier = Modifier.fillMaxSize()) {
             OptionalButton(
                 label = "label",
-                "👦",
+                icon = ThenaIcons.Male,
                 onClick = {},
                 selected = true
             )
@@ -48,7 +49,7 @@ fun OptionalButtonComponentNotSelectedDarkModePreview() {
         Column(modifier = Modifier.fillMaxSize()) {
             OptionalButton(
                 label = "label",
-                "👦",
+                icon = ThenaIcons.Male,
                 onClick = {},
                 selected = false
             )
@@ -64,7 +65,7 @@ fun OptionalButtonComponentSelectedDarkModePreview() {
         Column(modifier = Modifier.fillMaxSize()) {
             OptionalButton(
                 label = "label",
-                "👦",
+                icon = ThenaIcons.Male,
                 onClick = {},
                 selected = true
             )
