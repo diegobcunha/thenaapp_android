@@ -35,8 +35,12 @@ class HomeViewModel(
         when (intent) {
             HomeIntent.EditBabyInfo,
             HomeIntent.UserProfile,
-            HomeIntent.SummaryInfo,
-            HomeIntent.VaccineInfo -> sendEffect(HomeEffect.NotDevelopedYet)
+            HomeIntent.SummaryInfo -> sendEffect(HomeEffect.NotDevelopedYet)
+
+            HomeIntent.VaccineInfo -> {
+                val babyId = state.value.babyId ?: return
+                sendEffect(HomeEffect.NavigateToVaccine(babyId))
+            }
 
             HomeIntent.FeedInfo -> {
                 val babyId = state.value.babyId ?: return

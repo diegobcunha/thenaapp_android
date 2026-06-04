@@ -63,6 +63,7 @@ fun HomeScreen(
     viewModel: HomeViewModel,
     onNavigateToFeeding: (babyId: String) -> Unit,
     onNavigateToSleep: (babyId: String) -> Unit = {},
+    onNavigateToVaccine: (babyId: String) -> Unit = {},
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -85,6 +86,7 @@ fun HomeScreen(
                 )
                 is HomeEffect.NavigateToFeeding -> onNavigateToFeeding(effect.babyId)
                 is HomeEffect.NavigateToSleep -> onNavigateToSleep(effect.babyId)
+                is HomeEffect.NavigateToVaccine -> onNavigateToVaccine(effect.babyId)
                 is HomeEffect.SleepSessionClosed -> snackbarHostState.showSnackbar(sessionClosedMessage)
                 is HomeEffect.CloseSessionError -> snackbarHostState.showSnackbar(genericErrorMessage)
             }

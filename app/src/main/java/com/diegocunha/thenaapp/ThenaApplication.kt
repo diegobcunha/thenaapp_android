@@ -10,6 +10,7 @@ import com.diegocunha.thenaapp.feature.home.di.homeModule
 import com.diegocunha.thenaapp.feature.login.di.loginModule
 import com.diegocunha.thenaapp.feature.onboarding.di.onboardingModule
 import com.diegocunha.thenaapp.feature.signup.di.signupModule
+import com.diegocunha.thenaapp.feature.vaccine.di.vaccineModule
 import com.diegocunha.thenaapp.sleep.di.sleepModule
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.skydoves.compose.stability.runtime.ComposeStabilityAnalyzer
@@ -44,6 +45,7 @@ class ThenaApplication : Application() {
                 homeModule,
                 feedingModule,
                 sleepModule,
+                vaccineModule,
             )
         }
     }

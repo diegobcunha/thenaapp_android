@@ -23,9 +23,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.sp
+import com.diegocunha.thenaapp.coreui.component.DateMaskVisualTransformation
 import com.diegocunha.thenaapp.coreui.theme.ThenaTheme
 import com.diegocunha.thenaapp.feature.baby.R
-import com.diegocunha.thenaapp.feature.baby.presentation.create.util.DateMaskVisualTransformation
 import java.util.Locale
 
 @Composable

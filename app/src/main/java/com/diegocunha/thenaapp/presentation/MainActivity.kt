@@ -42,6 +42,12 @@ import com.diegocunha.thenaapp.feature.onboarding.presentation.navigation.Onboar
 import com.diegocunha.thenaapp.feature.signup.presentation.SignupScreen
 import com.diegocunha.thenaapp.feature.signup.presentation.SignupViewModel
 import com.diegocunha.thenaapp.feature.signup.presentation.navigation.SignupNavigation
+import com.diegocunha.thenaapp.feature.vaccine.presentation.RegisterVaccineScreen
+import com.diegocunha.thenaapp.feature.vaccine.presentation.RegisterVaccineViewModel
+import com.diegocunha.thenaapp.feature.vaccine.presentation.VaccineScreen
+import com.diegocunha.thenaapp.feature.vaccine.presentation.VaccineViewModel
+import com.diegocunha.thenaapp.feature.vaccine.presentation.navigation.RegisterVaccineNavigation
+import com.diegocunha.thenaapp.feature.vaccine.presentation.navigation.VaccineNavigation
 import com.diegocunha.thenaapp.sleep.presentation.SleepScreen
 import com.diegocunha.thenaapp.sleep.presentation.SleepStatisticsScreen
 import com.diegocunha.thenaapp.sleep.presentation.SleepStatisticsViewModel
@@ -165,6 +171,7 @@ class MainActivity : ComponentActivity() {
                                         viewModel = koinViewModel<HomeViewModel>(),
                                         onNavigateToFeeding = { babyId -> backStack.add(FeedingNavigation(babyId)) },
                                         onNavigateToSleep = { babyId -> backStack.add(SleepNavigation(babyId)) },
+                                        onNavigateToVaccine = { babyId -> backStack.add(VaccineNavigation(babyId)) },
                                     )
                                 }
 
@@ -205,6 +212,27 @@ class MainActivity : ComponentActivity() {
                                     SleepStatisticsScreen(
                                         viewModel = koinViewModel<SleepStatisticsViewModel>(
                                             parameters = { parametersOf(key.babyId) }
+                                        ),
+                                        onNavigateBack = { backStack.removeLastOrNull() },
+                                    )
+                                }
+
+                                entry<VaccineNavigation> { key ->
+                                    VaccineScreen(
+                                        viewModel = koinViewModel<VaccineViewModel>(
+                                            parameters = { parametersOf(key.babyId) }
+                                        ),
+                                        onNavigateBack = { backStack.removeLastOrNull() },
+                                        onNavigateToRegister = { babyId, pniTemplateId, vaccineName ->
+                                            backStack.add(RegisterVaccineNavigation(babyId, pniTemplateId, vaccineName))
+                                        },
+                                    )
+                                }
+
+                                entry<RegisterVaccineNavigation> { key ->
+                                    RegisterVaccineScreen(
+                                        viewModel = koinViewModel<RegisterVaccineViewModel>(
+                                            parameters = { parametersOf(key.babyId, key.pniTemplateId, key.vaccineName) }
                                         ),
                                         onNavigateBack = { backStack.removeLastOrNull() },
                                     )

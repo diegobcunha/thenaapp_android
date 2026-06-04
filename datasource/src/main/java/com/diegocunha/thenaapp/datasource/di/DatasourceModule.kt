@@ -3,9 +3,9 @@ package com.diegocunha.thenaapp.datasource.di
 import androidx.credentials.CredentialManager
 import androidx.room.Room
 import com.diegocunha.thenaapp.datasource.BuildConfig
-import com.diegocunha.thenaapp.datasource.database.FeedingDatabase
 import com.diegocunha.thenaapp.datasource.database.FeedingLocalDataSource
 import com.diegocunha.thenaapp.datasource.database.FeedingLocalDataSourceImpl
+import com.diegocunha.thenaapp.datasource.database.ThenaDatabase
 import com.diegocunha.thenaapp.datasource.network.ThenaAppService
 import com.diegocunha.thenaapp.datasource.network.createRetrofit
 import com.diegocunha.thenaapp.datasource.network.interceptor.AccessTokenRepository
@@ -18,6 +18,7 @@ import com.diegocunha.thenaapp.datasource.network.service.FeedingService
 import com.diegocunha.thenaapp.datasource.network.service.HomeService
 import com.diegocunha.thenaapp.datasource.network.service.SleepApiService
 import com.diegocunha.thenaapp.datasource.network.service.UserService
+import com.diegocunha.thenaapp.datasource.network.service.VaccineApiService
 import com.diegocunha.thenaapp.datasource.repository.LoginCredentialsManager
 import com.diegocunha.thenaapp.datasource.repository.UserSessionRepository
 import com.diegocunha.thenaapp.datasource.repository.UserSessionRepositoryImpl
@@ -98,6 +99,7 @@ val datasourceModule = module {
     single { get<Retrofit>().create(FeedingService::class.java) }
     single { get<Retrofit>().create(SleepApiService::class.java) }
     single { get<Retrofit>().create(HomeService::class.java) }
+    single { get<Retrofit>().create(VaccineApiService::class.java) }
 
     single<CredentialManager> {
         CredentialManager.create(androidApplication())
@@ -136,10 +138,11 @@ val datasourceModule = module {
     single<CloudinaryService> { get<Retrofit>(named(CLOUDINARY_NAME)).create(CloudinaryService::class.java) }
 
     single {
-        Room.databaseBuilder(androidApplication(), FeedingDatabase::class.java, "feeding.db")
+        Room.databaseBuilder(androidApplication(), ThenaDatabase::class.java, "thena.db")
             .build()
     }
-    single { get<FeedingDatabase>().feedingSessionDao() }
-    single { get<FeedingDatabase>().breastSegmentDao() }
+    single { get<ThenaDatabase>().feedingSessionDao() }
+    single { get<ThenaDatabase>().breastSegmentDao() }
+    single { get<ThenaDatabase>().vaccineRecordDao() }
     single<FeedingLocalDataSource> { FeedingLocalDataSourceImpl(get(), get()) }
 }

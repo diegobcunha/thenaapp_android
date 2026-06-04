@@ -62,6 +62,7 @@ dependencies {
     implementation(project(":feature:home"))
     implementation(project(":feature:feeding"))
     implementation(project(":feature:sleep"))
+    implementation(project(":feature:vaccine"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

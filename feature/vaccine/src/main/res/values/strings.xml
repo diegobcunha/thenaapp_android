@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="vaccine_title">Vaccines</string>
+    <string name="vaccine_register_fab">Register vaccine</string>
+    <string name="vaccine_register_title">Register Vaccine</string>
+    <string name="vaccine_register_submit">Save</string>
+    <string name="vaccine_register_action">Register</string>
+    <string name="vaccine_delete_action">Delete</string>
+
+    <string name="vaccine_tab_upcoming">Upcoming</string>
+    <string name="vaccine_tab_completed">Completed</string>
+
+    <string name="vaccine_progress_title">Vaccination progress</string>
+    <string name="vaccine_urgent_alert">Some vaccines are due or overdue. Please register them.</string>
+
+    <string name="vaccine_dose_number">Dose %1$d</string>
+    <string name="vaccine_recommended_age">Recommended at %1$d months</string>
+
+    <string name="vaccine_field_name">Vaccine name</string>
+    <string name="vaccine_field_name_error">Name is required</string>
+    <string name="vaccine_field_date">Date administered (YYYY-MM-DD)</string>
+    <string name="vaccine_field_date_error">Enter a valid date</string>
+    <string name="vaccine_field_dose_type">Dose type</string>
+    <string name="vaccine_field_injection_site">Injection site</string>
+    <string name="vaccine_field_not_applicable">Not applicable</string>
+    <string name="vaccine_field_batch">Batch number (optional)</string>
+    <string name="vaccine_field_provider">Healthcare provider (optional)</string>
+    <string name="vaccine_field_reaction">Had a reaction?</string>
+    <string name="vaccine_field_reaction_severity">Reaction severity</string>
+    <string name="vaccine_field_reaction_notes">Reaction notes (optional)</string>
+
+    <string name="vaccine_error_load">Failed to load vaccine schedule</string>
+    <string name="vaccine_error_delete">Failed to delete record</string>
+    <string name="vaccine_error_register">Failed to save vaccine. It will sync when online.</string>
+</resources>
